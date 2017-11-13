@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
+<!-- 2014-10-09T22:54:38 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorio_estoque_geral" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b6a1a307-3db9-4f6d-8864-b171c8fd412b">
+	<property name="ireport.zoom" value="3.7974983358324432"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="99"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="quantidade" class="java.lang.Integer">
+		<fieldDescription><![CDATA[quantidade]]></fieldDescription>
+	</field>
+	<field name="idItemEstoque" class="java.lang.Integer">
+		<fieldDescription><![CDATA[idItemEstoque]]></fieldDescription>
+	</field>
+	<field name="dataContagem" class="java.util.Date">
+		<fieldDescription><![CDATA[dataContagem]]></fieldDescription>
+	</field>
+	<field name="cor" class="java.lang.String">
+		<fieldDescription><![CDATA[pecaRoupa.cor]]></fieldDescription>
+	</field>
+	<field name="descricaoPecaRoupa" class="java.lang.String">
+		<fieldDescription><![CDATA[pecaRoupa.descricaoPecaRoupa]]></fieldDescription>
+	</field>
+	<field name="valorUnitario" class="java.lang.Float">
+		<fieldDescription><![CDATA[pecaRoupa.valorUnitario]]></fieldDescription>
+	</field>
+	<field name="descricaoTipoRoupa" class="java.lang.String">
+		<fieldDescription><![CDATA[pecaRoupa.tipoRoupa.descricaoTipoRoupa]]></fieldDescription>
+	</field>
+	<field name="descricaoTipoRoupa_1" class="java.lang.String">
+		<fieldDescription><![CDATA[pecaRoupa.tipoRoupa.superTipoPecaRoupa.descricaoTipoRoupa]]></fieldDescription>
+	</field>
+	<field name="sexo" class="java.lang.String">
+		<fieldDescription><![CDATA[pecaRoupa.tipoRoupa.sexo]]></fieldDescription>
+	</field>
+	<variable name="quantidade_1" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{quantidade}]]></variableExpression>
+	</variable>
+	<variable name="valorTotalMaterial" class="java.lang.Float">
+		<variableExpression><![CDATA[$F{quantidade}*$F{valorUnitario}]]></variableExpression>
+	</variable>
+	<variable name="somatoria_valor_total" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$V{valorTotalMaterial}]]></variableExpression>
+	</variable>
+	<variable name="variable1" class="java.util.Date"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy HH:mm:ss">
+				<reportElement x="390" y="57" width="120" height="12" uuid="f72a5188-9a2a-451e-a4bb-302b6f8373e9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="268" y="57" width="118" height="12" uuid="038416ae-8e91-4cf9-bc5a-90ea8104523e"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data de Emissão do Relatório:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="140" y="0" width="340" height="46" uuid="fb87d232-76ec-45e7-8116-ed9eb9d70141"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RELATÓRIO DE ESTOQUE]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="1" width="70" height="74" uuid="558ac56b-7412-4235-a5a3-542975245108"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<imageExpression><![CDATA["C:\\controleestoque\\img\\logo_marca.jpg"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="120" y="2" width="93" height="32" uuid="a477d2f7-133e-4412-a64a-36533810c6f1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo de Roupa]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="1" width="555" height="1" uuid="4430249e-b0d5-46ca-bd0c-227b4cfa41e2"/>
+			</line>
+			<staticText>
+				<reportElement x="214" y="1" width="47" height="33" uuid="eac10d98-e245-4528-af07-a34522aac522"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sexo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="1" width="85" height="33" uuid="67a0fcd0-fa25-4b7e-832f-942a946c6568"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Item]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="363" y="0" width="69" height="32" uuid="536228ab-d5a6-4258-8ac4-005b04b7e27f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quantidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="433" y="1" width="64" height="33" uuid="476faaef-25d0-45e2-82ea-a0384b630207"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Unitário]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="507" y="1" width="46" height="32" uuid="fc8ba559-3de1-4325-adfb-56e6b9b1f579"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Total]]></text>
+			</staticText>
+			<line>
+				<reportElement x="-1" y="34" width="555" height="1" uuid="4430249e-b0d5-46ca-bd0c-227b4cfa41e2"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="12" y="1" width="23" height="12" uuid="805cc1b1-f32b-4d13-a45b-cd98b32a16c5"/>
+				<textElement textAlignment="Right">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idItemEstoque}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="78" y="0" width="42" height="12" uuid="d1365c4f-b580-4f25-97a3-375955adc82b"/>
+				<textElement textAlignment="Justified">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descricaoTipoRoupa_1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="155" y="1" width="58" height="12" uuid="72156af8-c6df-4d07-a871-d1a6f1b5e226"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descricaoTipoRoupa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="278" y="1" width="85" height="12" uuid="198a12c5-2570-4e17-9089-334d7a3986f4"/>
+				<textElement textAlignment="Justified">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descricaoPecaRoupa}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="431" y="0" width="55" height="12" uuid="b21156d2-8e61-45eb-8301-044fd8c42ad6"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{valorUnitario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="219" y="0" width="37" height="12" uuid="76f36c28-13ae-43d1-9f50-efc7ebddac92"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sexo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="507" y="0" width="46" height="12" uuid="1c936c54-b411-4d2c-bba9-449a7b35c847"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{valorTotalMaterial}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="389" y="0" width="43" height="12" uuid="83f7f459-2e18-4bea-8815-3baff733ee5d"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{quantidade}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="36" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="17" width="555" height="1" uuid="4430249e-b0d5-46ca-bd0c-227b4cfa41e2"/>
+			</line>
+			<textField>
+				<reportElement x="139" y="3" width="74" height="12" uuid="3e953a79-8d74-43b2-9911-1d7997a40c37"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{quantidade_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="3" width="130" height="12" uuid="96b55759-7d59-4a9f-aa12-90f2a6b0aff7"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total de Ítens no Estoque:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="353" y="3" width="118" height="12" uuid="96b55759-7d59-4a9f-aa12-90f2a6b0aff7"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Total do Estoque:]]></text>
+			</staticText>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="471" y="3" width="83" height="12" uuid="82823838-47a7-478d-bd8b-1e11be3df65e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{somatoria_valor_total}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" uuid="4430249e-b0d5-46ca-bd0c-227b4cfa41e2"/>
+			</line>
+			<textField>
+				<reportElement x="541" y="18" width="12" height="12" uuid="17b033f0-16f5-45ab-864f-d9864d0b6427"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="507" y="19" width="31" height="12" uuid="474755fe-ee89-444e-b1a8-dba131537c66"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Página:]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>
