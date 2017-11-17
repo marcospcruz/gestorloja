@@ -4,7 +4,7 @@ import br.com.marcospcruz.gestorloja.view.PrincipalGUI;
 
 public class App {
 
-	public static final String CONTROLE_ESTOQUE_HOME = "C:\\controleestoque";
+	public static final String CONTROLE_ESTOQUE_HOME = "C:/gestorLoja";
 	private static final String DB_HOME = CONTROLE_ESTOQUE_HOME + "\\db";
 
 	public static void main(String args[]) {

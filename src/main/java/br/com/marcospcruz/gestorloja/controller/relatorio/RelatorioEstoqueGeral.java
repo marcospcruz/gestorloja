@@ -25,14 +25,11 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 public class RelatorioEstoqueGeral {
 
-	private final static String PASTA_PROJETO = App.CONTROLE_ESTOQUE_HOME
-			+ "\\";
+	private final static String PASTA_PROJETO = App.CONTROLE_ESTOQUE_HOME + "\\";
 
 	private final static String ARQUIVO_JASPER = "/relatorios_jaspers/relatorio_estoque_geral.jasper";
 
 	private static final String RELATORIO_GERADO = "relatorio_estoque.pdf";
-
-	private static final String NO_DATA_FOUND = "NÃ£o hÃ¡ Dados no Estoque.";
 
 	private static final Object BRAZIL = new Locale("pt", "BR");
 
@@ -40,9 +37,9 @@ public class RelatorioEstoqueGeral {
 
 		Collection<ItemEstoque> itensEstoque = listaEstoque();
 
-		if (itensEstoque == null || itensEstoque.size() == 0)
+		if (itensEstoque == null || itensEstoque.isEmpty())
 
-			throw new Exception(NO_DATA_FOUND);
+			throw new Exception(ConstantesEnum.NO_DATA_FOUND.getValue().toString());
 
 		JRDataSource jrDataSource = new JRBeanCollectionDataSource(itensEstoque);
 
@@ -55,11 +52,11 @@ public class RelatorioEstoqueGeral {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void gerarRelatorio(JRDataSource jrDataSource, Map parametros)
-			throws Exception {
+	private void gerarRelatorio(JRDataSource jrDataSource, Map parametros) throws Exception {
 
-		InputStream inputStream = getClass().getClassLoader()
-				.getResourceAsStream("META-INF" + ARQUIVO_JASPER);
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("META-INF" + ARQUIVO_JASPER);
+		
+		if(inputStream==null) throw new Exception("Necessário refatorar o Relatório.");
 
 		FileOutputStream outPut = null;
 
@@ -73,8 +70,7 @@ public class RelatorioEstoqueGeral {
 
 			}
 
-			JasperPrint print = JasperFillManager.fillReport(inputStream,
-					parametros, jrDataSource);
+			JasperPrint print = JasperFillManager.fillReport(inputStream, parametros, jrDataSource);
 
 			outPut = new FileOutputStream(arquivoRelatorio);
 
@@ -94,8 +90,7 @@ public class RelatorioEstoqueGeral {
 
 			e.printStackTrace();
 
-			throw new Exception(ConstantesEnum.ERROR_MESSAGE_LOGO_MARCA
-					.getValue().toString());
+			throw new Exception(ConstantesEnum.ERROR_MESSAGE_LOGO_MARCA.getValue().toString());
 
 		}
 

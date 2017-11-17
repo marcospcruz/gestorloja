@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja.controller;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
 
-public class EstoqueController {
+public class EstoqueController implements Serializable {
 
 	private static final String MESSAGE_QT_INVALIDA_EXCEPTION = "Quantidade informada Inv�lida!";
 
@@ -56,8 +57,7 @@ public class EstoqueController {
 		this.itensEstoque = itensEstoque;
 	}
 
-	public void criaItemEstoque(Produto produto, String quantidade)
-			throws Exception {
+	public void criaItemEstoque(Produto produto, String quantidade) throws Exception {
 
 		itemEstoque = new ItemEstoque();
 
@@ -116,8 +116,8 @@ public class EstoqueController {
 
 		String valor = "%" + descricao.toUpperCase() + "%";
 
-		itensEstoque = (List<ItemEstoque>) itemEstoqueDao.buscaList(
-				"itemestoque.readDescricaoPecao", "descricao", valor);
+		itensEstoque = (List<ItemEstoque>) itemEstoqueDao.buscaList("itemestoque.readDescricaoPecao", "descricao",
+				valor);
 
 		if (itensEstoque.size() == 1)
 

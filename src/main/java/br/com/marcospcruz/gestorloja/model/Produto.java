@@ -17,19 +17,23 @@ import javax.persistence.OrderBy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+//@formatter:off
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "produto.readall", query = "select p from Produto p "
-				+ "LEFT JOIN fetch p.itemEstoque"),
-		@NamedQuery(name = "produto.readparametrolike", query = "select p from Produto p "
+		@NamedQuery(name = "produto.readall", query = "select p from Produto p " 
 				+ "LEFT JOIN fetch p.itemEstoque "
+				+ "LEFT JOIN fetch p.fabricante "),
+		@NamedQuery(name = "produto.readparametrolike", query = "select p from Produto p "
+				+ "LEFT JOIN fetch p.itemEstoque " 
+				+ "LEFT JOIN fetch p.fabricante "
 				+ "where upper(p.descricaoProduto) like :descricao") })
+//@formatter:on
 public class Produto implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1569267845320671168L;
+	private static final long serialVersionUID = -3182478717153999154L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -49,6 +53,10 @@ public class Produto implements Serializable {
 	@JoinColumn(name = "idTipoProduto")
 	@OrderBy
 	private SubTipoProduto tipoProduto;
+
+	@ManyToOne
+	@JoinColumn(name = "idFabricante")
+	private Fabricante fabricante;
 
 	public Integer getIdProduto() {
 		return idProduto;
@@ -98,21 +106,23 @@ public class Produto implements Serializable {
 		this.tipoProduto = tipoProduto;
 	}
 
+	public Fabricante getFabricante() {
+		return fabricante;
+	}
+
+	public void setFabricante(Fabricante fabricante) {
+		this.fabricante = fabricante;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((descricaoProduto == null) ? 0 : descricaoProduto.hashCode());
-		result = prime * result
-				+ ((idProduto == null) ? 0 : idProduto.hashCode());
-		result = prime * result
-				+ ((itemEstoque == null) ? 0 : itemEstoque.hashCode());
-		result = prime * result
-				+ ((tipoProduto == null) ? 0 : tipoProduto.hashCode());
-		result = prime * result
-				+ ((unidadeMedida == null) ? 0 : unidadeMedida.hashCode());
+		result = prime * result + ((descricaoProduto == null) ? 0 : descricaoProduto.hashCode());
+		result = prime * result + ((idProduto == null) ? 0 : idProduto.hashCode());
+		result = prime * result + ((itemEstoque == null) ? 0 : itemEstoque.hashCode());
+		result = prime * result + ((tipoProduto == null) ? 0 : tipoProduto.hashCode());
+		result = prime * result + ((unidadeMedida == null) ? 0 : unidadeMedida.hashCode());
 		result = prime * result + Float.floatToIntBits(valorUnitario);
 		return result;
 	}
@@ -151,15 +161,15 @@ public class Produto implements Serializable {
 				return false;
 		} else if (!unidadeMedida.equals(other.unidadeMedida))
 			return false;
-		if (Float.floatToIntBits(valorUnitario) != Float
-				.floatToIntBits(other.valorUnitario))
+		if (Float.floatToIntBits(valorUnitario) != Float.floatToIntBits(other.valorUnitario))
 			return false;
 		return true;
 	}
 
+	@Override
 	public String toString() {
 
-		return tipoProduto.getDescricaoTipo() + " - " + descricaoProduto;
+		return tipoProduto.getDescricaoTipo() + " - " + descricaoProduto + " - " + fabricante.getNome();
 
 	}
 
