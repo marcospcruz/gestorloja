@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Produto;
@@ -12,7 +13,7 @@ import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
 public class ProdutoController extends AbstractController {
 
-	private static final String RESULTADO_NAO_ENCONTRADO = "Produto nï¿½o encontrado";
+	private static final String RESULTADO_NAO_ENCONTRADO = "Produto não encontrado";
 
 	private List<Produto> produtos;
 
@@ -22,11 +23,11 @@ public class ProdutoController extends AbstractController {
 
 	public ProdutoController() {
 
-		produtoDao = new CrudDao<Produto>();
+		produtoDao = new CrudDao<>();
 
 	}
 
-	public List<Produto> getProdutos() {
+	public List<Produto> getList() {
 
 		if (produtos == null || produtos.size() == 0)
 
@@ -42,23 +43,27 @@ public class ProdutoController extends AbstractController {
 
 	}
 
-	public void setPecasRoupa(List<Produto> produtos) {
-		this.produtos = produtos;
-	}
-
-	public Produto getProduto() {
+	public Produto getItem() {
 		return produto;
 	}
 
-	public void setProduto(Produto produto) {
-		this.produto = produto;
+	public void setItem(Object produto) {
+		this.produto = (Produto) produto;
 	}
 
 	public Object[] getArrayTiposProduto() {
 
-		TipoProdutoController tipoProdutoController = new TipoProdutoController();
+		TipoProdutoController tipoProdutoController = null;
+		List<TipoProduto> listaTipos = null;
+		try {
+			tipoProdutoController = (TipoProdutoController) ControllerAbstractFactory
+					.createController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
 
-		List<TipoProduto> listaTipos = tipoProdutoController.getTiposProdutos();
+			listaTipos = tipoProdutoController.getList();
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return listaTipos.toArray();
 
@@ -73,40 +78,41 @@ public class ProdutoController extends AbstractController {
 	 * @param valorUnitario
 	 * @throws Exception
 	 */
-	public void salva(Object tipoRoupa, Object subTipoRoupa, String descricao,
-			String unidadeMedida, String valorUnitario) throws Exception {
+	public void salva(Object produto) throws Exception {
 
-		valida(descricao, unidadeMedida, valorUnitario);
+		valida((Produto) produto);
 
-		if (produto == null)
+		// busca(((Produto) produto).getDescricaoProduto());
+		if (this.produto != null) {
+			merge(produto);
+			this.produto = produtoDao.update(this.produto);
+		} else
 
-			produto = new Produto();
+			this.produto = produtoDao.update((Produto) produto);
 
-		produto.setUnidadeMedida(unidadeMedida);
-
-		produto.setDescricaoProduto(descricao);
-
-		produto.setValorUnitario(Float.parseFloat(valorUnitario.replace(',',
-				'.')));
-
-		produto.setTipoProduto((SubTipoProduto) subTipoRoupa);
-
-		produtoDao.update(produto);
-
-		produto = null;
+		this.produto = null;
 
 	}
 
-	private void valida(String descricao, String cor, String valorUnitario)
-			throws Exception {
+	private void merge(Object produto) {
+		this.produto.setDescricaoProduto(((Produto) produto).getDescricaoProduto());
+		this.produto.setFabricante(((Produto) produto).getFabricante());
+		this.produto.setTipoProduto(((Produto) produto).getTipoProduto());
+		this.produto.setUnidadeMedida(((Produto) produto).getUnidadeMedida());
+		this.produto.setValorUnitario(((Produto) produto).getValorUnitario());
+		this.produto.setCodigoDeBarras(((Produto) produto).getCodigoDeBarras());
+	}
 
-		if (descricao == null || cor == null || valorUnitario == null
-				|| descricao.isEmpty() || cor.isEmpty()
-				|| valorUnitario.isEmpty()) {
+	private void valida(Produto produto) throws Exception {
 
-			throw new Exception(
-					"Necessï¿½rio preencher todos os campos da informaï¿½ï¿½o.");
+		if (produto.getDescricaoProduto() == null || produto.getValorUnitario() == 0f) {
 
+			throw new Exception("Necessário preencher todos os campos.");
+
+		}
+		
+		if(produto.getCodigoDeBarras()==null){
+			throw new Exception("Necessário cadastrar o Código de Barras.");
 		}
 
 	}
@@ -117,25 +123,10 @@ public class ProdutoController extends AbstractController {
 
 	}
 
-	public void deletaProduto() throws Exception {
-
-		if (produto.getItemEstoque() != null) {
-
-			throw new Exception(
-					ConstantesEnum.EXCLUSAO_PRODUTO_COM_ITENS_ESTOQUE
-							.getValue().toString());
-
-		}
-
-		produtoDao.delete(produto);
-
-		produto = null;
-
-	}
-
 	public void busca(String parametro) throws Exception {
 
-		zeraAtributos();
+		setItem(null);
+		setList(null);
 
 		if (contemAcentuacao(parametro)) {
 
@@ -145,8 +136,7 @@ public class ProdutoController extends AbstractController {
 
 			String valor = "%" + parametro.toUpperCase() + "%";
 
-			produtos = produtoDao.buscaList("produto.readparametrolike",
-					"descricao", valor);
+			produtos = produtoDao.buscaList("produto.readparametrolike", "descricao", valor);
 		}
 
 		if (produtos.size() >= 1)
@@ -177,12 +167,35 @@ public class ProdutoController extends AbstractController {
 
 	}
 
-	private void zeraAtributos() {
+	@Override
+	public List buscaTodos() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void excluir() throws Exception {
+		if (produto.getItemEstoque() != null) {
+
+			throw new Exception(ConstantesEnum.EXCLUSAO_PRODUTO_COM_ITENS_ESTOQUE.getValue().toString());
+
+		}
+
+		produtoDao.delete(produto);
 
 		produto = null;
+	}
 
-		produto = null;
+	@Override
+	public void salva(String text, boolean b, Object object) throws Exception {
+		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void setList(List list) {
+
+		this.produtos = list;
 	}
 
 }

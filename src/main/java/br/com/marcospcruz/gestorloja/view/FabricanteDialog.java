@@ -2,7 +2,6 @@ package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +14,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 
-import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.FabricanteController;
+import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
@@ -40,19 +40,16 @@ public class FabricanteDialog extends AbstractDialog {
 
 	private boolean atualizaTable;
 
-	private TipoProdutoController controller;
-
 	/**
 	 * 
 	 * @param owner
+	 * @throws Exception 
 	 */
-	public FabricanteDialog(JFrame owner) {
+	public FabricanteDialog(JFrame owner) throws Exception {
 
-		super(owner, "Cadastro de " + ConstantesEnum.FABRICANTE.getValue().toString(), true);
+		super(owner, "Cadastro de " + ConstantesEnum.FABRICANTE.getValue().toString(), ControllerAbstractFactory.FABRICANTE, true);
 
 		atualizaTable = true;
-
-		controller = new TipoProdutoController();
 
 		configuraJPanel();
 
@@ -172,24 +169,6 @@ public class FabricanteDialog extends AbstractDialog {
 
 		jPanel.add(txtDescricao);
 
-		// JLabel lbl2 = new JLabel("Sexo:");
-		//
-		// lbl2.setBounds(10, 45, 200, 50);
-		//
-		// jPanel.add(lbl2);
-
-		// cmbSexo = carregaComboSexo();
-		//
-		// cmbSexo.setEnabled(false);
-		//
-		// cmbSexo.setBounds(200, 55, 200, TXT_HEIGHT);
-		//
-		// jPanel.add(cmbSexo);
-
-		// setBounds(10, 90, 150, 30);
-
-		// setBounds(200, 90, 200, TXT_HEIGHT);
-
 		return jPanel;
 	}
 
@@ -227,7 +206,7 @@ public class FabricanteDialog extends AbstractDialog {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 
-		carregaTableModel(carregaLinhasTableModel(controller.getTiposProdutos()), COLUNAS_TABLE_MODEL);
+		carregaTableModel(carregaLinhasTableModel(controller.getList()), COLUNAS_TABLE_MODEL);
 
 		reloadJFrame();
 
@@ -285,9 +264,8 @@ public class FabricanteDialog extends AbstractDialog {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void carregaTableModel() {
-		// TipoProdutoController controller = new TipoProdutoController();
 
-		List linhas = carregaLinhasTableModel(controller.getTiposProdutos());
+		List linhas = carregaLinhasTableModel(controller.getList());
 
 		carregaTableModel(linhas, COLUNAS_TABLE_MODEL);
 
@@ -297,17 +275,16 @@ public class FabricanteDialog extends AbstractDialog {
 	 * Transforma TipoProduto em Array de Objects. Para ser usado como linha na
 	 * JTable
 	 * 
-	 * @param subTipo
+	 * @param fabricante
 	 * @return
 	 */
-	private Object[] processaColuna(SubTipoProduto subTipo) {
+	private Object[] processaColuna(Fabricante fabricante) {
 
 		Object[] linha = new Object[COLUNAS_TABLE_MODEL.length];
 
-		linha[0] = subTipo.getIdTipoItem();
+		linha[0] = fabricante.getIdFabricante();
 
-		linha[1] = subTipo.getSuperTipoProduto() == null ? subTipo.getDescricaoTipo()
-				: subTipo.getSuperTipoProduto().getDescricaoTipo();
+		linha[1] = fabricante.getNome();
 
 		// linha[3] = subTipo.getSexo();
 
@@ -402,7 +379,7 @@ public class FabricanteDialog extends AbstractDialog {
 
 		limpaFormulario();
 
-		if (controller.getTiposProdutos().size() >= 1)
+		if (!controller.getList().isEmpty())
 
 			populaFormulario();
 
@@ -415,10 +392,8 @@ public class FabricanteDialog extends AbstractDialog {
 	protected void populaFormulario() {
 
 		// TipoProdutoController controller = new TipoProdutoController();
-
-		boolean isSubTipo = controller.getTipoPeca().getSuperTipoProduto() != null;
-
-		txtDescricao.setText(controller.getTipoPeca().getDescricaoTipo());
+		Fabricante fabricante = (Fabricante) controller.getItem();
+		txtDescricao.setText(fabricante.getNome());
 
 		//
 
@@ -431,16 +406,6 @@ public class FabricanteDialog extends AbstractDialog {
 		// cmbSexo.setEnabled(isSubTipo);
 		//
 
-		if (isSubTipo) {
-
-			// String sexo = controller.getTipoPeca().getSexo();
-
-			// cmbSexo.setSelectedItem(sexo);
-
-			SubTipoProduto subTipoProduto = controller.getTipoPeca().getSuperTipoProduto();
-
-		}
-
 		acaoBuscar = true;
 
 	}
@@ -452,9 +417,9 @@ public class FabricanteDialog extends AbstractDialog {
 
 		if (!acaoBuscar) {
 
-			controller.setTipoProduto(null);
+			controller.setItem(null);
 
-			controller.setTiposProduto(null);
+			controller.setList(null);
 		}
 
 		txtDescricao.setEnabled(true);
@@ -473,26 +438,6 @@ public class FabricanteDialog extends AbstractDialog {
 
 	}
 
-	public void mouseClicked(MouseEvent e) {
-
-		// TipoProdutoController controller = new TipoProdutoController();
-
-		if (e.getSource() instanceof JTable) {
-
-			JTable table = (JTable) e.getSource();
-
-			int indiceLinha = table.getSelectedRow();
-
-			int idSubTipo = (Integer) table.getModel().getValueAt(indiceLinha, 0);
-
-			controller.busca(idSubTipo);
-
-			populaFormulario();
-
-		}
-
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected List carregaLinhasTableModel(List lista) {
@@ -501,23 +446,9 @@ public class FabricanteDialog extends AbstractDialog {
 
 		for (Object objeto : lista) {
 
-			SubTipoProduto subTipo = (SubTipoProduto) objeto;
+			Fabricante fabricante = (Fabricante) objeto;
 
-			linhas.add(processaColuna(subTipo));
-
-			try {
-
-				for (SubTipoProduto tipo : subTipo.getSubTiposProduto()) {
-
-					linhas.add(processaColuna(tipo));
-
-				}
-
-			} catch (NullPointerException e) {
-
-				e.printStackTrace();
-
-			}
+			linhas.add(processaColuna(fabricante));
 
 		}
 

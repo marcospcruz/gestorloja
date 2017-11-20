@@ -19,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
@@ -31,19 +32,15 @@ public class TipoProdutoDialog extends AbstractDialog {
 	 */
 	private static final long serialVersionUID = 1224811020311576735L;
 
-	private static final Object[] COLUNAS_TABLE_MODEL = {
-			ConstantesEnum.CODIGO_LABEL.getValue().toString(),
+	private static final Object[] COLUNAS_TABLE_MODEL = { ConstantesEnum.CODIGO_LABEL.getValue().toString(),
 			ConstantesEnum.DESCRICAO_LABEL.getValue().toString(),
 			ConstantesEnum.SUB_DESCRICAO_LABEL.getValue().toString() };
 
-	private static final String DESCRICAO_TIPO_PRODUTO = COLUNAS_TABLE_MODEL[1]
-			+ " / " + COLUNAS_TABLE_MODEL[2];
+	private static final String DESCRICAO_TIPO_PRODUTO = COLUNAS_TABLE_MODEL[1] + " / " + COLUNAS_TABLE_MODEL[2];
 
 	private static final String DESCRICAO_LABEL = COLUNAS_TABLE_MODEL[1] + ":";
 
 	private JCheckBox chkSubTipo;
-
-	private TipoProdutoController controller;
 
 	private JComboBox cmbTiposProduto;
 	// private JComboBox cmbSexo;
@@ -53,15 +50,13 @@ public class TipoProdutoDialog extends AbstractDialog {
 	/**
 	 * 
 	 * @param owner
+	 * @throws Exception
 	 */
-	public TipoProdutoDialog(JFrame owner) {
+	public TipoProdutoDialog(JFrame owner) throws Exception {
 
-		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue()
-				.toString(), true);
+		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(), ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true);
 
 		atualizaTable = true;
-
-		controller = new TipoProdutoController();
 
 		configuraJPanel();
 
@@ -141,7 +136,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		List objetos = controller.buscaTodos();
 
-		// List objetos = controller.getTiposProdutos();
+		// List objetos = controller.getList();
 
 		DefaultComboBoxModel model = new DefaultComboBoxModel();
 
@@ -165,8 +160,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		JPanel jPanel = new JPanel();
 
-		jPanel.setBorder(new TitledBorder(ConstantesEnum.TIPO_PRODUTO_LABEL
-				.getValue().toString()));
+		jPanel.setBorder(new TitledBorder(ConstantesEnum.TIPO_PRODUTO_LABEL.getValue().toString()));
 
 		jPanel.setLayout(null);
 
@@ -196,8 +190,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 		//
 		// jPanel.add(cmbSexo);
 
-		chkSubTipo = new JCheckBox(ConstantesEnum.SUB_TIPO_DE_LABEL.getValue()
-				.toString());
+		chkSubTipo = new JCheckBox(ConstantesEnum.SUB_TIPO_DE_LABEL.getValue().toString());
 		// setBounds(10, 90, 150, 30);
 
 		chkSubTipo.setBounds(10, 45, 190, 50);
@@ -230,8 +223,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		jPanel.setBounds(0, y, getWidth() - 17, 320);
 
-		jPanel.setBorder(new TitledBorder(ConstantesEnum.TIPOS_PRODUTOS_LABEL
-				.getValue().toString()));
+		jPanel.setBorder(new TitledBorder(ConstantesEnum.TIPOS_PRODUTOS_LABEL.getValue().toString()));
 
 		carregaTableModel();
 
@@ -239,8 +231,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		jScrollPane = new JScrollPane(jTable);
 
-		jScrollPane.setBounds(6, 15, jPanel.getWidth() - 15,
-				jPanel.getHeight() - 20);
+		jScrollPane.setBounds(6, 15, jPanel.getWidth() - 15, jPanel.getHeight() - 20);
 
 		jPanel.add(jScrollPane);
 
@@ -255,9 +246,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 
-		carregaTableModel(
-				carregaLinhasTableModel(controller.getTiposProdutos()),
-				COLUNAS_TABLE_MODEL);
+		carregaTableModel(carregaLinhasTableModel(controller.getList()), COLUNAS_TABLE_MODEL);
 
 		reloadJFrame();
 
@@ -278,8 +267,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 			linhas.add(subTipo);
 
-			carregaTableModel(carregaLinhasTableModel(linhas),
-					COLUNAS_TABLE_MODEL);
+			carregaTableModel(carregaLinhasTableModel(linhas), COLUNAS_TABLE_MODEL);
 
 		} catch (NullPointerException e) {
 
@@ -318,7 +306,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 	protected void carregaTableModel() {
 		// TipoProdutoController controller = new TipoProdutoController();
 
-		List linhas = carregaLinhasTableModel(controller.getTiposProdutos());
+		List linhas = carregaLinhasTableModel(controller.getList());
 
 		carregaTableModel(linhas, COLUNAS_TABLE_MODEL);
 
@@ -337,12 +325,10 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		linha[0] = subTipo.getIdTipoItem();
 
-		linha[1] = subTipo.getSuperTipoProduto() == null ? subTipo
-				.getDescricaoTipo() : subTipo.getSuperTipoProduto()
-				.getDescricaoTipo();
+		linha[1] = subTipo.getSuperTipoProduto() == null ? subTipo.getDescricaoTipo()
+				: subTipo.getSuperTipoProduto().getDescricaoTipo();
 
-		linha[2] = subTipo.getSuperTipoProduto() != null ? subTipo
-				.getDescricaoTipo() : "";
+		linha[2] = subTipo.getSuperTipoProduto() != null ? subTipo.getDescricaoTipo() : "";
 
 		// linha[3] = subTipo.getSexo();
 
@@ -368,8 +354,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 				e.printStackTrace();
 
-				JOptionPane.showMessageDialog(null, e.getMessage(), "Alerta",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, e.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
 
 				atualizaTable = false;
 
@@ -377,7 +362,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 				if (atualizaTable) {
 
-					// atualizaTableModel(controller.getTipoPeca());
+					// atualizaTableModel(controller.getItem());
 
 					atualizaTableModel();
 
@@ -443,7 +428,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		limpaFormulario();
 
-		if (controller.getTiposProdutos().size() >= 1)
+		if (controller.getList().size() >= 1)
 
 			populaFormulario();
 
@@ -457,9 +442,9 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 
-		boolean isSubTipo = controller.getTipoPeca().getSuperTipoProduto() != null;
+		boolean isSubTipo = ((SubTipoProduto) controller.getItem()).getSuperTipoProduto() != null;
 
-		txtDescricao.setText(controller.getTipoPeca().getDescricaoTipo());
+		txtDescricao.setText(((SubTipoProduto) controller.getItem()).getDescricaoTipo());
 
 		chkSubTipo.setEnabled(isSubTipo);
 		//
@@ -477,12 +462,11 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		if (isSubTipo) {
 
-			// String sexo = controller.getTipoPeca().getSexo();
+			// String sexo = controller.getItem().getSexo();
 
 			// cmbSexo.setSelectedItem(sexo);
 
-			SubTipoProduto subTipoProduto = controller.getTipoPeca()
-					.getSuperTipoProduto();
+			SubTipoProduto subTipoProduto = ((SubTipoProduto) controller.getItem()).getSuperTipoProduto();
 
 			cmbTiposProduto.setSelectedItem(subTipoProduto);
 
@@ -492,7 +476,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 			cmbTiposProduto.setSelectedIndex(0);
 			//
-			// btnDeletar.setEnabled(!(controller.getTipoPeca()
+			// btnDeletar.setEnabled(!(controller.getItem()
 			// .getSubTiposProduto().size() > 0));
 
 		}
@@ -529,9 +513,9 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		if (!acaoBuscar) {
 
-			controller.setTipoProduto(null);
+			controller.setItem(null);
 
-			controller.setTiposProduto(null);
+			controller.setList(null);
 		}
 
 		txtDescricao.setEnabled(true);
@@ -568,8 +552,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 			int indiceLinha = table.getSelectedRow();
 
-			int idSubTipo = (Integer) table.getModel().getValueAt(indiceLinha,
-					0);
+			int idSubTipo = (Integer) table.getModel().getValueAt(indiceLinha, 0);
 
 			controller.busca(idSubTipo);
 
@@ -629,8 +612,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		jPanel.add(txtBusca);
 
-		btnBusca = inicializaJButton("Buscar", 460, 20, 90,
-				txtBusca.getHeight());
+		btnBusca = inicializaJButton("Buscar", 460, 20, 90, txtBusca.getHeight());
 
 		jPanel.add(btnBusca);
 
@@ -665,14 +647,12 @@ public class TipoProdutoDialog extends AbstractDialog {
 			// String sexo = cmbSexo.getSelectedIndex() == 0 ? null : cmbSexo
 			// .getSelectedItem().toString();
 
-			Object tipoProduto = cmbTiposProduto.getSelectedIndex() == 0 ? null
-					: cmbTiposProduto.getSelectedItem();
+			Object tipoProduto = cmbTiposProduto.getSelectedIndex() == 0 ? null : cmbTiposProduto.getSelectedItem();
 
 			// controller.salva(txtDescricao.getText(), chkSubTipo.isSelected(),
 			// tipoProduto, sexo);
 
-			controller.salva(txtDescricao.getText(), chkSubTipo.isSelected(),
-					tipoProduto);
+			controller.salva(txtDescricao.getText(), chkSubTipo.isSelected(), tipoProduto);
 
 			mostraMensagemConfirmacaoSalvamento();
 

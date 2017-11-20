@@ -33,7 +33,7 @@ public class Produto implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -3182478717153999154L;
+	private static final long serialVersionUID = 966393974554317965L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,6 +44,8 @@ public class Produto implements Serializable {
 	private String unidadeMedida;
 
 	private float valorUnitario;
+
+	private String codigoDeBarras;
 
 	@OneToOne(targetEntity = ItemEstoque.class, fetch = FetchType.EAGER, mappedBy = "produto")
 	@Fetch(FetchMode.JOIN)
@@ -57,6 +59,19 @@ public class Produto implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idFabricante")
 	private Fabricante fabricante;
+
+	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida,
+			String codigoDeBarras, float valorUnitario) {
+		setTipoProduto(subTipoProduto);
+		getTipoProduto().setSuperTipoProduto((SubTipoProduto) tipoProduto);
+		setDescricaoProduto(descricao);
+		setUnidadeMedida(unidadeMedida);
+		setValorUnitario(valorUnitario);
+		setCodigoDeBarras(codigoDeBarras);
+	}
+
+	public Produto() {
+	}
 
 	public Integer getIdProduto() {
 		return idProduto;
@@ -114,11 +129,21 @@ public class Produto implements Serializable {
 		this.fabricante = fabricante;
 	}
 
+	public String getCodigoDeBarras() {
+		return codigoDeBarras;
+	}
+
+	public void setCodigoDeBarras(String codigoDeBarras) {
+		this.codigoDeBarras = codigoDeBarras;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((codigoDeBarras == null) ? 0 : codigoDeBarras.hashCode());
 		result = prime * result + ((descricaoProduto == null) ? 0 : descricaoProduto.hashCode());
+		result = prime * result + ((fabricante == null) ? 0 : fabricante.hashCode());
 		result = prime * result + ((idProduto == null) ? 0 : idProduto.hashCode());
 		result = prime * result + ((itemEstoque == null) ? 0 : itemEstoque.hashCode());
 		result = prime * result + ((tipoProduto == null) ? 0 : tipoProduto.hashCode());
@@ -136,10 +161,20 @@ public class Produto implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Produto other = (Produto) obj;
+		if (codigoDeBarras == null) {
+			if (other.codigoDeBarras != null)
+				return false;
+		} else if (!codigoDeBarras.equals(other.codigoDeBarras))
+			return false;
 		if (descricaoProduto == null) {
 			if (other.descricaoProduto != null)
 				return false;
 		} else if (!descricaoProduto.equals(other.descricaoProduto))
+			return false;
+		if (fabricante == null) {
+			if (other.fabricante != null)
+				return false;
+		} else if (!fabricante.equals(other.fabricante))
 			return false;
 		if (idProduto == null) {
 			if (other.idProduto != null)
@@ -168,9 +203,9 @@ public class Produto implements Serializable {
 
 	@Override
 	public String toString() {
-
-		return tipoProduto.getDescricaoTipo() + " - " + descricaoProduto + " - " + fabricante.getNome();
-
+		return "Produto [idProduto=" + idProduto + ", descricaoProduto=" + descricaoProduto + ", unidadeMedida="
+				+ unidadeMedida + ", valorUnitario=" + valorUnitario + ", codigoDeBarras=" + codigoDeBarras
+				+ ", itemEstoque=" + itemEstoque + ", tipoProduto=" + tipoProduto + ", fabricante=" + fabricante + "]";
 	}
 
 }

@@ -13,34 +13,32 @@ import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.TipoProdutoNotFoundException;
 
 /**
- * Classe respons�vel em gerenciar regras de neg�cio para Tipos de Pe�as de
- * Roupas.
+ * Classe respons�vel em gerenciar regras de neg�cio para Tipos de Pe�as
+ * de Roupas.
  * 
  * @author Marcos
  * 
  */
 public class TipoProdutoController extends AbstractController {
 
-	private static final String RESULTADO_NAO_ENCONTRADO = ConstantesEnum.TIPO_PRODUTO_NAO_ENCONTRADO
-			.getValue().toString();
+	private static final String RESULTADO_NAO_ENCONTRADO = ConstantesEnum.TIPO_PRODUTO_NAO_ENCONTRADO.getValue()
+			.toString();
 
-	private static final String TIPO_ITEM_INVALIDO = ConstantesEnum.TIPO_ITEM_INVALIDO
-			.getValue().toString();
+	private static final String TIPO_ITEM_INVALIDO = ConstantesEnum.TIPO_ITEM_INVALIDO.getValue().toString();
 
-	private static final String REMOCAO_INVALIDA_EXCEPTION = ConstantesEnum.REMOCAO_INVALIDA_EXCEPTION
-			.getValue().toString();
+	private static final String REMOCAO_INVALIDA_EXCEPTION = ConstantesEnum.REMOCAO_INVALIDA_EXCEPTION.getValue()
+			.toString();
 
 	private static final String SELECIONE_TIPO_PRODUTO_EXCEPTION = ConstantesEnum.TIPO_PRODUTO_SELECAO_MESSAGE_EXCEPTION
 			.getValue().toString();
 
-	private static final String TIPO_PRODUTO_JA_CADASTRADO = ConstantesEnum.TIPO_PRODUTO_JA_CADASTRADO
-			.getValue().toString();
+	private static final String TIPO_PRODUTO_JA_CADASTRADO = ConstantesEnum.TIPO_PRODUTO_JA_CADASTRADO.getValue()
+			.toString();
 
-	private static final String REMOCAO_TIPO_POPULADO = ConstantesEnum.TIPO_PRODUTO_POPULADO
-			.getValue().toString();
+	private static final String REMOCAO_TIPO_POPULADO = ConstantesEnum.TIPO_PRODUTO_POPULADO.getValue().toString();
 
-	private static final String REMOCAO_SUPERTIPO_POPULADO = ConstantesEnum.TIPO_PRODUTO_POPULADO_SUPERTIPO
-			.getValue().toString();
+	private static final String REMOCAO_SUPERTIPO_POPULADO = ConstantesEnum.TIPO_PRODUTO_POPULADO_SUPERTIPO.getValue()
+			.toString();
 
 	private SubTipoProduto tipoProduto;
 
@@ -70,8 +68,7 @@ public class TipoProdutoController extends AbstractController {
 	 * @throws Exception
 	 */
 
-	public void salva(String descricao, boolean subTipo, Object superTipoProduto)
-			throws Exception {
+	public void salva(String descricao, boolean subTipo, Object superTipoProduto) throws Exception {
 
 		// validaTipoRoupa(descricao);
 
@@ -85,19 +82,17 @@ public class TipoProdutoController extends AbstractController {
 
 		tipoProdutoDao.update(tipoProduto);
 
-		setTipoProduto(null);
+		setItem(null);
 
 	}
 
-	private void validaCriaTipoProduto(boolean subTipo,
-			Object superTipoProduto, String descricao) throws Exception {
+	private void validaCriaTipoProduto(boolean subTipo, Object superTipoProduto, String descricao) throws Exception {
 
 		try {
 
 			if (tipoProduto == null) {
 
-				tipoProduto = tipoProdutoDao.busca("tipoProduto.readParametro",
-						"descricao", descricao.toLowerCase());
+				tipoProduto = tipoProdutoDao.busca("tipoProduto.readParametro", "descricao", descricao.toLowerCase());
 
 				tipoProduto = null;
 
@@ -137,8 +132,7 @@ public class TipoProdutoController extends AbstractController {
 
 				tipoProduto = null;
 
-				throw new Exception("Tipo de Produto " + descricao
-						+ " já cadastrado!");
+				throw new Exception("Tipo de Produto " + descricao + " já cadastrado!");
 
 			}
 
@@ -160,31 +154,27 @@ public class TipoProdutoController extends AbstractController {
 
 	}
 
-	public List<TipoProduto> getTiposProdutos() {
+	public List<TipoProduto> getList() {
 
 		if (tiposProdutos == null || tiposProdutos.size() < 1)
 
-			carregaTiposPecasRoupa();
+			carregaTiposProdutos();
 
 		return tiposProdutos;
 
 	}
 
-	public void setTiposProduto(List tiposProdutos) {
+	public void setList(List tiposProdutos) {
 		this.tiposProdutos = tiposProdutos;
 	}
 
-	public SubTipoProduto getTipoPeca() {
-		return tipoProduto;
+	public void setItem(Object tipoProduto) {
+		this.tipoProduto = (SubTipoProduto) tipoProduto;
 	}
 
-	public void setTipoProduto(SubTipoProduto tipoProduto) {
-		this.tipoProduto = tipoProduto;
-	}
+	public void carregaTiposProdutos() {
 
-	public void carregaTiposPecasRoupa() {
-
-		setTiposProduto(tipoProdutoDao.busca("tipoProduto.readtiposabstratos"));
+		setList(tipoProdutoDao.busca("tipoProduto.readtiposabstratos"));
 
 	}
 
@@ -233,8 +223,7 @@ public class TipoProdutoController extends AbstractController {
 
 			String valor = "%" + parametro.toUpperCase() + "%";
 
-			tiposProdutos = tipoProdutoDao.buscaList(
-					"tipoProduto.readParametroLike", "descricao", valor);
+			tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike", "descricao", valor);
 
 		}
 
@@ -291,7 +280,7 @@ public class TipoProdutoController extends AbstractController {
 
 		}
 
-		if (tipoProduto.getProdutos().size() > 0)
+		if (tipoProduto.getProdutos()!=null && tipoProduto.getProdutos().size() > 0)
 
 			throw new Exception(REMOCAO_TIPO_POPULADO);
 
@@ -300,9 +289,9 @@ public class TipoProdutoController extends AbstractController {
 
 		tipoProdutoDao.delete(tipoProduto);
 
-		setTipoProduto(null);
+		setItem(null);
 
-		setTiposProduto(null);
+		setList(null);
 
 	}
 
@@ -320,6 +309,12 @@ public class TipoProdutoController extends AbstractController {
 
 		return tipoProdutoDao.busca("tipoProduto.readtiposabstratos");
 
+	}
+
+	@Override
+	public Object getItem() {
+
+		return tipoProduto;
 	}
 
 	// public void iniciaTipoPecaRoupa() {

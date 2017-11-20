@@ -64,6 +64,7 @@ public class SubTipoProduto extends TipoProduto {
 	}
 
 	public Collection<Produto> getProdutos() {
+	
 		return produtos;
 	}
 

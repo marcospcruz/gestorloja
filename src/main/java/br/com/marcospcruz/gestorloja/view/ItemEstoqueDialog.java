@@ -87,7 +87,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 		ProdutoController controller = new ProdutoController();
 
-		List lista = controller.getProdutos();
+		List lista = controller.getList();
 
 		Object[] objetos = new Object[lista.size() + 1];
 

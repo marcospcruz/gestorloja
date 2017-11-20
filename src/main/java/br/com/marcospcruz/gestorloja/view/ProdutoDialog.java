@@ -16,13 +16,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.hibernate.LazyInitializationException;
 
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
+import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
@@ -36,34 +39,33 @@ public class ProdutoDialog extends AbstractDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = -2443699410031970101L;
-
-	private static Object[] COLUNAS_TABLE_MODEL = {
+	//@formatter:off
+	private static final Object[] COLUNAS_TABLE_MODEL = { 
 			ConstantesEnum.CODIGO_LABEL.getValue().toString(),
 			ConstantesEnum.TIPO_PRODUTO_LABEL.getValue().toString(),
 			ConstantesEnum.DESCRICAO_LABEL.getValue().toString(),
+			ConstantesEnum.FABRICANTE.getValue().toString(),
 			ConstantesEnum.UNIDADE_MEDIDA_LABEL.getValue().toString(),
 			ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString() };
+	//@formatter:on
+	private static final String DESCRICAO_LABEL = (String) COLUNAS_TABLE_MODEL[2] + ":";
 
-	private static final String DESCRICAO_LABEL = (String) COLUNAS_TABLE_MODEL[2]
-			+ ":";
+	private static final String TIPO_PRODUTO_LABEL = COLUNAS_TABLE_MODEL[1] + ":";
 
-	private static final String TIPO_PRODUTO_LABEL = COLUNAS_TABLE_MODEL[1]
-			+ ":";
+	private static final String VALOR_UNITARIO_LABEL = COLUNAS_TABLE_MODEL[4] + ":";
 
-	private static final String VALOR_UNITARIO_LABEL = COLUNAS_TABLE_MODEL[4]
-			+ ":";
-
-	private ProdutoController controller;
 	private JFormattedTextField txtUnidadeMedida;
-	private JLabel lblValorUnitario;
+
 	private JFormattedTextField txtValorUnitario;
+
+	private JTextField txtCodigoBarras;
 
 	private JComboBox cmbTiposDeProduto;
 	private JComboBox cmbSubTiposDeProduto;
 
-	public ProdutoDialog(JFrame owner) {
+	public ProdutoDialog(JFrame owner) throws Exception {
 
-		super(owner, "Cadastro de Produtos", true);
+		super(owner, "Cadastro de Produtos", ControllerAbstractFactory.PRODUTO, true);
 
 		controller = new ProdutoController();
 
@@ -79,9 +81,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		if (arg0.getSource() instanceof JComboBox) {
 
-			cmbSubTiposDeProduto
-					.setModel(selectModelSubTiposDeProduto((JComboBox) arg0
-							.getSource()));
+			cmbSubTiposDeProduto.setModel(selectModelSubTiposDeProduto((JComboBox) arg0.getSource()));
 
 		} else {
 
@@ -97,12 +97,11 @@ public class ProdutoDialog extends AbstractDialog {
 
 				e.printStackTrace();
 
-				JOptionPane.showMessageDialog(null, e.getMessage(), "Alerta",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, e.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
 
 			} finally {
 
-				atualizaTableModel(controller.getProdutos());
+				atualizaTableModel(controller.getList());
 
 			}
 
@@ -171,7 +170,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		if (confirmacao == 0) {
 
-			controller.deletaProduto();
+			controller.excluir();
 
 			limpaFormulario();
 
@@ -195,7 +194,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		if (contadorVirgula > 1) {
 
-			throw new Exception(COLUNAS_TABLE_MODEL[4] + " inv√°lido!");
+			throw new Exception(COLUNAS_TABLE_MODEL[4] + " inv·lido!");
 
 		}
 
@@ -209,9 +208,9 @@ public class ProdutoDialog extends AbstractDialog {
 
 		if (!acaoBuscar) {
 
-			controller.setProduto(null);
+			controller.setItem(null);
 
-			controller.setPecasRoupa(null);
+			controller.setList(null);
 
 			txtBusca.setText("");
 
@@ -219,8 +218,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 			cmbTiposDeProduto.setSelectedIndex(0);
 
-			cmbSubTiposDeProduto
-					.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
+			cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
 
 		}
 
@@ -230,6 +228,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		txtValorUnitario.setText("");
 
+		txtCodigoBarras.setText("");
 	}
 
 	/**
@@ -239,8 +238,7 @@ public class ProdutoDialog extends AbstractDialog {
 	 */
 	private DefaultComboBoxModel carregaSubTiposProdutoModel(Object selectedItem) {
 
-		List<SubTipoProduto> tiposProduto = (List<SubTipoProduto>) ((SubTipoProduto) selectedItem)
-				.getSubTiposProduto();
+		List<SubTipoProduto> tiposProduto = (List<SubTipoProduto>) ((SubTipoProduto) selectedItem).getSubTiposProduto();
 
 		Object[] arrayTipos = null;
 
@@ -252,8 +250,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		try {
 
-			arrayTipos = new Object[tiposProduto == null ? 1 : tiposProduto
-					.size() + 1];
+			arrayTipos = new Object[tiposProduto == null ? 1 : tiposProduto.size() + 1];
 
 			arrayTipos[0] = ITEM_ZERO_COMBO;
 
@@ -283,8 +280,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 			int indiceLinha = table.getSelectedRow();
 
-			int idPecaRoupa = (Integer) table.getModel().getValueAt(
-					indiceLinha, 0);
+			int idPecaRoupa = (Integer) table.getModel().getValueAt(indiceLinha, 0);
 
 			controller.busca(idPecaRoupa);
 
@@ -299,19 +295,19 @@ public class ProdutoDialog extends AbstractDialog {
 	@Override
 	protected void populaFormulario() {
 
-		Produto produto = controller.getProduto();
+		Produto produto = (Produto) controller.getItem();
 
 		txtUnidadeMedida.setText(produto.getUnidadeMedida());
 
+		txtCodigoBarras.setText(produto.getCodigoDeBarras());
+
 		txtDescricao.setText(produto.getDescricaoProduto());
 
-		String valor = Float.toString(produto.getValorUnitario()).replace('.',
-				',');
+		String valor = Float.toString(produto.getValorUnitario()).replace('.', ',');
 
 		txtValorUnitario.setText(valor);
 
-		SubTipoProduto subTipoProduto = (SubTipoProduto) produto
-				.getTipoProduto();
+		SubTipoProduto subTipoProduto = (SubTipoProduto) produto.getTipoProduto();
 
 		TipoProduto tipoProduto = subTipoProduto.getSuperTipoProduto();
 
@@ -395,11 +391,9 @@ public class ProdutoDialog extends AbstractDialog {
 
 		cmbSubTiposDeProduto = new JComboBox();
 
-		cmbSubTiposDeProduto
-				.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
+		cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
 
-		cmbSubTiposDeProduto.setBounds(cmbTiposDeProduto.getWidth() + 210,
-				y + 15, 150, TXT_HEIGHT);
+		cmbSubTiposDeProduto.setBounds(cmbTiposDeProduto.getWidth() + 210, y + 15, 150, TXT_HEIGHT);
 
 		jPanel.add(cmbSubTiposDeProduto);
 
@@ -436,8 +430,21 @@ public class ProdutoDialog extends AbstractDialog {
 		jPanel.add(txtUnidadeMedida);
 
 		y += 35;
+		// --------------------------------------
+		JLabel lblCodigoDeBarras = new JLabel("CÛdigo de Barras: ");
 
-		lblValorUnitario = new JLabel(VALOR_UNITARIO_LABEL);
+		lblCodigoDeBarras.setBounds(10, y, 150, 30);
+
+		jPanel.add(lblCodigoDeBarras);
+
+		txtCodigoBarras = new JTextField();
+
+		txtCodigoBarras.setBounds(150, y, 150, TXT_HEIGHT);
+
+		jPanel.add(txtCodigoBarras);
+		// --------------------------------------
+		y += 30;
+		JLabel lblValorUnitario = new JLabel(VALOR_UNITARIO_LABEL);
 
 		lblValorUnitario.setBounds(10, y, 150, 30);
 
@@ -457,7 +464,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 	private DefaultComboBoxModel carregaComboTiposProdutoModel() {
 
-		Object[] tmp = controller.getArrayTiposProduto();
+		Object[] tmp = ((ProdutoController) controller).getArrayTiposProduto();
 
 		Object[] items = new Object[tmp.length + 1];
 
@@ -490,8 +497,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		jScrollPane = new JScrollPane(jTable);
 
-		jScrollPane.setBounds(6, 15, jPanel.getWidth() - 15,
-				jPanel.getHeight() - 20);
+		jScrollPane.setBounds(6, 15, jPanel.getWidth() - 15, jPanel.getHeight() - 20);
 
 		jPanel.add(jScrollPane);
 
@@ -511,8 +517,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 			// linhas.add(produto);
 
-			carregaTableModel(carregaLinhasTableModel(linhas),
-					COLUNAS_TABLE_MODEL);
+			carregaTableModel(carregaLinhasTableModel(linhas), COLUNAS_TABLE_MODEL);
 
 		} catch (NullPointerException e) {
 
@@ -557,7 +562,7 @@ public class ProdutoDialog extends AbstractDialog {
 	@Override
 	protected void carregaTableModel() {
 
-		List linhas = carregaLinhasTableModel(controller.getProdutos());
+		List linhas = carregaLinhasTableModel(controller.getList());
 
 		carregaTableModel(linhas, COLUNAS_TABLE_MODEL);
 
@@ -573,14 +578,19 @@ public class ProdutoDialog extends AbstractDialog {
 
 			Produto produto = (Produto) objeto;
 
-			String valorUnitario = "R$ "
-					+ MyFormatador.formataStringDecimais(produto
-							.getValorUnitario());
+			String valorUnitario = "R$ " + MyFormatador.formataStringDecimais(produto.getValorUnitario());
 
-			Object[] linha = { produto.getIdProduto(),
-					produto.getTipoProduto(), produto.getDescricaoProduto(),
-					produto.getUnidadeMedida(), valorUnitario };
-
+			Fabricante fabricante = produto.getFabricante();
+			//@formatter:off
+			Object[] linha = { 
+					produto.getIdProduto(), 
+					produto.getTipoProduto(), 
+					produto.getDescricaoProduto(),
+					fabricante!=null?fabricante.getNome():"",
+					produto.getUnidadeMedida(),
+					valorUnitario 
+					};
+			//@formatter:on
 			linhas.add(linha);
 
 		}
@@ -608,8 +618,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		jPanel.add(txtBusca);
 
-		btnBusca = inicializaJButton("Buscar", 450, 20, 90,
-				txtBusca.getHeight());
+		btnBusca = inicializaJButton("Buscar", 450, 20, 90, txtBusca.getHeight());
 
 		jPanel.add(btnBusca);
 
@@ -619,21 +628,18 @@ public class ProdutoDialog extends AbstractDialog {
 
 	@Override
 	protected void salvarItem() throws Exception {
-		// TODO Auto-generated method stub
 
 		if (confirmaSalvamentoItem() == 0) {
 
 			if (cmbTiposDeProduto.getSelectedIndex() == 0) {
 
 				throw new Exception(
-						ConstantesEnum.SELECAO_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE
-								.getValue().toString());
+						ConstantesEnum.SELECAO_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE.getValue().toString());
 
 			} else if (cmbSubTiposDeProduto.getSelectedIndex() == 0)
 
 				throw new Exception(
-						ConstantesEnum.SELECAO_SUB_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE
-								.getValue().toString());
+						ConstantesEnum.SELECAO_SUB_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE.getValue().toString());
 
 			Object tipoProduto = cmbTiposDeProduto.getSelectedItem();
 
@@ -645,10 +651,12 @@ public class ProdutoDialog extends AbstractDialog {
 
 			String valorUnitario = txtValorUnitario.getText();
 
+			String codigoDeBarras = txtCodigoBarras.getText();
+
 			validaValorUnitario(valorUnitario);
 
-			controller.salva(tipoProduto, subTipoProduto, descricao,
-					unidadeMedida, valorUnitario);
+			controller.salva(new Produto((TipoProduto) tipoProduto, (SubTipoProduto) subTipoProduto, descricao,
+					unidadeMedida, codigoDeBarras, Float.valueOf(valorUnitario.replaceAll(",", "."))));
 
 			mostraMensagemConfirmacaoSalvamento();
 
