@@ -2,6 +2,8 @@ package br.com.marcospcruz.gestorloja.dao;
 
 import java.util.List;
 
+import br.com.marcospcruz.gestorloja.model.Usuario;
+
 public interface Crud<T> {
 	/**
 	 * M�todo respons�vel em procurar entidade no banco de dados.
@@ -15,7 +17,7 @@ public interface Crud<T> {
 	 * M�todo respons�vel em atualizar a entidade no banco.
 	 * 
 	 * @param tipoPeca
-	 * @return 
+	 * @return
 	 */
 	public T update(T entity);
 
@@ -28,5 +30,7 @@ public interface Crud<T> {
 	public T busca(Class clazz, int id);
 
 	public List<T> buscaList(String query, String parametro, String valor);
+
+	public T busca(String namedQuery, String param1, String paramValue1, String param2, String paramValue2);
 
 }

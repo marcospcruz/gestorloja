@@ -317,6 +317,12 @@ public class TipoProdutoController extends AbstractController {
 		return tipoProduto;
 	}
 
+	@Override
+	public void salva(Object object) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 	// public void iniciaTipoPecaRoupa() {
 	//
 	// tipoProduto = new SubTipoProduto();

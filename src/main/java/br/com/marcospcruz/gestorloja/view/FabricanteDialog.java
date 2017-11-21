@@ -43,11 +43,12 @@ public class FabricanteDialog extends AbstractDialog {
 	/**
 	 * 
 	 * @param owner
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public FabricanteDialog(JFrame owner) throws Exception {
 
-		super(owner, "Cadastro de " + ConstantesEnum.FABRICANTE.getValue().toString(), ControllerAbstractFactory.FABRICANTE, true);
+		super(owner, "Cadastro de " + ConstantesEnum.FABRICANTE.getValue().toString(),
+				ControllerAbstractFactory.FABRICANTE, true);
 
 		atualizaTable = true;
 
@@ -504,7 +505,10 @@ public class FabricanteDialog extends AbstractDialog {
 			// controller.salva(txtDescricao.getText(), chkSubTipo.isSelected(),
 			// tipoProduto, sexo);
 
-			controller.salva(txtDescricao.getText(), false, null);
+			// controller.salva(txtDescricao.getText(), false, null);
+			Fabricante fabricante = new Fabricante();
+			fabricante.setNome(txtDescricao.getText());
+			controller.salva(fabricante);
 
 			mostraMensagemConfirmacaoSalvamento();
 

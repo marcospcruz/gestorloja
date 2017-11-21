@@ -10,7 +10,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "fabricante.buscaTodos", query = "select f from Fabricante f"),
+@NamedQueries({ @NamedQuery(name = "fabricante.buscaTodos", query = "select f from Fabricante f order by f.nome"),
 		@NamedQuery(name = "fabricante.readParametroLike", query = "select f from Fabricante f where UPPER(f.nome) like :nome") })
 public class Fabricante implements Serializable {
 
@@ -73,7 +73,7 @@ public class Fabricante implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Fabricante [idFabricante=" + idFabricante + ", nome=" + nome + "]";
+		return nome;
 	}
 
 }

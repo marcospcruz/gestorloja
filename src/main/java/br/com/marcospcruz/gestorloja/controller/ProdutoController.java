@@ -134,7 +134,7 @@ public class ProdutoController extends AbstractController {
 
 		} else {
 
-			String valor = "%" + parametro.toUpperCase() + "%";
+			String valor = "%" + parametro.trim().toUpperCase() + "%";
 
 			produtos = produtoDao.buscaList("produto.readparametrolike", "descricao", valor);
 		}

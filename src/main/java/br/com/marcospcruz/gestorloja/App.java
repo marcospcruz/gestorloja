@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja;
 
+import br.com.marcospcruz.gestorloja.view.LoginGui;
 import br.com.marcospcruz.gestorloja.view.PrincipalGUI;
 
 public class App {
@@ -30,7 +31,8 @@ public class App {
 		//
 		// }
 
-		new PrincipalGUI("Controle de Estoque");
+//		new PrincipalGUI("Controle de Estoque");
+		new LoginGui("Gestão Loja").setVisible(true);
 
 	}
 

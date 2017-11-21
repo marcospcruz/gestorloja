@@ -24,6 +24,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.hibernate.LazyInitializationException;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.AbstractController;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.Produto;
@@ -52,7 +53,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 	private static final String TIPO_PRODUTO_LABEL = COLUNAS_TABLE_MODEL[1] + ":";
 
-	private static final String VALOR_UNITARIO_LABEL = COLUNAS_TABLE_MODEL[4] + ":";
+	private static final String VALOR_UNITARIO_LABEL = ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString() + ":";
 
 	private JFormattedTextField txtUnidadeMedida;
 
@@ -62,6 +63,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 	private JComboBox cmbTiposDeProduto;
 	private JComboBox cmbSubTiposDeProduto;
+	private JComboBox cmbMarca;
 
 	public ProdutoDialog(JFrame owner) throws Exception {
 
@@ -219,6 +221,8 @@ public class ProdutoDialog extends AbstractDialog {
 			cmbTiposDeProduto.setSelectedIndex(0);
 
 			cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
+			
+			cmbMarca.setModel(carregaFabricantes(new Fabricante()));
 
 		}
 
@@ -229,6 +233,34 @@ public class ProdutoDialog extends AbstractDialog {
 		txtValorUnitario.setText("");
 
 		txtCodigoBarras.setText("");
+	}
+
+	private ComboBoxModel carregaFabricantes(Fabricante fabricante) {
+
+		AbstractController fabricanteController = null;
+		try {
+			fabricanteController = ControllerAbstractFactory.createController(ControllerAbstractFactory.FABRICANTE);
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		List<Fabricante> fabricantes = fabricanteController.getList();
+
+		Object[] arrayFabricantes = new Object[fabricantes.size() + 1];
+
+		arrayFabricantes[0] = "Selecione uma Opção";
+
+		if (fabricantes == null)
+			fabricantes = new ArrayList<>();
+
+		int i = 0;
+		for (Fabricante f : fabricantes) {
+			arrayFabricantes[++i] = f;
+		}
+
+		DefaultComboBoxModel model = new DefaultComboBoxModel<>(arrayFabricantes);
+		return model;
 	}
 
 	/**
@@ -317,6 +349,9 @@ public class ProdutoDialog extends AbstractDialog {
 
 		cmbSubTiposDeProduto.getModel().setSelectedItem(subTipoProduto);
 
+		if (produto.getFabricante() != null)
+			cmbMarca.getModel().setSelectedItem(produto.getFabricante());
+
 	}
 
 	@Override
@@ -334,7 +369,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		jPanelFormulario = carregaJpanelFormulario();
 
-		jPanelFormulario.setBounds(0, y, getWidth() - 17, 170);
+		jPanelFormulario.setBounds(0, y, getWidth() - 17, 250);
 
 		add(jPanelFormulario);
 
@@ -398,7 +433,23 @@ public class ProdutoDialog extends AbstractDialog {
 		jPanel.add(cmbSubTiposDeProduto);
 
 		y += 45;
+		// -------------------------------------------------------
+		JLabel lblMarca = new JLabel(ConstantesEnum.FABRICANTE.getValue().toString());
 
+		lblMarca.setBounds(10, y, 200, TXT_HEIGHT);
+
+		jPanel.add(lblMarca);
+
+		cmbMarca = new JComboBox();
+
+		cmbMarca.setModel(carregaFabricantes(new Fabricante()));
+
+		cmbMarca.setBounds(150, y, 150, TXT_HEIGHT);
+
+		jPanel.add(cmbMarca);
+
+		y += 25;
+		// --------------------------------------------------------
 		JLabel lbl1 = new JLabel(DESCRICAO_LABEL);
 
 		lbl1.setBounds(10, y, 200, TXT_HEIGHT);
@@ -636,10 +687,11 @@ public class ProdutoDialog extends AbstractDialog {
 				throw new Exception(
 						ConstantesEnum.SELECAO_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE.getValue().toString());
 
-			} else if (cmbSubTiposDeProduto.getSelectedIndex() == 0)
-
-				throw new Exception(
-						ConstantesEnum.SELECAO_SUB_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE.getValue().toString());
+			} 
+//			else if (cmbSubTiposDeProduto.getSelectedIndex() == 0)
+//
+//				throw new Exception(
+//						ConstantesEnum.SELECAO_SUB_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE.getValue().toString());
 
 			Object tipoProduto = cmbTiposDeProduto.getSelectedItem();
 
@@ -653,10 +705,12 @@ public class ProdutoDialog extends AbstractDialog {
 
 			String codigoDeBarras = txtCodigoBarras.getText();
 
+			Object fabricante = cmbMarca.getSelectedItem();
 			validaValorUnitario(valorUnitario);
 
 			controller.salva(new Produto((TipoProduto) tipoProduto, (SubTipoProduto) subTipoProduto, descricao,
-					unidadeMedida, codigoDeBarras, Float.valueOf(valorUnitario.replaceAll(",", "."))));
+					unidadeMedida, codigoDeBarras, (Fabricante) fabricante,
+					Float.valueOf(valorUnitario.replaceAll(",", "."))));
 
 			mostraMensagemConfirmacaoSalvamento();
 

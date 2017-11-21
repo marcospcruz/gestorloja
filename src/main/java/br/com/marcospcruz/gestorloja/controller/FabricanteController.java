@@ -118,4 +118,21 @@ public class FabricanteController extends AbstractController {
 		this.fabricante = (Fabricante) object;
 	}
 
+	@Override
+	public void salva(Object object) throws Exception {
+
+		// busca(((Fabricante) object).getNome());
+
+		if (fabricante != null) {
+			fabricante.setNome(((Fabricante) object).getNome());
+		} else {
+			fabricante = (Fabricante) object;
+		}
+
+		// validaNovoFabricante();
+
+		fabricanteDao.update(fabricante);
+
+	}
+
 }

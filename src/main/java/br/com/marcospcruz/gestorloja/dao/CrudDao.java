@@ -34,8 +34,7 @@ public class CrudDao<T> implements Crud<T> {
 
 			// if (entityManagerFactory == null)
 
-			entityManagerFactory = Persistence
-					.createEntityManagerFactory(PERSISTENCE_UNITY);
+			entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNITY);
 
 			entityManager = entityManagerFactory.createEntityManager();
 
@@ -132,6 +131,22 @@ public class CrudDao<T> implements Crud<T> {
 
 		return objetos;
 
+	}
+
+	@Override
+	public T busca(String namedQuery, String param1, String paramValue1, String param2, String paramValue2) {
+		inicializaEntityManager();
+		Query query = createQuery(namedQuery);
+		query.setParameter(param1, paramValue1);
+		query.setParameter(param2, paramValue2);
+
+		T entity = (T) query.getSingleResult();
+		return entity;
+	}
+
+	private Query createQuery(String namedQuery) {
+
+		return entityManager.createNamedQuery(namedQuery);
 	}
 
 }

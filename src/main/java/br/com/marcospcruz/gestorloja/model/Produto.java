@@ -61,13 +61,14 @@ public class Produto implements Serializable {
 	private Fabricante fabricante;
 
 	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida,
-			String codigoDeBarras, float valorUnitario) {
+			String codigoDeBarras, Fabricante fabricante, float valorUnitario) {
 		setTipoProduto(subTipoProduto);
 		getTipoProduto().setSuperTipoProduto((SubTipoProduto) tipoProduto);
 		setDescricaoProduto(descricao);
 		setUnidadeMedida(unidadeMedida);
 		setValorUnitario(valorUnitario);
 		setCodigoDeBarras(codigoDeBarras);
+		setFabricante(fabricante);
 	}
 
 	public Produto() {
@@ -203,9 +204,7 @@ public class Produto implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Produto [idProduto=" + idProduto + ", descricaoProduto=" + descricaoProduto + ", unidadeMedida="
-				+ unidadeMedida + ", valorUnitario=" + valorUnitario + ", codigoDeBarras=" + codigoDeBarras
-				+ ", itemEstoque=" + itemEstoque + ", tipoProduto=" + tipoProduto + ", fabricante=" + fabricante + "]";
+		return tipoProduto.getDescricaoTipo() + " - " + descricaoProduto + " - " + fabricante.getNome();
 	}
 
 }

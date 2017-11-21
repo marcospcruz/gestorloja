@@ -35,9 +35,9 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 	public ItemEstoqueDialog(EstoqueController controller, JFrame owner) {
 
-		super(owner, "Item de Estoque", true);
+ 		super(owner, "Item de Estoque", true);
 
-		setSize(600, 200);
+		setSize(800, 200);
 
 		this.controller = controller;
 
@@ -229,9 +229,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 			// atualizaView();
 
-			throw new Exception(
-					ConstantesEnum.PRODUTO_NECESSARIO_SELECIONAR_ALERTA
-							.getValue().toString());
+			throw new Exception(ConstantesEnum.PRODUTO_NECESSARIO_SELECIONAR_ALERTA.getValue().toString());
 
 		}
 
@@ -239,8 +237,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 		if (cmbProduto.getSelectedIndex() == 0) {
 
-			throw new Exception(ConstantesEnum.SELECAO_INVALIDA.getValue()
-					.toString());
+			throw new Exception(ConstantesEnum.SELECAO_INVALIDA.getValue().toString());
 
 		}
 
@@ -248,9 +245,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 			controller.anulaAtributos();
 
-			throw new Exception(
-					ConstantesEnum.PRODUTO_JA_EXISTENTE_MESSAGE_EXCEPTION
-							.getValue().toString());
+			throw new Exception(ConstantesEnum.PRODUTO_JA_EXISTENTE_MESSAGE_EXCEPTION.getValue().toString());
 
 		}
 
