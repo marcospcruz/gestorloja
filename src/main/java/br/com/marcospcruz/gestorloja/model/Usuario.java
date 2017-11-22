@@ -1,26 +1,70 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import sun.management.counter.perf.PerfInstrumentation;
 
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "usuario.findLogin", query = "select u from Usuario u where u.nomeUsuario=:nomeUsuario and u.password=:password"),
-		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u where u.nomeUsuario=:nomeUsuario")})
+		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u where u.nomeUsuario=:nomeUsuario") })
 public class Usuario {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idUsuario;
+	@Column(unique = true)
 	private String nomeUsuario;
 	private String password;
+	@Temporal(value = TemporalType.TIMESTAMP)
 	private Date ultimoAcesso;
+	private String nomeCompleto;
+	@OneToMany
+	@JoinTable(name = "Perfil_usuario", joinColumns = { @JoinColumn(name = "idUsuario") }, inverseJoinColumns = {
+			@JoinColumn(name = "idPerfilUsuario") })
+	private List<PerfilUsuario> perfisUsuario;
+
+	public Usuario() {
+	}
+
+	public Usuario(String string, String string2, String string3, List<PerfilUsuario> perfisUsuario) {
+		setNomeCompleto(string);
+		setNomeUsuario(string2);
+		setPassword(string3);
+		setPerfisUsuario(perfisUsuario);
+	}
+
+	private void setNomeCompleto(String nomeCompleto) {
+		this.nomeCompleto = nomeCompleto;
+
+	}
+
+	private void setPerfisUsuario(List<PerfilUsuario> perfisUsuario) {
+		this.perfisUsuario = perfisUsuario;
+
+	}
+
+	public String getNomeCompleto() {
+		return nomeCompleto;
+	}
+
+	public List<PerfilUsuario> getPerfisUsuario() {
+		return perfisUsuario;
+	}
 
 	public Integer getIdUsuario() {
 		return idUsuario;

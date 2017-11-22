@@ -39,7 +39,7 @@ import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.MyFormatador;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
-public class PrincipalGUI extends JFrame implements ActionListener, MouseListener {
+public class EstoquePrincipalGui extends JFrame implements ActionListener, MouseListener {
 
 	/**
 	 * 
@@ -70,7 +70,7 @@ public class PrincipalGUI extends JFrame implements ActionListener, MouseListene
 
 	private JPanel jPanelTableEstoque;
 
-	public PrincipalGUI(String tituloJanela) {
+	public EstoquePrincipalGui(String tituloJanela) {
 
 		super(tituloJanela);
 
