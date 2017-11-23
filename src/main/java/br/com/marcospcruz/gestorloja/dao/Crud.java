@@ -23,7 +23,7 @@ public interface Crud<T> {
 
 	public List<T> busca(String namedQuery);
 
-	public T busca(String namedQuery, String parametro, String valor);
+	public T busca(String namedQuery, String parametro, Object valor);
 
 	public void delete(T entity);
 

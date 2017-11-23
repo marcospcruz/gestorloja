@@ -39,7 +39,7 @@ import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.MyFormatador;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
-public class EstoquePrincipalGui extends JFrame implements ActionListener, MouseListener {
+public class EstoquePrincipalGui extends AbstractJFrame {
 
 	/**
 	 * 
@@ -74,15 +74,11 @@ public class EstoquePrincipalGui extends JFrame implements ActionListener, Mouse
 
 		super(tituloJanela);
 
-		setSize(configuraDimensaoJanela());
-
 		controller = new EstoqueController();
 
 		carregaJPanel();
 
 		setVisible(true);
-
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 	}
 
@@ -112,14 +108,6 @@ public class EstoquePrincipalGui extends JFrame implements ActionListener, Mouse
 		p.setBackground(Color.YELLOW);
 
 		return p;
-
-	}
-
-	private Dimension configuraDimensaoJanela() {
-
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-
-		return toolkit.getScreenSize();
 
 	}
 

@@ -88,14 +88,14 @@ public class LoginGui extends JDialog implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		LoginFacade controller = new LoginFacade();
+		LoginFacade controller = new LoginFacade(this);
 		String usuario = txtUsuario.getText();
 		String senha = new String(passwordField.getPassword());
 
 		try {
 			controller.processaLogin(usuario, senha);
 		} catch (Exception e1) {
-
+			e1.printStackTrace();
 			JOptionPane.showMessageDialog(null, e1.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
 
 		}

@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -16,13 +17,19 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import sun.management.counter.perf.PerfInstrumentation;
-
 @Entity
+//@formatter:off
 @NamedQueries({
-		@NamedQuery(name = "usuario.findLogin", query = "select u from Usuario u where u.nomeUsuario=:nomeUsuario and u.password=:password"),
-		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u where u.nomeUsuario=:nomeUsuario") })
-public class Usuario {
+		@NamedQuery(name = "usuario.findLogin", query = 
+				"select u from Usuario u "
+				+ "JOIN FETCH u.perfisUsuario "
+				+ "where u.nomeUsuario=:nomeUsuario "
+				+ "and u.password=:password"),
+		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u "
+				+ "JOIN FETCH u.perfisUsuario "
+				+ "where u.nomeUsuario=:nomeUsuario") })
+//@formatter:on
+public class Usuario implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,19 +40,23 @@ public class Usuario {
 	@Temporal(value = TemporalType.TIMESTAMP)
 	private Date ultimoAcesso;
 	private String nomeCompleto;
+	private boolean primeiroAcesso;
 	@OneToMany
 	@JoinTable(name = "Perfil_usuario", joinColumns = { @JoinColumn(name = "idUsuario") }, inverseJoinColumns = {
 			@JoinColumn(name = "idPerfilUsuario") })
 	private List<PerfilUsuario> perfisUsuario;
 
 	public Usuario() {
+
 	}
 
 	public Usuario(String string, String string2, String string3, List<PerfilUsuario> perfisUsuario) {
+		this();
 		setNomeCompleto(string);
 		setNomeUsuario(string2);
 		setPassword(string3);
 		setPerfisUsuario(perfisUsuario);
+		setPrimeiroAcesso(primeiroAcesso);
 	}
 
 	private void setNomeCompleto(String nomeCompleto) {
@@ -100,13 +111,25 @@ public class Usuario {
 		this.ultimoAcesso = ultimoAcesso;
 	}
 
+	public boolean isPrimeiroAcesso() {
+		return primeiroAcesso;
+	}
+
+	public void setPrimeiroAcesso(boolean primeiroAcesso) {
+		this.primeiroAcesso = primeiroAcesso;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((idUsuario == null) ? 0 : idUsuario.hashCode());
+		result = prime * result + ((nomeCompleto == null) ? 0 : nomeCompleto.hashCode());
 		result = prime * result + ((nomeUsuario == null) ? 0 : nomeUsuario.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((perfisUsuario == null) ? 0 : perfisUsuario.hashCode());
+		result = prime * result + (primeiroAcesso ? 1231 : 1237);
+		result = prime * result + ((ultimoAcesso == null) ? 0 : ultimoAcesso.hashCode());
 		return result;
 	}
 
@@ -124,6 +147,11 @@ public class Usuario {
 				return false;
 		} else if (!idUsuario.equals(other.idUsuario))
 			return false;
+		if (nomeCompleto == null) {
+			if (other.nomeCompleto != null)
+				return false;
+		} else if (!nomeCompleto.equals(other.nomeCompleto))
+			return false;
 		if (nomeUsuario == null) {
 			if (other.nomeUsuario != null)
 				return false;
@@ -134,13 +162,26 @@ public class Usuario {
 				return false;
 		} else if (!password.equals(other.password))
 			return false;
+		if (perfisUsuario == null) {
+			if (other.perfisUsuario != null)
+				return false;
+		} else if (!perfisUsuario.equals(other.perfisUsuario))
+			return false;
+		if (primeiroAcesso != other.primeiroAcesso)
+			return false;
+		if (ultimoAcesso == null) {
+			if (other.ultimoAcesso != null)
+				return false;
+		} else if (!ultimoAcesso.equals(other.ultimoAcesso))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "Usuario [idUsuario=" + idUsuario + ", nomeUsuario=" + nomeUsuario + ", password=" + password
-				+ ", ultimoAcesso=" + ultimoAcesso + "]";
+				+ ", ultimoAcesso=" + ultimoAcesso + ", nomeCompleto=" + nomeCompleto + ", primeiroAcesso="
+				+ primeiroAcesso + ", perfisUsuario=" + perfisUsuario + "]";
 	}
 
 }

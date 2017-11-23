@@ -107,13 +107,13 @@ public class CrudDao<T> implements Crud<T> {
 
 	}
 
-	public T busca(String namedQuery, String parametro, String valor) {
+	public T busca(String namedQuery, String parametro, Object value) {
 
 		inicializaEntityManager();
 
 		Query query = entityManager.createNamedQuery(namedQuery);
 
-		query.setParameter(parametro, valor);
+		query.setParameter(parametro, value);
 
 		T entity = (T) query.getSingleResult();
 

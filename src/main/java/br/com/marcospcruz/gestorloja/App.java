@@ -10,6 +10,7 @@ import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.view.LoginGui;
 
 public class App {
 
@@ -17,7 +18,10 @@ public class App {
 	private static final String DB_HOME = CONTROLE_ESTOQUE_HOME + "\\db";
 
 	public static void main(String args[]) {
-
+		switch (args[0]) {
+		case "1":
+			criaUsuario();
+		}
 		initApp();
 
 	}
@@ -40,9 +44,8 @@ public class App {
 		// }
 
 		// new EstoquePrincipalGui("Controle de Estoque");
-		// new LoginGui("Gestão Loja").setVisible(true);
+		new LoginGui("Gestão Loja - Login de Usuário").setVisible(true);
 		// new UsuarioGui().setVisible(true);
-		criaUsuario();
 
 	}
 
