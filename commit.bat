@@ -2,7 +2,9 @@
 set mensagemCommit=%1
 echo mensagem: %mensagemCommit%
 
-rem * * * mvn eclipse:clean
+rem * * *  mvn eclipse:clean
+
+sleep 10
 
 git add --all .
 
