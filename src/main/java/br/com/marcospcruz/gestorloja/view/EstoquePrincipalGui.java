@@ -72,6 +72,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		super(owner, tituloJanela, true);
 
 		controller = new EstoqueController();
+		controller.setLoginFacade(((PrincipalGui)owner).getLoginFacade());
 
 		carregaJPanel();
 
@@ -600,6 +601,14 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	protected void populaFormulario() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public EstoqueController getController() {
+		return controller;
+	}
+
+	public void setController(EstoqueController controller) {
+		this.controller = controller;
 	}
 
 }

@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @NamedQueries({ @NamedQuery(name = "fabricante.buscaTodos", query = "select f from Fabricante f order by f.nome"),
@@ -30,6 +33,13 @@ public class Fabricante implements Serializable {
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date dataInsercao;
+
+	public Fabricante() {
+		dataInsercao = new Date();
+	}
+
 	public Integer getIdFabricante() {
 		return idFabricante;
 	}
@@ -46,10 +56,28 @@ public class Fabricante implements Serializable {
 		this.nome = nome;
 	}
 
+	public void setOperador(Usuario operador) {
+		this.operador = operador;
+
+	}
+
+	public Usuario getOperador() {
+		return operador;
+	}
+
+	public Date getDataInsercao() {
+		return dataInsercao;
+	}
+
+	public void setDataInsercao(Date dataInsercao) {
+		this.dataInsercao = dataInsercao;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((dataInsercao == null) ? 0 : dataInsercao.hashCode());
 		result = prime * result + ((idFabricante == null) ? 0 : idFabricante.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
@@ -65,6 +93,11 @@ public class Fabricante implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Fabricante other = (Fabricante) obj;
+		if (dataInsercao == null) {
+			if (other.dataInsercao != null)
+				return false;
+		} else if (!dataInsercao.equals(other.dataInsercao))
+			return false;
 		if (idFabricante == null) {
 			if (other.idFabricante != null)
 				return false;
@@ -85,7 +118,7 @@ public class Fabricante implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Fabricante [idFabricante=" + idFabricante + ", nome=" + nome + ", operador=" + operador + "]";
+		return nome;
 	}
 
 }

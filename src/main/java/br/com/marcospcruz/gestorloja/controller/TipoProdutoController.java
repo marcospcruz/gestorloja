@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -9,6 +10,7 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
+import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.TipoProdutoNotFoundException;
 
@@ -79,6 +81,11 @@ public class TipoProdutoController extends AbstractController {
 		}
 
 		validaCriaTipoProduto(subTipo, superTipoProduto, descricao);
+
+		Usuario operador = getLoginFacade().getUsuarioLogado();
+		
+		tipoProduto.setOperador(operador);
+		tipoProduto.setDataInsercao(new Date());
 
 		tipoProdutoDao.update(tipoProduto);
 
@@ -280,7 +287,7 @@ public class TipoProdutoController extends AbstractController {
 
 		}
 
-		if (tipoProduto.getProdutos()!=null && tipoProduto.getProdutos().size() > 0)
+		if (tipoProduto.getProdutos() != null && tipoProduto.getProdutos().size() > 0)
 
 			throw new Exception(REMOCAO_TIPO_POPULADO);
 
@@ -320,7 +327,7 @@ public class TipoProdutoController extends AbstractController {
 	@Override
 	public void salva(Object object) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	// public void iniciaTipoPecaRoupa() {

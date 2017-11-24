@@ -22,6 +22,8 @@ public class EstoqueController implements Serializable {
 
 	private ProdutoController produtoController;
 
+	private LoginFacade loginFacade;
+
 	public EstoqueController() {
 
 		itemEstoqueDao = new CrudDao<ItemEstoque>();
@@ -170,6 +172,15 @@ public class EstoqueController implements Serializable {
 
 			throw new Exception(ConstantesEnum.ITEM_DO_ESTOQUE_NAO_ENCONTRADO.getValue().toString());
 
+	}
+
+	public void setLoginFacade(LoginFacade loginFacade) {
+		
+		this.loginFacade=loginFacade;
+	}
+
+	public LoginFacade getLoginFacade() {
+		return loginFacade;
 	}
 
 }

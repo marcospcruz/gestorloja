@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +11,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -64,7 +67,7 @@ public class SubTipoProduto extends TipoProduto {
 	}
 
 	public Collection<Produto> getProdutos() {
-	
+
 		return produtos;
 	}
 
@@ -76,12 +79,9 @@ public class SubTipoProduto extends TipoProduto {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ((produtos == null) ? 0 : produtos.hashCode());
+		result = prime * result + ((produtos == null) ? 0 : produtos.hashCode());
 		result = prime * result + ((sexo == null) ? 0 : sexo.hashCode());
-		result = prime
-				* result
-				+ ((superTipoProduto == null) ? 0 : superTipoProduto.hashCode());
+		result = prime * result + ((superTipoProduto == null) ? 0 : superTipoProduto.hashCode());
 		return result;
 	}
 
@@ -114,8 +114,7 @@ public class SubTipoProduto extends TipoProduto {
 
 	public String toString() {
 
-		String descricaoSuperTipoRoupa = superTipoProduto == null ? ""
-				: superTipoProduto.getDescricaoTipo();
+		String descricaoSuperTipoRoupa = superTipoProduto == null ? "" : superTipoProduto.getDescricaoTipo();
 
 		String sexo = getSexo() == null ? "" : getSexo();
 

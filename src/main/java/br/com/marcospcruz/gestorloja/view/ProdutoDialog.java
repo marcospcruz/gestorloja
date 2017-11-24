@@ -69,7 +69,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		super(owner, "Cadastro de Produtos", ControllerAbstractFactory.PRODUTO, true);
 
-		controller = new ProdutoController();
+//		controller = new ProdutoController();
 
 		configuraJPanel();
 

@@ -1,13 +1,13 @@
 package br.com.marcospcruz.gestorloja.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Produto;
-import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
@@ -86,9 +86,14 @@ public class ProdutoController extends AbstractController {
 		if (this.produto != null) {
 			merge(produto);
 			this.produto = produtoDao.update(this.produto);
-		} else
+		} else {
+			((Produto) produto).setDataInsercao(new Date());
+			this.produto = ((Produto) produto);
 
-			this.produto = produtoDao.update((Produto) produto);
+		}
+		this.produto.setOperador(getLoginFacade().getUsuarioLogado());
+		
+		produtoDao.update(this.produto);
 
 		this.produto = null;
 
@@ -110,8 +115,8 @@ public class ProdutoController extends AbstractController {
 			throw new Exception("Necessário preencher todos os campos.");
 
 		}
-		
-		if(produto.getCodigoDeBarras()==null){
+
+		if (produto.getCodigoDeBarras() == null) {
 			throw new Exception("Necessário cadastrar o Código de Barras.");
 		}
 

@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -62,6 +63,8 @@ public class Produto implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
+
+	private Date dataInsercao;
 
 	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida,
 			String codigoDeBarras, Fabricante fabricante, float valorUnitario) {
@@ -149,12 +152,17 @@ public class Produto implements Serializable {
 		this.operador = operador;
 	}
 
+	public Date getDataInsercao() {
+		return dataInsercao;
+	}
+
+	public void setDataInsercao(Date dataInsercao) {
+		this.dataInsercao = dataInsercao;
+	}
+
 	@Override
 	public String toString() {
-		return "Produto [idProduto=" + idProduto + ", descricaoProduto=" + descricaoProduto + ", unidadeMedida="
-				+ unidadeMedida + ", valorUnitario=" + valorUnitario + ", codigoDeBarras=" + codigoDeBarras
-				+ ", itemEstoque=" + itemEstoque + ", tipoProduto=" + tipoProduto + ", fabricante=" + fabricante
-				+ ", operador=" + operador + "]";
+		return descricaoProduto;
 	}
 
 	@Override

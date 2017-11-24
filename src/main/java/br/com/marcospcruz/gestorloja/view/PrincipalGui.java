@@ -64,10 +64,9 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		System.out.println(e.getActionCommand());
 		switch (e.getActionCommand()) {
 		case InterfaceGrafica.ESTOQUE:
-			new EstoquePrincipalGui(InterfaceGrafica.ESTOQUE,this);
+			new EstoquePrincipalGui(InterfaceGrafica.ESTOQUE, this);
 
 		}
 

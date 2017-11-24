@@ -8,6 +8,7 @@ import br.com.marcospcruz.gestorloja.model.Produto;
 public abstract class AbstractController {
 
 	protected static final String BUSCA_INVALIDA = "Busca Invïálida";
+	private LoginFacade loginFacade;
 
 	protected boolean contemAcentuacao(String parametro) {
 
@@ -41,8 +42,17 @@ public abstract class AbstractController {
 
 	public abstract void excluir() throws Exception;
 
-	public abstract void salva(String text, boolean b, Object object) throws Exception ;
+	public abstract void salva(String text, boolean b, Object object) throws Exception;
 
 	public abstract void salva(Object object) throws Exception;
+
+	public void setLoginFacade(LoginFacade loginFacade) {
+		this.loginFacade = loginFacade;
+
+	}
+
+	public LoginFacade getLoginFacade() {
+		return loginFacade;
+	}
 
 }

@@ -20,6 +20,7 @@ import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.AbstractController;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.NumberDocument;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
@@ -61,6 +62,8 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	private String controllerClassName;
 
+	private LoginFacade loginFacade;
+
 	protected static final Border BUSCAR_TITLED_BORDER = new TitledBorder("Busca");
 
 	private static final String TITLE_CONFIRMING_SAVING = ConstantesEnum.CONFIRMACAO_SALVAMENTO_TITLE.getValue()
@@ -83,8 +86,6 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	
-
 	public AbstractDialog(JDialog owner, String tituloJanela, String controllerClassName, boolean modal)
 			throws Exception {
 
@@ -92,6 +93,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 		try {
 			controller = ControllerAbstractFactory.createController(controllerClassName);
+			controller.setLoginFacade(((EstoquePrincipalGui)owner).getController().getLoginFacade());
 		} catch (ClassNotFoundException e) {
 
 			e.printStackTrace();
@@ -117,6 +119,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 		setLayout(null);
 	}
+
 	protected Dimension configuraDimensaoJanela() {
 
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -124,6 +127,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 		return toolkit.getScreenSize();
 
 	}
+
 	/**
 	 * xxx
 	 */

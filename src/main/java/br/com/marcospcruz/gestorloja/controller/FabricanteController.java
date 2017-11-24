@@ -128,6 +128,7 @@ public class FabricanteController extends AbstractController {
 		} else {
 			fabricante = (Fabricante) object;
 		}
+		fabricante.setOperador(getLoginFacade().getUsuarioLogado());
 
 		// validaNovoFabricante();
 

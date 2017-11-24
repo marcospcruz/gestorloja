@@ -2,6 +2,7 @@ package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -15,6 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -40,6 +43,9 @@ public abstract class TipoProduto implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date dataInsercao;
 
 	public Usuario getOperador() {
 		return operador;
@@ -75,6 +81,14 @@ public abstract class TipoProduto implements Serializable {
 
 	public void setSubTiposProduto(Collection<SubTipoProduto> subTiposProduto) {
 		this.subTiposProduto = subTiposProduto;
+	}
+
+	public void setDataInsercao(Date dataInsercao) {
+		this.dataInsercao = dataInsercao;
+	}
+
+	public Date getDataInsercao() {
+		return dataInsercao;
 	}
 
 	@Override
@@ -122,8 +136,7 @@ public abstract class TipoProduto implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TipoProduto [idTipoItem=" + idTipoItem + ", descricaoTipo=" + descricaoTipo + ", subTiposProduto="
-				+ subTiposProduto + ", operador=" + operador + "]";
+		return descricaoTipo;
 	}
 
 }
