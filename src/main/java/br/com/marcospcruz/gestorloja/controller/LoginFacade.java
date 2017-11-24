@@ -41,8 +41,10 @@ public class LoginFacade {
 
 	private void buscaSessaoUsuarioAtiva(Usuario usuario) throws Exception {
 		try {
-			sessaoUsuarioDao.busca("sessaousuario.findSessaoAtiva", "idUsuario", usuario.getIdUsuario());
-			throw new Exception("Usuário possui sessão ainda ativa.");
+			SessaoUsuario sessaoUsuario = sessaoUsuarioDao.busca("sessaousuario.findSessaoAtiva", "idUsuario",
+					usuario.getIdUsuario());
+			throw new Exception(
+					"Usuário " + sessaoUsuario.getUsuario().getNomeUsuario() + " ainda possui sessão ativa.");
 		} catch (NoResultException e) {
 			e.printStackTrace();
 		}
@@ -102,14 +104,14 @@ public class LoginFacade {
 		sessaoUsuarioBuilder.setDataFim(new Date());
 		SessaoUsuario sessao = sessaoUsuarioBuilder.getSessaoUsuario();
 		// temp
-		 sessaoUsuarioDao.update(sessao);
+		sessaoUsuarioDao.update(sessao);
 
 		return this;
 	}
 
 	public Usuario getUsuarioLogado() {
 		Usuario usuario = sessaoUsuarioBuilder.getSessaoUsuario().getUsuario();
-		
+
 		return new CrudDao<Usuario>().busca(Usuario.class, usuario.getIdUsuario());
 	}
 

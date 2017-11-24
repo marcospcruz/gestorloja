@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -67,11 +68,28 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	private static final String MESSAGE_CONFIRMING_SAVING = ConstantesEnum.CONFIRMACAO_SALVAMENTO.getValue().toString();
 
-	public AbstractDialog(JFrame owner, String tituloJanela, String controllerClassName, boolean modal)
+	public AbstractDialog(JDialog owner, String tituloJanela, boolean modal) {
+
+		super(owner, tituloJanela, modal);
+
+		configuraDialog();
+
+	}
+
+	public AbstractDialog(JFrame owner, String tituloJanela, boolean modal) {
+		super(owner, tituloJanela, modal);
+
+		setSize(configuraDimensaoJanela());
+
+	}
+
+	
+
+	public AbstractDialog(JDialog owner, String tituloJanela, String controllerClassName, boolean modal)
 			throws Exception {
 
-		this(owner,tituloJanela,modal);
-		
+		this(owner, tituloJanela, modal);
+
 		try {
 			controller = ControllerAbstractFactory.createController(controllerClassName);
 		} catch (ClassNotFoundException e) {
@@ -92,17 +110,20 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	public AbstractDialog(JFrame owner, String tituloJanela, boolean modal) {
-		super(owner, tituloJanela, modal);
-
+	private void configuraDialog() {
 		setSize(new Dimension(800, 600));
 
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 
 		setLayout(null);
+	}
+	protected Dimension configuraDimensaoJanela() {
+
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+
+		return toolkit.getScreenSize();
 
 	}
-
 	/**
 	 * xxx
 	 */
@@ -199,7 +220,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	public JTable inicializaJTable() {
+	JTable inicializaJTable() {
 
 		JTable jTable = new JTable(myTableModel);
 

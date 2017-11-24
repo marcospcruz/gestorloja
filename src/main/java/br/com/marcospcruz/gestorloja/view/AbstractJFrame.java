@@ -15,7 +15,7 @@ public abstract class AbstractJFrame extends JFrame implements ActionListener, M
 	public AbstractJFrame(String tituloJanela) {
 		super(tituloJanela);
 		setSize(configuraDimensaoJanela());
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+
 	}
 
 	public AbstractJFrame(String string, LoginFacade loginFacade) {

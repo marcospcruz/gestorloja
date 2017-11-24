@@ -10,8 +10,8 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -33,9 +33,9 @@ public class ItemEstoqueDialog extends AbstractDialog {
 	private JButton btnAdicionarItem;
 	private EstoqueController controller;
 
-	public ItemEstoqueDialog(EstoqueController controller, JFrame owner) {
+	public ItemEstoqueDialog(EstoqueController controller, JDialog owner) throws Exception {
 
- 		super(owner, "Item de Estoque", true);
+		super(owner, "Item de Estoque", true);
 
 		setSize(800, 200);
 
@@ -53,7 +53,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 	}
 
-	private JPanel configuraJPanelNovoItem() {
+	private JPanel configuraJPanelNovoItem() throws Exception {
 
 		JPanel panel = new JPanel();
 
@@ -82,12 +82,17 @@ public class ItemEstoqueDialog extends AbstractDialog {
 	/**
 	 * 
 	 * @return
+	 * @throws Exception 
 	 */
-	private ComboBoxModel carregaComboProdutoModel() {
+	private ComboBoxModel carregaComboProdutoModel() throws Exception {
 
 		ProdutoController controller = new ProdutoController();
 
 		List lista = controller.getList();
+		
+		if(lista.isEmpty()){
+			throw new Exception("Não há Produtos cadastrados.");
+		}
 
 		Object[] objetos = new Object[lista.size() + 1];
 

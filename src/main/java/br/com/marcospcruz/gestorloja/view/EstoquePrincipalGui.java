@@ -6,11 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -39,7 +36,7 @@ import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.MyFormatador;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
-public class EstoquePrincipalGui extends AbstractJFrame {
+public class EstoquePrincipalGui extends AbstractDialog {
 
 	/**
 	 * 
@@ -70,9 +67,9 @@ public class EstoquePrincipalGui extends AbstractJFrame {
 
 	private JPanel jPanelTableEstoque;
 
-	public EstoquePrincipalGui(String tituloJanela) {
+	public EstoquePrincipalGui(String tituloJanela, JFrame owner) {
 
-		super(tituloJanela);
+		super(owner, tituloJanela, true);
 
 		controller = new EstoqueController();
 
@@ -165,7 +162,7 @@ public class EstoquePrincipalGui extends AbstractJFrame {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void carregaTableModel() {
+	protected void carregaTableModel() {
 
 		List linhas = carregaLinhasTableModel(controller.getItensEstoque());
 
@@ -181,14 +178,14 @@ public class EstoquePrincipalGui extends AbstractJFrame {
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private List carregaLinhasTableModel(List<ItemEstoque> itensEstoque) {
+	@Override
+	protected List carregaLinhasTableModel(List itensEstoque) {
 
 		List linhas = new ArrayList();
 
-		for (ItemEstoque itemEstoque : itensEstoque) {
+		for (Object itemEstoque : itensEstoque) {
 
-			linhas.add(processaColuna(itemEstoque));
+			linhas.add(processaColuna((ItemEstoque) itemEstoque));
 
 		}
 
@@ -344,7 +341,7 @@ public class EstoquePrincipalGui extends AbstractJFrame {
 
 	}
 
-	private JButton inicializaJButton(String text) {
+	protected JButton inicializaJButton(String text) {
 
 		JButton jButton = new JButton(text);
 
@@ -360,7 +357,7 @@ public class EstoquePrincipalGui extends AbstractJFrame {
 
 	}
 
-	private JButton inicializaJButton(String text, int x, int y, int width, int height) {
+	protected JButton inicializaJButton(String text, int x, int y, int width, int height) {
 
 		JButton jButton = inicializaJButton(text);
 
@@ -388,7 +385,7 @@ public class EstoquePrincipalGui extends AbstractJFrame {
 
 	}
 
-	private void selecionaAcao(String actionCommand) throws Exception {
+	protected void selecionaAcao(String actionCommand) throws Exception {
 
 		if (actionCommand.equals(ConstantesEnum.LBL_BTN_NOVO_ITEM_ESTOQUE.getValue().toString())) {
 
@@ -555,6 +552,54 @@ public class EstoquePrincipalGui extends AbstractJFrame {
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	protected void configuraJPanel() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected JPanel carregaJPanelBusca() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected JPanel carregaJpanelFormulario() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected JPanel carregaJpanelTable(int y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void atualizaTableModel(Object object) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void excluiItem() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void salvarItem() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void populaFormulario() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

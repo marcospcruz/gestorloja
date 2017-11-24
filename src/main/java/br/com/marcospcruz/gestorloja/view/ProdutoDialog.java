@@ -9,8 +9,8 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -65,7 +65,7 @@ public class ProdutoDialog extends AbstractDialog {
 	private JComboBox cmbSubTiposDeProduto;
 	private JComboBox cmbMarca;
 
-	public ProdutoDialog(JFrame owner) throws Exception {
+	public ProdutoDialog(JDialog owner) throws Exception {
 
 		super(owner, "Cadastro de Produtos", ControllerAbstractFactory.PRODUTO, true);
 

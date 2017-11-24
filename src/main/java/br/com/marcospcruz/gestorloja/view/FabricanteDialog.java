@@ -8,8 +8,8 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,7 +17,6 @@ import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
-import br.com.marcospcruz.gestorloja.controller.FabricanteController;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
@@ -45,7 +44,7 @@ public class FabricanteDialog extends AbstractDialog {
 	 * @param owner
 	 * @throws Exception
 	 */
-	public FabricanteDialog(JFrame owner) throws Exception {
+	public FabricanteDialog(JDialog owner) throws Exception {
 
 		super(owner, "Cadastro de " + ConstantesEnum.FABRICANTE.getValue().toString(),
 				ControllerAbstractFactory.FABRICANTE, true);

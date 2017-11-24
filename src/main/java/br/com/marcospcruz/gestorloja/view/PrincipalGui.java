@@ -7,6 +7,8 @@ import java.awt.event.WindowListener;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
+import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
+
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
@@ -26,6 +28,7 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 		carregaBotoesModulos(loginFacade);
 
 		setVisible(true);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 	}
 
@@ -60,7 +63,13 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+
+		System.out.println(e.getActionCommand());
+		switch (e.getActionCommand()) {
+		case InterfaceGrafica.ESTOQUE:
+			new EstoquePrincipalGui(InterfaceGrafica.ESTOQUE,this);
+
+		}
 
 	}
 

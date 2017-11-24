@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,7 +32,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 	private EstoqueController controller;
 
-	private ItemDoEstoqueDialog(JFrame owner, String tituloJanela, boolean modal) {
+	private ItemDoEstoqueDialog(JDialog owner, String tituloJanela, boolean modal) {
 
 		super(owner, tituloJanela, modal);
 
@@ -47,7 +48,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 	}
 
-	public ItemDoEstoqueDialog(JFrame owner, EstoqueController controller) {
+	public ItemDoEstoqueDialog(JDialog owner, EstoqueController controller) {
 
 		this(owner, "Item do Estoque: "
 				+ controller.getItemEstoque().getProduto()
@@ -215,13 +216,13 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 		if (controller.getItemEstoque() == null) {
 
 			throw new Exception(
-					"É necessário selecionar um Ítem no Estoque antes de Excluir.");
+					"Ã‰ necessÃ¡rio selecionar um Ã�tem no Estoque antes de Excluir.");
 
 		}
 
 		int confirmacao = confirmaExclusaoItem();
 		// JOptionPane.showConfirmDialog(null,
-		// "Confirmar Exclusão", "Deseja realmente excluir este item?",
+		// "Confirmar ExclusÃ£o", "Deseja realmente excluir este item?",
 		// JOptionPane.YES_NO_OPTION);
 
 		if (confirmacao == 0) {

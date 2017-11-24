@@ -46,7 +46,9 @@ public enum ConstantesEnum {
 	ITEM_DO_ESTOQUE_EXCEPTION_SALVAMENTO(42), 
 	EXCLUSAO_PRODUTO_COM_ITENS_ESTOQUE(43), 
 	NO_DATA_FOUND(44), 
-	FABRICANTE(45), FABRICANTE_NAO_ENCONTRADO(46);
+	FABRICANTE(45), 
+	FABRICANTE_NAO_ENCONTRADO(46), 
+	ITEM_DO_ESTOQUE_NAO_ENCONTRADO(47);
 //@formatter:on
 	private int index;
 
@@ -100,7 +102,9 @@ public enum ConstantesEnum {
 			"Exclusão não permitida! Há ítens deste Produto no estoque.", // 43
 			"Não há Dados no Estoque.", // 44
 			"Fabricante / Marca", 
-			"Fabricante / Marca não encontrado"};
+			"Fabricante / Marca não encontrado",
+			"Ítem não encontrado no Estoque"
+			};
 
 	public Object getValue() {
 		return VALUES[index];

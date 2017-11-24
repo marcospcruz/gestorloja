@@ -8,6 +8,7 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
+import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
 public class EstoqueController implements Serializable {
 
@@ -167,7 +168,7 @@ public class EstoqueController implements Serializable {
 
 		if (itemEstoque == null && itensEstoque.size() == 0)
 
-			throw new Exception("Pe�a de Roupa n�o encontrada no Estoque");
+			throw new Exception(ConstantesEnum.ITEM_DO_ESTOQUE_NAO_ENCONTRADO.getValue().toString());
 
 	}
 

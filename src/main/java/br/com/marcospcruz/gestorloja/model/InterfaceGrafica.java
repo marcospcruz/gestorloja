@@ -21,6 +21,7 @@ public class InterfaceGrafica implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -8000151228417933839L;
+	public static final String ESTOQUE = "Estoque";
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idInterfaceGrafica;
@@ -44,9 +45,11 @@ public class InterfaceGrafica implements Serializable {
 		this(string);
 		this.nomeModulo = string2;
 	}
+
 	public InterfaceGrafica() {
-		
+
 	}
+
 	public InterfaceGrafica(String className) {
 		this.className = className;
 	}

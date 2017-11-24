@@ -10,6 +10,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -52,7 +53,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 	 * @param owner
 	 * @throws Exception
 	 */
-	public TipoProdutoDialog(JFrame owner) throws Exception {
+	public TipoProdutoDialog(JDialog owner) throws Exception {
 
 		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(), ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true);
 
