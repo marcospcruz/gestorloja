@@ -1,4 +1,5 @@
 echo off
+cls
 set mensagemCommit=%1
 echo mensagem: %mensagemCommit%
 
