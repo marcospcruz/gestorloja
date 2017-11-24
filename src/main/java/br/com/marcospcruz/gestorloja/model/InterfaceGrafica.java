@@ -2,10 +2,13 @@ package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
@@ -21,11 +24,29 @@ public class InterfaceGrafica implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idInterfaceGrafica;
+	@Column(unique = true)
 	private String className;
+	@ManyToOne
+	@JoinColumn(name = "idOperador")
+	private Usuario operador;
+	@Column(unique = true)
+	private String nomeModulo;
 
-	public InterfaceGrafica() {
+	public Usuario getOperador() {
+		return operador;
 	}
 
+	public void setOperador(Usuario operador) {
+		this.operador = operador;
+	}
+
+	public InterfaceGrafica(String string, String string2) {
+		this(string);
+		this.nomeModulo = string2;
+	}
+	public InterfaceGrafica() {
+		
+	}
 	public InterfaceGrafica(String className) {
 		this.className = className;
 	}
@@ -48,7 +69,16 @@ public class InterfaceGrafica implements Serializable {
 
 	@Override
 	public String toString() {
-		return "InterfaceGrafica [idInterfaceGrafica=" + idInterfaceGrafica + ", className=" + className + "]";
+		return "InterfaceGrafica [idInterfaceGrafica=" + idInterfaceGrafica + ", className=" + className + ", operador="
+				+ operador + "]";
+	}
+
+	public String getNomeModulo() {
+		return nomeModulo;
+	}
+
+	public void setNomeModulo(String nomeModulo) {
+		this.nomeModulo = nomeModulo;
 	}
 
 	@Override
@@ -57,6 +87,7 @@ public class InterfaceGrafica implements Serializable {
 		int result = 1;
 		result = prime * result + ((className == null) ? 0 : className.hashCode());
 		result = prime * result + idInterfaceGrafica;
+		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		return result;
 	}
 
@@ -75,6 +106,11 @@ public class InterfaceGrafica implements Serializable {
 		} else if (!className.equals(other.className))
 			return false;
 		if (idInterfaceGrafica != other.idInterfaceGrafica)
+			return false;
+		if (operador == null) {
+			if (other.operador != null)
+				return false;
+		} else if (!operador.equals(other.operador))
 			return false;
 		return true;
 	}

@@ -4,25 +4,31 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 @Entity
 @NamedQuery(name = "perfilusuario.findperfil", query = "select p from PerfilUsuario p where p.descricao=:descricao")
-public class PerfilUsuario implements Serializable{
+public class PerfilUsuario implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idPerfilusuario;
 	private String descricao;
-	@OneToMany
+	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "Perfis_interfaces", joinColumns = {
 			@JoinColumn(name = "idPerfilUsuario") }, inverseJoinColumns = { @JoinColumn(name = "idInterface") })
 	private List<InterfaceGrafica> interfaces;
+
+	@ManyToOne
+	@JoinColumn(name = "idOperador")
+	private Usuario operador;
 
 	public PerfilUsuario(String descricao) {
 		this.descricao = descricao;
@@ -60,6 +66,14 @@ public class PerfilUsuario implements Serializable{
 		this.interfaces = interfaces;
 	}
 
+	public Usuario getOperador() {
+		return operador;
+	}
+
+	public void setOperador(Usuario operador) {
+		this.operador = operador;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -67,6 +81,7 @@ public class PerfilUsuario implements Serializable{
 		result = prime * result + ((descricao == null) ? 0 : descricao.hashCode());
 		result = prime * result + idPerfilusuario;
 		result = prime * result + ((interfaces == null) ? 0 : interfaces.hashCode());
+		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		return result;
 	}
 
@@ -91,13 +106,18 @@ public class PerfilUsuario implements Serializable{
 				return false;
 		} else if (!interfaces.equals(other.interfaces))
 			return false;
+		if (operador == null) {
+			if (other.operador != null)
+				return false;
+		} else if (!operador.equals(other.operador))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "PerfilUsuario [idPerfilusuario=" + idPerfilusuario + ", descricao=" + descricao + ", interfaces="
-				+ interfaces + "]";
+				+ interfaces + ", operador=" + operador + "]";
 	}
 
 }

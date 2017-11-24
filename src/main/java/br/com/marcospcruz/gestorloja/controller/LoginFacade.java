@@ -56,6 +56,7 @@ public class LoginFacade {
 		SessaoUsuario sessaoUsuario = sessaoUsuarioDao.update(sessaoUsuarioBuilder.getSessaoUsuario());
 		sessaoUsuarioBuilder.setSessaoUsuario(sessaoUsuario);
 		usuario.setUltimoAcesso(sessaoUsuario.getDataInicio());
+		usuario.setPrimeiroAcesso(false);
 		new CrudDao<Usuario>().update(usuario);
 	}
 
@@ -99,8 +100,21 @@ public class LoginFacade {
 
 	public LoginFacade fechaSessaoUsuario() {
 		sessaoUsuarioBuilder.setDataFim(new Date());
-		sessaoUsuarioDao.update(sessaoUsuarioBuilder.getSessaoUsuario());
+		SessaoUsuario sessao = sessaoUsuarioBuilder.getSessaoUsuario();
+		// temp
+		 sessaoUsuarioDao.update(sessao);
+
 		return this;
+	}
+
+	public Usuario getUsuarioLogado() {
+		Usuario usuario = sessaoUsuarioBuilder.getSessaoUsuario().getUsuario();
+		
+		return new CrudDao<Usuario>().busca(Usuario.class, usuario.getIdUsuario());
+	}
+
+	public void setSessaoUsuarioBuilder(SessaoUsuarioBuilder sessaoUsuarioBuilder) {
+		this.sessaoUsuarioBuilder = sessaoUsuarioBuilder;
 	}
 
 }

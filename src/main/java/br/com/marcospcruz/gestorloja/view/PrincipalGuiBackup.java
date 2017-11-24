@@ -14,12 +14,12 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
 
-public class PrincipalGui extends AbstractJFrame implements WindowListener {
+public class PrincipalGuiBackup extends AbstractJFrame implements WindowListener {
 
 	/**
 	 * @param loginFacade
 	 */
-	public PrincipalGui(LoginFacade loginFacade) {
+	public PrincipalGuiBackup(LoginFacade loginFacade) {
 		super("Gestor Loja", loginFacade);
 		addWindowListener(this);
 

@@ -63,7 +63,9 @@ public class App {
 	private static Crud<InterfaceGrafica> criaInterfaceGrafica() {
 		String pack = "br.com.marcospcruz.gestorloja.view.";
 		List<InterfaceGrafica> interfaces = Arrays
-				.asList(new InterfaceGrafica[] { new InterfaceGrafica(pack + "EstoquePrincipalGui") });
+				.asList(new InterfaceGrafica[] { new InterfaceGrafica(pack + "EstoquePrincipalGui","Estoque"),
+//						new InterfaceGrafica(pack + "VendaPrincipalGui","Venda") 
+						});
 		Crud<InterfaceGrafica> iDao = new CrudDao<>();
 		interfaces.stream().forEach(i -> {
 			try {

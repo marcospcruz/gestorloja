@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
@@ -34,6 +36,22 @@ public abstract class TipoProduto implements Serializable {
 	@OneToMany(mappedBy = "superTipoProduto")
 	@OrderBy("descricaoTipo")
 	private Collection<SubTipoProduto> subTiposProduto;
+
+	@ManyToOne
+	@JoinColumn(name = "idOperador")
+	private Usuario operador;
+
+	public Usuario getOperador() {
+		return operador;
+	}
+
+	public void setOperador(Usuario operador) {
+		this.operador = operador;
+	}
+
+	public void setIdTipoItem(Integer idTipoItem) {
+		this.idTipoItem = idTipoItem;
+	}
 
 	public Integer getIdTipoItem() {
 		return idTipoItem;
@@ -63,12 +81,10 @@ public abstract class TipoProduto implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((descricaoTipo == null) ? 0 : descricaoTipo.hashCode());
-		result = prime * result
-				+ ((descricaoTipo == null) ? 0 : descricaoTipo.hashCode());
-		result = prime * result
-				+ ((subTiposProduto == null) ? 0 : subTiposProduto.hashCode());
+		result = prime * result + ((descricaoTipo == null) ? 0 : descricaoTipo.hashCode());
+		result = prime * result + ((idTipoItem == null) ? 0 : idTipoItem.hashCode());
+		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
+		result = prime * result + ((subTiposProduto == null) ? 0 : subTiposProduto.hashCode());
 		return result;
 	}
 
@@ -86,10 +102,15 @@ public abstract class TipoProduto implements Serializable {
 				return false;
 		} else if (!descricaoTipo.equals(other.descricaoTipo))
 			return false;
-		if (descricaoTipo == null) {
-			if (other.descricaoTipo != null)
+		if (idTipoItem == null) {
+			if (other.idTipoItem != null)
 				return false;
-		} else if (!descricaoTipo.equals(other.descricaoTipo))
+		} else if (!idTipoItem.equals(other.idTipoItem))
+			return false;
+		if (operador == null) {
+			if (other.operador != null)
+				return false;
+		} else if (!operador.equals(other.operador))
 			return false;
 		if (subTiposProduto == null) {
 			if (other.subTiposProduto != null)
@@ -101,9 +122,8 @@ public abstract class TipoProduto implements Serializable {
 
 	@Override
 	public String toString() {
-
-		return getDescricaoTipo();
-
+		return "TipoProduto [idTipoItem=" + idTipoItem + ", descricaoTipo=" + descricaoTipo + ", subTiposProduto="
+				+ subTiposProduto + ", operador=" + operador + "]";
 	}
 
 }

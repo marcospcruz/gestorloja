@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -23,10 +24,13 @@ import javax.persistence.TemporalType;
 		@NamedQuery(name = "usuario.findLogin", query = 
 				"select u from Usuario u "
 				+ "JOIN FETCH u.perfisUsuario "
+//				+ "LEFT JOIN u.operador o "						
 				+ "where u.nomeUsuario=:nomeUsuario "
 				+ "and u.password=:password"),
 		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u "
-				+ "JOIN FETCH u.perfisUsuario "
+				+ "LEFT JOIN u.operador o "
+//				+ "JOIN FETCH u.perfisUsuario p "
+//				+ "LEFT JOIN FETCH p.interfaces i "				
 				+ "where u.nomeUsuario=:nomeUsuario") })
 //@formatter:on
 public class Usuario implements Serializable {
@@ -45,6 +49,9 @@ public class Usuario implements Serializable {
 	@JoinTable(name = "Perfil_usuario", joinColumns = { @JoinColumn(name = "idUsuario") }, inverseJoinColumns = {
 			@JoinColumn(name = "idPerfilUsuario") })
 	private List<PerfilUsuario> perfisUsuario;
+	@ManyToOne
+	@JoinColumn(name = "idOperador")
+	private Usuario operador;
 
 	public Usuario() {
 
@@ -57,6 +64,14 @@ public class Usuario implements Serializable {
 		setPassword(string3);
 		setPerfisUsuario(perfisUsuario);
 		setPrimeiroAcesso(primeiroAcesso);
+	}
+
+	public Usuario getOperador() {
+		return operador;
+	}
+
+	public void setOperador(Usuario operador) {
+		this.operador = operador;
 	}
 
 	private void setNomeCompleto(String nomeCompleto) {

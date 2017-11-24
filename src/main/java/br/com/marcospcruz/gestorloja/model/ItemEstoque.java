@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -16,10 +18,9 @@ import javax.persistence.Table;
 @Table(name = "Estoque")
 @NamedQueries({
 		@NamedQuery(name = "itemestoque.readDescricaoPecao", query = "select ie from ItemEstoque ie "
-				+ "JOIN ie.produto p "
-				+ "where upper(p.descricaoProduto) like :descricao"),
-		@NamedQuery(name = "itemEstoque.readAll", query = "select ie from ItemEstoque ie "
-				+ "JOIN ie.produto p " + "order by p.descricaoProduto")
+				+ "JOIN ie.produto p " + "where upper(p.descricaoProduto) like :descricao"),
+		@NamedQuery(name = "itemEstoque.readAll", query = "select ie from ItemEstoque ie " + "JOIN ie.produto p "
+				+ "order by p.descricaoProduto")
 
 })
 public class ItemEstoque implements Serializable {
@@ -39,6 +40,17 @@ public class ItemEstoque implements Serializable {
 	private Integer quantidade;
 
 	private Date dataContagem;
+	@ManyToOne
+	@JoinColumn(name = "idOperador")
+	private Usuario operador;
+
+	public Usuario getOperador() {
+		return operador;
+	}
+
+	public void setOperador(Usuario operador) {
+		this.operador = operador;
+	}
 
 	public Integer getIdItemEstoque() {
 		return idItemEstoque;
@@ -80,13 +92,11 @@ public class ItemEstoque implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((dataContagem == null) ? 0 : dataContagem.hashCode());
-		result = prime * result
-				+ ((idItemEstoque == null) ? 0 : idItemEstoque.hashCode());
+		result = prime * result + ((dataContagem == null) ? 0 : dataContagem.hashCode());
+		result = prime * result + ((idItemEstoque == null) ? 0 : idItemEstoque.hashCode());
+		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((produto == null) ? 0 : produto.hashCode());
-		result = prime * result
-				+ ((quantidade == null) ? 0 : quantidade.hashCode());
+		result = prime * result + ((quantidade == null) ? 0 : quantidade.hashCode());
 		return result;
 	}
 
@@ -109,6 +119,11 @@ public class ItemEstoque implements Serializable {
 				return false;
 		} else if (!idItemEstoque.equals(other.idItemEstoque))
 			return false;
+		if (operador == null) {
+			if (other.operador != null)
+				return false;
+		} else if (!operador.equals(other.operador))
+			return false;
 		if (produto == null) {
 			if (other.produto != null)
 				return false;
@@ -124,9 +139,8 @@ public class ItemEstoque implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ItemEstoque [idItemEstoque=" + idItemEstoque + ", produto="
-				+ produto + ", quantidade=" + quantidade + ", dataContagem="
-				+ dataContagem + "]";
+		return "ItemEstoque [idItemEstoque=" + idItemEstoque + ", produto=" + produto + ", quantidade=" + quantidade
+				+ ", dataContagem=" + dataContagem + ", operador=" + operador + "]";
 	}
 
 }

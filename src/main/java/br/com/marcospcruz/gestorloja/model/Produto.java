@@ -59,6 +59,9 @@ public class Produto implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idFabricante")
 	private Fabricante fabricante;
+	@ManyToOne
+	@JoinColumn(name = "idOperador")
+	private Usuario operador;
 
 	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida,
 			String codigoDeBarras, Fabricante fabricante, float valorUnitario) {
@@ -138,6 +141,22 @@ public class Produto implements Serializable {
 		this.codigoDeBarras = codigoDeBarras;
 	}
 
+	public Usuario getOperador() {
+		return operador;
+	}
+
+	public void setOperador(Usuario operador) {
+		this.operador = operador;
+	}
+
+	@Override
+	public String toString() {
+		return "Produto [idProduto=" + idProduto + ", descricaoProduto=" + descricaoProduto + ", unidadeMedida="
+				+ unidadeMedida + ", valorUnitario=" + valorUnitario + ", codigoDeBarras=" + codigoDeBarras
+				+ ", itemEstoque=" + itemEstoque + ", tipoProduto=" + tipoProduto + ", fabricante=" + fabricante
+				+ ", operador=" + operador + "]";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -147,6 +166,7 @@ public class Produto implements Serializable {
 		result = prime * result + ((fabricante == null) ? 0 : fabricante.hashCode());
 		result = prime * result + ((idProduto == null) ? 0 : idProduto.hashCode());
 		result = prime * result + ((itemEstoque == null) ? 0 : itemEstoque.hashCode());
+		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((tipoProduto == null) ? 0 : tipoProduto.hashCode());
 		result = prime * result + ((unidadeMedida == null) ? 0 : unidadeMedida.hashCode());
 		result = prime * result + Float.floatToIntBits(valorUnitario);
@@ -187,6 +207,11 @@ public class Produto implements Serializable {
 				return false;
 		} else if (!itemEstoque.equals(other.itemEstoque))
 			return false;
+		if (operador == null) {
+			if (other.operador != null)
+				return false;
+		} else if (!operador.equals(other.operador))
+			return false;
 		if (tipoProduto == null) {
 			if (other.tipoProduto != null)
 				return false;
@@ -200,11 +225,6 @@ public class Produto implements Serializable {
 		if (Float.floatToIntBits(valorUnitario) != Float.floatToIntBits(other.valorUnitario))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return tipoProduto.getDescricaoTipo() + " - " + descricaoProduto + " - " + fabricante.getNome();
 	}
 
 }

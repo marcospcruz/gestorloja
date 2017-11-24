@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
@@ -23,6 +25,10 @@ public class Fabricante implements Serializable {
 	private Integer idFabricante;
 
 	private String nome;
+
+	@ManyToOne
+	@JoinColumn(name = "idOperador")
+	private Usuario operador;
 
 	public Integer getIdFabricante() {
 		return idFabricante;
@@ -46,6 +52,7 @@ public class Fabricante implements Serializable {
 		int result = 1;
 		result = prime * result + ((idFabricante == null) ? 0 : idFabricante.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		return result;
 	}
 
@@ -68,12 +75,17 @@ public class Fabricante implements Serializable {
 				return false;
 		} else if (!nome.equals(other.nome))
 			return false;
+		if (operador == null) {
+			if (other.operador != null)
+				return false;
+		} else if (!operador.equals(other.operador))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return nome;
+		return "Fabricante [idFabricante=" + idFabricante + ", nome=" + nome + ", operador=" + operador + "]";
 	}
 
 }
