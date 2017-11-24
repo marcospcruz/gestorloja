@@ -88,7 +88,7 @@ public class ProdutoController extends AbstractController {
 			this.produto = produtoDao.update(this.produto);
 		} else {
 			((Produto) produto).setDataInsercao(new Date());
-			this.produto = ((Produto) produto);
+			this.produto = (Produto) produto;
 
 		}
 		this.produto.setOperador(getLoginFacade().getUsuarioLogado());
