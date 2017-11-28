@@ -50,7 +50,7 @@ public class ControleCaixaGui extends AbstractDialog {
 	public void actionPerformed(ActionEvent arg0) {
 		switch(arg0.getActionCommand()){
 		case ABRIR_CAIXA:
-			new FormAberturaCaixaDialog(this);
+			new FormAberturaCaixaDialog(this,controller);
 			break;
 		}
 

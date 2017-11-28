@@ -65,16 +65,15 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-		switch (e.getActionCommand()) {
-		case InterfaceGrafica.ESTOQUE:
-			new EstoquePrincipalGui(InterfaceGrafica.ESTOQUE, this);
-			break;
-		case InterfaceGrafica.CONTROLE_DE_CAIXA:
-			
-				new ControleCaixaGui(getLoginFacade(),InterfaceGrafica.CONTROLE_DE_CAIXA,this);
-			
+			switch (e.getActionCommand()) {
+			case InterfaceGrafica.ESTOQUE:
+				new EstoquePrincipalGui(InterfaceGrafica.ESTOQUE, this);
+				break;
+			case InterfaceGrafica.CONTROLE_DE_CAIXA:
 
-		}
+				new ControleCaixaGui(getLoginFacade(), InterfaceGrafica.CONTROLE_DE_CAIXA, this);
+
+			}
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

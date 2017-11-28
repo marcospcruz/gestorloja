@@ -88,8 +88,6 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	
-
 	public AbstractDialog(JFrame owner, String tituloJanela, boolean modal) {
 		super(owner, tituloJanela, modal);
 
@@ -98,12 +96,12 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 	}
 
 	public AbstractDialog(JFrame owner, String tituloJanela, boolean b, LoginFacade loginFacade) throws Exception {
-		this(owner,tituloJanela,b);
-	
-			criaController(ControllerAbstractFactory.CONTROLE_CAIXA, loginFacade);
-		
-		
+		this(owner, tituloJanela, b);
+
+		criaController(ControllerAbstractFactory.CONTROLE_CAIXA, loginFacade);
+
 	}
+
 	private void criaController(String controllerClassName, LoginFacade loginFacade) throws Exception {
 		try {
 			controller = ControllerAbstractFactory.createController(controllerClassName);
@@ -124,6 +122,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 		}
 	}
+
 	private void configuraDialog() {
 		setSize(new Dimension(800, 600));
 
