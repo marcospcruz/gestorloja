@@ -62,7 +62,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	private String controllerClassName;
 
-//	private LoginFacade loginFacade;
+	// private LoginFacade loginFacade;
 
 	protected static final Border BUSCAR_TITLED_BORDER = new TitledBorder("Busca");
 
@@ -79,6 +79,17 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
+	public AbstractDialog(JDialog owner, String tituloJanela, String controllerClassName, boolean modal,
+			LoginFacade loginFacade) throws Exception {
+
+		this(owner, tituloJanela, modal);
+
+		criaController(controllerClassName, loginFacade);
+
+	}
+
+	
+
 	public AbstractDialog(JFrame owner, String tituloJanela, boolean modal) {
 		super(owner, tituloJanela, modal);
 
@@ -86,11 +97,14 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	public AbstractDialog(JDialog owner, String tituloJanela, String controllerClassName, boolean modal, LoginFacade loginFacade)
-			throws Exception {
-
-		this(owner, tituloJanela, modal);
-
+	public AbstractDialog(JFrame owner, String tituloJanela, boolean b, LoginFacade loginFacade) throws Exception {
+		this(owner,tituloJanela,b);
+	
+			criaController(ControllerAbstractFactory.CONTROLE_CAIXA, loginFacade);
+		
+		
+	}
+	private void criaController(String controllerClassName, LoginFacade loginFacade) throws Exception {
 		try {
 			controller = ControllerAbstractFactory.createController(controllerClassName);
 			controller.setLoginFacade(loginFacade);
@@ -109,9 +123,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 			e.printStackTrace();
 
 		}
-
 	}
-
 	private void configuraDialog() {
 		setSize(new Dimension(800, 600));
 

@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -15,15 +16,17 @@ import javax.swing.JButton;
 
 public class ControleCaixaGui extends AbstractDialog {
 
-	public ControleCaixaGui(String tituloJanela, JFrame owner) {
+	private static final String ABRIR_CAIXA = "Abrir Caixa";
 
-		super(owner, tituloJanela, true);
+	public ControleCaixaGui(LoginFacade loginFacade, String tituloJanela, JFrame owner) throws Exception {
+
+		super(owner, tituloJanela, true,loginFacade);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		try {
 			getContentPane().add(configuraOperacoesPanel(), BorderLayout.NORTH);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 
@@ -31,6 +34,7 @@ public class ControleCaixaGui extends AbstractDialog {
 
 	}
 
+	
 	private JPanel configuraOperacoesPanel() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		JPanel panel = new JPanel();
 
@@ -44,7 +48,11 @@ public class ControleCaixaGui extends AbstractDialog {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		System.out.println(arg0.getActionCommand());
+		switch(arg0.getActionCommand()){
+		case ABRIR_CAIXA:
+			new FormAberturaCaixaDialog(this);
+			break;
+		}
 
 	}
 

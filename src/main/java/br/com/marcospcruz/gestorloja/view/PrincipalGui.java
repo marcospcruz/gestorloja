@@ -15,6 +15,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 public class PrincipalGui extends AbstractJFrame implements WindowListener {
 
@@ -63,16 +64,22 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
+		try {
 		switch (e.getActionCommand()) {
 		case InterfaceGrafica.ESTOQUE:
 			new EstoquePrincipalGui(InterfaceGrafica.ESTOQUE, this);
 			break;
 		case InterfaceGrafica.CONTROLE_DE_CAIXA:
-			new ControleCaixaGui(InterfaceGrafica.CONTROLE_DE_CAIXA,this);
+			
+				new ControleCaixaGui(getLoginFacade(),InterfaceGrafica.CONTROLE_DE_CAIXA,this);
+			
 
 		}
-
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(null, e1.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	@Override
