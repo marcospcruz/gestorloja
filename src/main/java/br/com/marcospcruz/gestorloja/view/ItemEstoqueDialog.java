@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
@@ -32,6 +33,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 	private JFormattedTextField txtQuantidadeInicial;
 	private JButton btnAdicionarItem;
 	private EstoqueController controller;
+	private LoginFacade loginFacade;
 
 	public ItemEstoqueDialog(EstoqueController controller, JDialog owner) throws Exception {
 
@@ -50,6 +52,8 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		add(btnAdicionarItem);
 
 		setVisible(true);
+		
+		this.loginFacade=loginFacade;
 
 	}
 

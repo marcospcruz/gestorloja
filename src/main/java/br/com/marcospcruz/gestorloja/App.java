@@ -63,7 +63,9 @@ public class App {
 	private static Crud<InterfaceGrafica> criaInterfaceGrafica() {
 		String pack = "br.com.marcospcruz.gestorloja.view.";
 		List<InterfaceGrafica> interfaces = Arrays
-				.asList(new InterfaceGrafica[] { new InterfaceGrafica(pack + "EstoquePrincipalGui","Estoque"),
+				.asList(new InterfaceGrafica[] { 
+						new InterfaceGrafica(pack + "EstoquePrincipalGui","Estoque"),
+						new InterfaceGrafica(pack + "ControleCaixaGui","Controle de Caixa")
 //						new InterfaceGrafica(pack + "VendaPrincipalGui","Venda") 
 						});
 		Crud<InterfaceGrafica> iDao = new CrudDao<>();
@@ -97,6 +99,8 @@ public class App {
 			} catch (NoResultException e) {
 				e.printStackTrace();
 				userdao.update(usuario);
+			}finally{
+				
 			}
 		});
 	}
@@ -125,6 +129,8 @@ public class App {
 			} catch (NoResultException e) {
 				e.printStackTrace();
 				dao.update(perfil);
+			}finally{
+				
 			}
 			//
 		});

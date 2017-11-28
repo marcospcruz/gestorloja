@@ -28,6 +28,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.controller.relatorio.RelatorioEstoqueGeral;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
@@ -72,7 +73,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		super(owner, tituloJanela, true);
 
 		controller = new EstoqueController();
-		controller.setLoginFacade(((PrincipalGui)owner).getLoginFacade());
+		controller.setLoginFacade(((PrincipalGui) owner).getLoginFacade());
 
 		carregaJPanel();
 
@@ -387,7 +388,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	}
 
 	protected void selecionaAcao(String actionCommand) throws Exception {
-
+		LoginFacade loginFacade = controller.getLoginFacade();
 		if (actionCommand.equals(ConstantesEnum.LBL_BTN_NOVO_ITEM_ESTOQUE.getValue().toString())) {
 
 			new ItemEstoqueDialog(controller, this);
@@ -404,13 +405,13 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		} else if (actionCommand.equals(ConstantesEnum.LBL_BTN_TIPO_PRODUTO.getValue().toString())) {
 
-			new TipoProdutoDialog(this);
+			new TipoProdutoDialog(this,loginFacade);
 
 			// atualizaView();
 
 		} else if (actionCommand.equals(ConstantesEnum.PRODUTO_LABEL.getValue().toString())) {
 
-			new ProdutoDialog(this);
+			new ProdutoDialog(this,loginFacade);
 
 			// atualizaView();
 
@@ -424,7 +425,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		} else if (actionCommand.equals(ConstantesEnum.FABRICANTE.getValue().toString())) {
 
-			new FabricanteDialog(this);
+			new FabricanteDialog(this, loginFacade);
 
 			// atualizaView();
 
@@ -525,7 +526,12 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 			controller.busca(idItemEstoque);
 
-			new ItemDoEstoqueDialog(this, controller);
+			try {
+				new ItemDoEstoqueDialog(this, controller);
+			} catch (Exception e1) {
+
+				e1.printStackTrace();
+			}
 
 			controller.anulaAtributos();
 
@@ -558,7 +564,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	@Override
 	protected void configuraJPanel() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -582,25 +588,25 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	@Override
 	protected void atualizaTableModel(Object object) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void excluiItem() throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void salvarItem() throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void populaFormulario() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public EstoqueController getController() {

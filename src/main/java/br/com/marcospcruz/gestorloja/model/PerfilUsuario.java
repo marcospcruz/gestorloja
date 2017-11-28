@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 @Entity
 @NamedQuery(name = "perfilusuario.findperfil", query = "select p from PerfilUsuario p where p.descricao=:descricao")
@@ -24,6 +25,7 @@ public class PerfilUsuario implements Serializable {
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "Perfis_interfaces", joinColumns = {
 			@JoinColumn(name = "idPerfilUsuario") }, inverseJoinColumns = { @JoinColumn(name = "idInterface") })
+	@OrderBy(value="nomeModulo")
 	private List<InterfaceGrafica> interfaces;
 
 	@ManyToOne

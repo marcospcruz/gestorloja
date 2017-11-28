@@ -32,7 +32,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 	private EstoqueController controller;
 
-	private ItemDoEstoqueDialog(JDialog owner, String tituloJanela, boolean modal) {
+	private ItemDoEstoqueDialog(JDialog owner, String tituloJanela, boolean modal) throws Exception {
 
 		super(owner, tituloJanela, modal);
 
@@ -48,7 +48,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 	}
 
-	public ItemDoEstoqueDialog(JDialog owner, EstoqueController controller) {
+	public ItemDoEstoqueDialog(JDialog owner, EstoqueController controller) throws Exception {
 
 		this(owner, "Item do Estoque: "
 				+ controller.getItemEstoque().getProduto()

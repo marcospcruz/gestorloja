@@ -21,6 +21,7 @@ import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
@@ -51,11 +52,12 @@ public class TipoProdutoDialog extends AbstractDialog {
 	/**
 	 * 
 	 * @param owner
+	 * @param loginFacade 
 	 * @throws Exception
 	 */
-	public TipoProdutoDialog(JDialog owner) throws Exception {
+	public TipoProdutoDialog(JDialog owner, LoginFacade loginFacade) throws Exception {
 
-		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(), ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true);
+		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(), ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true, loginFacade);
 
 		atualizaTable = true;
 

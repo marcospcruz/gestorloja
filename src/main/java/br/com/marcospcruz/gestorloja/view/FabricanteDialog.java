@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
@@ -44,10 +45,10 @@ public class FabricanteDialog extends AbstractDialog {
 	 * @param owner
 	 * @throws Exception
 	 */
-	public FabricanteDialog(JDialog owner) throws Exception {
+	public FabricanteDialog(JDialog owner, LoginFacade loginFacade) throws Exception {
 
 		super(owner, "Cadastro de " + ConstantesEnum.FABRICANTE.getValue().toString(),
-				ControllerAbstractFactory.FABRICANTE, true);
+				ControllerAbstractFactory.FABRICANTE, true, loginFacade);
 
 		atualizaTable = true;
 

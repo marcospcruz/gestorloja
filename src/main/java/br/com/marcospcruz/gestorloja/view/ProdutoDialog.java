@@ -25,6 +25,7 @@ import org.hibernate.LazyInitializationException;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.AbstractController;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.Produto;
@@ -65,11 +66,11 @@ public class ProdutoDialog extends AbstractDialog {
 	private JComboBox cmbSubTiposDeProduto;
 	private JComboBox cmbMarca;
 
-	public ProdutoDialog(JDialog owner) throws Exception {
+	public ProdutoDialog(JDialog owner, LoginFacade loginFacade) throws Exception {
 
-		super(owner, "Cadastro de Produtos", ControllerAbstractFactory.PRODUTO, true);
+		super(owner, "Cadastro de Produtos", ControllerAbstractFactory.PRODUTO, true, loginFacade);
 
-//		controller = new ProdutoController();
+		// controller = new ProdutoController();
 
 		configuraJPanel();
 
@@ -221,7 +222,7 @@ public class ProdutoDialog extends AbstractDialog {
 			cmbTiposDeProduto.setSelectedIndex(0);
 
 			cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
-			
+
 			cmbMarca.setModel(carregaFabricantes(new Fabricante()));
 
 		}
@@ -687,11 +688,11 @@ public class ProdutoDialog extends AbstractDialog {
 				throw new Exception(
 						ConstantesEnum.SELECAO_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE.getValue().toString());
 
-			} 
-//			else if (cmbSubTiposDeProduto.getSelectedIndex() == 0)
-//
-//				throw new Exception(
-//						ConstantesEnum.SELECAO_SUB_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE.getValue().toString());
+			}
+			// else if (cmbSubTiposDeProduto.getSelectedIndex() == 0)
+			//
+			// throw new Exception(
+			// ConstantesEnum.SELECAO_SUB_TIPO_PRODUTO_INVALIDA_EXCEPTION_MESSAGE.getValue().toString());
 
 			Object tipoProduto = cmbTiposDeProduto.getSelectedItem();
 

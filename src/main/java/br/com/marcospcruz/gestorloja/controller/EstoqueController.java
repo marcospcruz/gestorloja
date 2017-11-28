@@ -75,6 +75,8 @@ public class EstoqueController implements Serializable {
 			int qt = parseInt(quantidade);
 
 			itemEstoque.setQuantidade(qt);
+			
+			itemEstoque.setOperador(loginFacade.getUsuarioLogado());
 
 			itemEstoque = itemEstoqueDao.update(itemEstoque);
 

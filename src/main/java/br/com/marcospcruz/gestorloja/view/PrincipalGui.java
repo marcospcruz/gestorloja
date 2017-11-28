@@ -67,6 +67,9 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 		switch (e.getActionCommand()) {
 		case InterfaceGrafica.ESTOQUE:
 			new EstoquePrincipalGui(InterfaceGrafica.ESTOQUE, this);
+			break;
+		case InterfaceGrafica.CONTROLE_DE_CAIXA:
+			new ControleCaixaGui(InterfaceGrafica.CONTROLE_DE_CAIXA,this);
 
 		}
 

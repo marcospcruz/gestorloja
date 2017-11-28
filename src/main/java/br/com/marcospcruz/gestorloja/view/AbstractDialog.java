@@ -62,7 +62,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	private String controllerClassName;
 
-	private LoginFacade loginFacade;
+//	private LoginFacade loginFacade;
 
 	protected static final Border BUSCAR_TITLED_BORDER = new TitledBorder("Busca");
 
@@ -86,14 +86,14 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	public AbstractDialog(JDialog owner, String tituloJanela, String controllerClassName, boolean modal)
+	public AbstractDialog(JDialog owner, String tituloJanela, String controllerClassName, boolean modal, LoginFacade loginFacade)
 			throws Exception {
 
 		this(owner, tituloJanela, modal);
 
 		try {
 			controller = ControllerAbstractFactory.createController(controllerClassName);
-			controller.setLoginFacade(((EstoquePrincipalGui)owner).getController().getLoginFacade());
+			controller.setLoginFacade(loginFacade);
 		} catch (ClassNotFoundException e) {
 
 			e.printStackTrace();
