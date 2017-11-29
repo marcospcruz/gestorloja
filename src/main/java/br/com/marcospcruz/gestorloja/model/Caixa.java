@@ -9,10 +9,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
+@NamedQueries({
+		@NamedQuery(name = "caixa.findCaixaAberto", query = "select c from Caixa c where c.dataFechamento=null") ,
+		@NamedQuery(name="caixa.findAll",query="select c from Caixa c")})
 public class Caixa implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

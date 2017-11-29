@@ -2,7 +2,14 @@ package br.com.marcospcruz.gestorloja.controller;
 
 import java.util.List;
 
+import br.com.marcospcruz.gestorloja.dao.Crud;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
+import br.com.marcospcruz.gestorloja.model.Caixa;
+
 public class CaixaController extends AbstractController {
+
+	private Crud<Caixa> dao = new CrudDao<>();
+	private List<Caixa> caixaList;
 
 	@Override
 	public void busca(int id) {
@@ -12,20 +19,19 @@ public class CaixaController extends AbstractController {
 
 	@Override
 	public List buscaTodos() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return dao.busca("caixa.findAll");
 	}
 
 	@Override
 	public List getList() {
-		// TODO Auto-generated method stub
-		return null;
+		return buscaTodos();
+		
 	}
 
 	@Override
-	public void busca(String text) throws Exception {
-		// TODO Auto-generated method stub
-
+	public void busca(String query) throws Exception {
+		caixaList = dao.busca(query);
 	}
 
 	@Override
@@ -60,7 +66,21 @@ public class CaixaController extends AbstractController {
 
 	@Override
 	public void salva(Object object) throws Exception {
-		// TODO Auto-generated method stub
+
+		validateCaixaAberto();
+		Caixa caixa = (Caixa) object;
+
+		dao.update(caixa);
+
+	}
+
+	public void validateCaixaAberto() throws Exception {
+
+		busca("caixa.findCaixaAberto");
+
+		if (caixaList != null && !caixaList.isEmpty()) {
+			throw new Exception("Há caixa aberto.");
+		}
 
 	}
 

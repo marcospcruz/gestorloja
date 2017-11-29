@@ -7,19 +7,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
-
-import javax.swing.Timer;
 
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.AbstractController;
+import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.util.NumberDocument;
@@ -42,15 +42,24 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 		criaFormPanel();
 
 		try {
+			validaCaixaAberto();
 			criaCommandPanel();
 
 			carregaController();
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
+			
+			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			setVisible(true);
+
+		} catch (Exception e) {
+
 			e.printStackTrace();
+			showMessage(e.getMessage());
 		}
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setVisible(true);
+	}
+
+	private void validaCaixaAberto() throws Exception {
+		((CaixaController)caixaController).validateCaixaAberto();
+		
 	}
 
 	private void criaCommandPanel() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -142,18 +151,43 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 		if (e.getActionCommand() != null)
 			switch (e.getActionCommand()) {
 			case "Abrir Caixa":
-				Caixa caixa = new Caixa();
-				float saldoInicial = 0f;
-				if (!saldoTextField.getText().isEmpty()) {
+				try {
+					abreCaixa();
+				} catch (Exception e1) {
 
-					saldoInicial = Float.parseFloat(saldoTextField.getText());
+					e1.printStackTrace();
 				}
-				caixa.setSaldoInicial(saldoInicial);
 				dispose();
 				return;
 			}
 
 		atualizaDataAbertura();
+	}
+
+	private void abreCaixa() {
+		Caixa caixa = new Caixa();
+		float saldoInicial = 0f;
+		if (!saldoTextField.getText().isEmpty()) {
+
+			saldoInicial = Float.parseFloat(saldoTextField.getText());
+		}
+		caixa.setSaldoInicial(saldoInicial);
+		caixa.setUsuarioAbertura(operador);
+		String message = null;
+		try {
+			caixaController.salva(caixa);
+			message = "Caixa aberto com sucesso!";
+		} catch (Exception e) {
+			message = e.getMessage();
+		} finally {
+			showMessage(message);
+		}
+
+	}
+
+	private void showMessage(String message) {
+		JOptionPane.showMessageDialog(this, message);
+		
 	}
 
 	private void atualizaDataAbertura() {
