@@ -2,7 +2,6 @@ package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,38 +18,45 @@ import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
 public class ControleCaixaGui extends AbstractDialog {
 
 	private static final String ABRIR_CAIXA = "Abrir Caixa";
+	private static final Object[] COLUNAS_JTABLE = new Object[] { "Abertura", "Operador Abertura", "Saldo Abertura", "Saldo Fechamento",
+			"Fechamento", "Operador Fechamento" };
 
 	public ControleCaixaGui(LoginFacade loginFacade, String tituloJanela, JFrame owner) throws Exception {
 
 		super(owner, tituloJanela, true, loginFacade);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
+		atualizaJTable();
+
+		setVisible(true);
+
+	}
+
+	private void atualizaJTable() {
 		try {
 			getContentPane().add(configuraOperacoesPanel(), BorderLayout.NORTH);
 			carregaTableModel();
 			jTable = inicializaJTable();
-			JPanel panel = new JPanel();
-			
-			panel.setBorder(new TitledBorder("Caixa"));
+			// JPanel panel = new JPanel();
+
+			// panel.setBorder(new TitledBorder("Caixa"));
 			JScrollPane jScrollPane = new JScrollPane(jTable);
 
-			Rectangle retangulo = this.getBounds();
-			panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-			jScrollPane.setBounds(retangulo);
+			// panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+			jScrollPane.setSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-			panel.add(jScrollPane);
-			getContentPane().add(panel, BorderLayout.CENTER);
+			// panel.add(jScrollPane);
+			jScrollPane.repaint();
+			getContentPane().add(jScrollPane, BorderLayout.CENTER);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 
 			e.printStackTrace();
 		}
-
-		setVisible(true);
-
 	}
 
 	JTable inicializaJTable() {
@@ -94,12 +100,11 @@ public class ControleCaixaGui extends AbstractDialog {
 			new FormAberturaCaixaDialog(this, controller);
 			break;
 		}
-
+		atualizaTableModel(controller.getItem());
 	}
 
 	@Override
 	protected void configuraJPanel() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -129,15 +134,24 @@ public class ControleCaixaGui extends AbstractDialog {
 
 	@Override
 	protected void atualizaTableModel(Object object) {
-		// TODO Auto-generated method stub
 
+		List linhas = new ArrayList();
+		linhas.add(object);
+		carregaTableModel(carregaLinhasTableModel(linhas));
+		repaint();
+	}
+
+	private void carregaTableModel(List linhas) {
+		
+
+	carregaTableModel(linhas, COLUNAS_JTABLE);
+		
 	}
 
 	@Override
 	protected void carregaTableModel() {
 		List linhas = carregaLinhasTableModel(controller.getList());
-		carregaTableModel(linhas, new Object[] { "Abertura", "Operador Abertura", "Saldo Abertura", "Saldo Fechamento",
-				"Fechamento", "Operador Fechamento" });
+		carregaTableModel(linhas, COLUNAS_JTABLE);
 
 	}
 

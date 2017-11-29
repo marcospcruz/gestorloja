@@ -60,7 +60,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	private EstoqueController controller;
 
-	private MyTableModel myTableModel;
+//	private MyTableModel myTableModel;
 
 	private JTable jTable;
 
@@ -174,10 +174,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	@SuppressWarnings("rawtypes")
 	protected void carregaTableModel(List linhas) {
 
-		myTableModel = new MyTableModel(linhas, COLUNAS_JTABLE);
-
-		myTableModel.fireTableDataChanged();
-
+		carregaTableModel(linhas, COLUNAS_JTABLE);
 	}
 
 	@Override
@@ -405,13 +402,13 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		} else if (actionCommand.equals(ConstantesEnum.LBL_BTN_TIPO_PRODUTO.getValue().toString())) {
 
-			new TipoProdutoDialog(this,loginFacade);
+			new TipoProdutoDialog(this, loginFacade);
 
 			// atualizaView();
 
 		} else if (actionCommand.equals(ConstantesEnum.PRODUTO_LABEL.getValue().toString())) {
 
-			new ProdutoDialog(this,loginFacade);
+			new ProdutoDialog(this, loginFacade);
 
 			// atualizaView();
 
