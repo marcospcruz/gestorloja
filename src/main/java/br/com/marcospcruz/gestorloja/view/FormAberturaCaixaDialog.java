@@ -157,6 +157,7 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 
 					e1.printStackTrace();
 				}
+				
 				dispose();
 				return;
 			}
@@ -177,6 +178,7 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 		try {
 			caixaController.salva(caixa);
 			message = "Caixa aberto com sucesso!";
+			
 		} catch (Exception e) {
 			message = e.getMessage();
 		} finally {

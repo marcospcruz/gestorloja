@@ -1,9 +1,11 @@
 package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -23,13 +25,15 @@ import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 public class ControleCaixaGui extends AbstractDialog {
 
 	private static final String ABRIR_CAIXA = "Abrir Caixa";
-	private static final Object[] COLUNAS_JTABLE = new Object[] { "Abertura", "Operador Abertura", "Saldo Abertura", "Saldo Fechamento",
-			"Fechamento", "Operador Fechamento" };
+	private static final Object[] COLUNAS_JTABLE = new Object[] { "Abertura", "Operador Abertura", "Saldo Abertura",
+			"Saldo Fechamento", "Fechamento", "Operador Fechamento" };
+	private JPanel jpanel;
 
 	public ControleCaixaGui(LoginFacade loginFacade, String tituloJanela, JFrame owner) throws Exception {
 
 		super(owner, tituloJanela, true, loginFacade);
 		getContentPane().setLayout(new BorderLayout(0, 0));
+		getContentPane().add(configuraOperacoesPanel(), BorderLayout.NORTH);
 
 		atualizaJTable();
 
@@ -38,25 +42,27 @@ public class ControleCaixaGui extends AbstractDialog {
 	}
 
 	private void atualizaJTable() {
-		try {
-			getContentPane().add(configuraOperacoesPanel(), BorderLayout.NORTH);
-			carregaTableModel();
-			jTable = inicializaJTable();
-			// JPanel panel = new JPanel();
+		if (jpanel == null) {
+			jpanel = new JPanel();
+//			jpanel.setBorder(new TitledBorder("xxxxxxxxxxxx"));
+			jpanel.setSize(new Dimension(getWidth(), getHeight()));
+			jpanel.setLayout(new BorderLayout());
 
-			// panel.setBorder(new TitledBorder("Caixa"));
-			JScrollPane jScrollPane = new JScrollPane(jTable);
-
-			// panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-			jScrollPane.setSize(getContentPane().getWidth(), getContentPane().getHeight());
-
-			// panel.add(jScrollPane);
-			jScrollPane.repaint();
-			getContentPane().add(jScrollPane, BorderLayout.CENTER);
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-
-			e.printStackTrace();
+		} else {
+			jpanel.remove(jScrollPane);
+			jpanel.repaint();
 		}
+
+		carregaTableModel();
+		jTable = inicializaJTable();
+
+		jScrollPane = new JScrollPane(jTable);
+
+		jScrollPane.setSize(jpanel.getWidth() - 15, jpanel.getHeight() - 20);
+
+		jpanel.add(jScrollPane, BorderLayout.CENTER);
+
+		getContentPane().add(jpanel, BorderLayout.CENTER);
 	}
 
 	JTable inicializaJTable() {
@@ -100,7 +106,8 @@ public class ControleCaixaGui extends AbstractDialog {
 			new FormAberturaCaixaDialog(this, controller);
 			break;
 		}
-		atualizaTableModel(controller.getItem());
+
+		atualizaTableModel(null);
 	}
 
 	@Override
@@ -136,16 +143,22 @@ public class ControleCaixaGui extends AbstractDialog {
 	protected void atualizaTableModel(Object object) {
 
 		List linhas = new ArrayList();
-		linhas.add(object);
-		carregaTableModel(carregaLinhasTableModel(linhas));
-		repaint();
+		try {
+			linhas.add(object);
+			carregaTableModel(carregaLinhasTableModel(linhas));
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			carregaTableModel();
+		} finally {
+			atualizaJTable();
+		}
+
 	}
 
 	private void carregaTableModel(List linhas) {
-		
 
-	carregaTableModel(linhas, COLUNAS_JTABLE);
-		
+		carregaTableModel(linhas, COLUNAS_JTABLE);
+
 	}
 
 	@Override
@@ -168,7 +181,7 @@ public class ControleCaixaGui extends AbstractDialog {
 	}
 
 	//@formatter:off
-	private Object[] processaLinha(Caixa linha) {
+	private Object[] processaLinha(Caixa linha){
 
 		Usuario usuarioAbertura = linha.getUsuarioAbertura();
 		Usuario usuarioFechamento = linha.getUsuarioFechamento();
