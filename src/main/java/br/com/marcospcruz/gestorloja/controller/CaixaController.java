@@ -9,7 +9,7 @@ import br.com.marcospcruz.gestorloja.model.Caixa;
 public class CaixaController extends AbstractController {
 
 	private static final String QUERY_BUSCA_TODOS = "caixa.findAll";
-	private Crud<Caixa> dao = new CrudDao<>();
+	// private Crud<Caixa> dao = new CrudDao<>();
 	private List<Caixa> caixaList;
 	private Caixa caixa;
 
@@ -21,8 +21,16 @@ public class CaixaController extends AbstractController {
 
 	@Override
 	public List buscaTodos() {
+		Crud<Caixa> dao = getDao();
+		if (caixaList == null)
+			caixaList = dao.busca(QUERY_BUSCA_TODOS);
 
-		return dao.busca(QUERY_BUSCA_TODOS);
+		return caixaList;
+	}
+
+	private Crud<Caixa> getDao() {
+
+		return new CrudDao<>();
 	}
 
 	@Override
@@ -33,15 +41,16 @@ public class CaixaController extends AbstractController {
 
 	@Override
 	public void busca(String query) throws Exception {
+		Crud<Caixa> dao=getDao();
 		caixaList = dao.busca(query);
 	}
 
 	@Override
 	public Object getItem() {
-		if(caixa==null){
+		if (caixa == null) {
 			try {
 				busca("caixa.findCaixaAberto");
-				caixa=caixaList.get(0);
+				caixa = caixaList.get(0);
 			} catch (Exception e) {
 
 				e.printStackTrace();
@@ -52,7 +61,7 @@ public class CaixaController extends AbstractController {
 
 	@Override
 	public void setList(List list) {
-		// TODO Auto-generated method stub
+		this.caixaList = list;
 
 	}
 
@@ -79,8 +88,8 @@ public class CaixaController extends AbstractController {
 
 		validateCaixaAberto();
 		caixa = (Caixa) object;
-
-		caixa=dao.update(caixa);
+		Crud<Caixa> dao=getDao();
+		caixa = dao.update(caixa);
 
 	}
 

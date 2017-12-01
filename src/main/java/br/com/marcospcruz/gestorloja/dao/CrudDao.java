@@ -74,8 +74,8 @@ public class CrudDao<T> implements Crud<T> {
 	}
 
 	public void delete(T entity) {
-		
-		if(!entityManager.isOpen())
+
+		if (!entityManager.isOpen())
 			inicializaEntityManager();
 
 		entityManager.getTransaction().begin();
@@ -131,7 +131,7 @@ public class CrudDao<T> implements Crud<T> {
 		Query query = entityManager.createNamedQuery(namedQuery);
 
 		List<T> objetos = query.getResultList();
-
+		entityManager.close();
 		return objetos;
 
 	}

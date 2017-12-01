@@ -56,6 +56,7 @@ public class ControleCaixaGui extends AbstractDialog {
 		carregaTableModel();
 		jTable = inicializaJTable();
 
+//		JScrollPane 
 		jScrollPane = new JScrollPane(jTable);
 
 		jScrollPane.setSize(jpanel.getWidth() - 15, jpanel.getHeight() - 20);
@@ -106,8 +107,9 @@ public class ControleCaixaGui extends AbstractDialog {
 			new FormAberturaCaixaDialog(this, controller);
 			break;
 		}
-
-		atualizaTableModel(null);
+		controller.setList(null);
+//		atualizaTableModel(null);
+		atualizaJTable();
 	}
 
 	@Override
