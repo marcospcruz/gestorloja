@@ -18,10 +18,11 @@ public class App {
 	private static final String DB_HOME = CONTROLE_ESTOQUE_HOME + "\\db";
 
 	public static void main(String args[]) {
-		switch (args[0]) {
-		case "1":
-			criaUsuario();
-		}
+		if (args.length > 0)
+			switch (args[0]) {
+			case "1":
+				criaUsuario();
+			}
 		initApp();
 
 	}
@@ -63,11 +64,10 @@ public class App {
 	private static Crud<InterfaceGrafica> criaInterfaceGrafica() {
 		String pack = "br.com.marcospcruz.gestorloja.view.";
 		List<InterfaceGrafica> interfaces = Arrays
-				.asList(new InterfaceGrafica[] { 
-						new InterfaceGrafica(pack + "EstoquePrincipalGui","Estoque"),
-						new InterfaceGrafica(pack + "ControleCaixaGui","Controle de Caixa")
-//						new InterfaceGrafica(pack + "VendaPrincipalGui","Venda") 
-						});
+				.asList(new InterfaceGrafica[] { new InterfaceGrafica(pack + "EstoquePrincipalGui", "Estoque"),
+						new InterfaceGrafica(pack + "ControleCaixaGui", "Controle de Caixa")
+				// new InterfaceGrafica(pack + "VendaPrincipalGui","Venda")
+		});
 		Crud<InterfaceGrafica> iDao = new CrudDao<>();
 		interfaces.stream().forEach(i -> {
 			try {
@@ -99,8 +99,8 @@ public class App {
 			} catch (NoResultException e) {
 				e.printStackTrace();
 				userdao.update(usuario);
-			}finally{
-				
+			} finally {
+
 			}
 		});
 	}
@@ -113,12 +113,9 @@ public class App {
 	 * @return
 	 */
 	private static Crud<PerfilUsuario> criaPerfisUsuario(Crud<InterfaceGrafica> iDao) {
-		//@formatter:off
-		PerfilUsuario[] perfis = { 
-				new PerfilUsuario("Administrador",iDao.busca("interface.findall")), 
-				new PerfilUsuario("Vendedor"),
-				new PerfilUsuario("Caixa"), 
-				new PerfilUsuario("Estoque") };
+		// @formatter:off
+		PerfilUsuario[] perfis = { new PerfilUsuario("Administrador", iDao.busca("interface.findall")),
+				new PerfilUsuario("Vendedor"), new PerfilUsuario("Caixa"), new PerfilUsuario("Estoque") };
 
 		List<PerfilUsuario> perfisList = Arrays.asList(perfis);
 		Crud<PerfilUsuario> dao = new CrudDao<>();
@@ -129,8 +126,8 @@ public class App {
 			} catch (NoResultException e) {
 				e.printStackTrace();
 				dao.update(perfil);
-			}finally{
-				
+			} finally {
+
 			}
 			//
 		});
