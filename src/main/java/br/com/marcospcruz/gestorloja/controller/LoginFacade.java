@@ -41,14 +41,25 @@ public class LoginFacade {
 
 	private void buscaSessaoUsuarioAtiva(Usuario usuario) throws Exception {
 		try {
-			SessaoUsuario sessaoUsuario = sessaoUsuarioDao.busca("sessaousuario.findSessaoAtiva", "idUsuario",
-					usuario.getIdUsuario());
+			SessaoUsuario sessaoUsuario = buscaUsuarioLogado(usuario);
 			throw new Exception(
 					"Usuário " + sessaoUsuario.getUsuario().getNomeUsuario() + " ainda possui sessão ativa.");
 		} catch (NoResultException e) {
+
 			e.printStackTrace();
 		}
 
+	}
+
+	private SessaoUsuario buscaUsuarioLogado(Usuario usuario) {
+		SessaoUsuario sessaoUsuario;
+		try {
+			sessaoUsuario = sessaoUsuarioDao.busca("sessaousuario.findSessaoAtiva", "idUsuario",
+					usuario.getIdUsuario());
+		} catch (NoResultException e) {
+			throw new NoResultException("Não há sessão ativa para o usuário " + usuario.getNomeUsuario());
+		}
+		return sessaoUsuario;
 	}
 
 	private void criaSessaoUsuario(Usuario usuario) {
@@ -105,6 +116,9 @@ public class LoginFacade {
 		SessaoUsuario sessao = sessaoUsuarioBuilder.getSessaoUsuario();
 		// temp
 		sessaoUsuarioDao.update(sessao);
+		StringBuilder logMessage = new StringBuilder("Finalizando sessão do usuário ");
+		logMessage.append(sessao.getUsuario().getNomeUsuario());
+		logMessage.append(" em " + sessao.getDataFim());
 
 		return this;
 	}

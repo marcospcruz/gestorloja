@@ -75,7 +75,7 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 
 			}
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
+			
 			e1.printStackTrace();
 			JOptionPane.showMessageDialog(null, e1.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
 		}
