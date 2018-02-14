@@ -5,12 +5,14 @@ rem * * * echo mensagem: %mensagemCommit%
 
 call mvn eclipse:clean
 
-sleep 5
+rem * * * sleep 5
+ping 127.0.0.1 -n 6 > nul
 
 git add --all .
 
 git commit -m %mensagemCommit%
 
-git push origin master
+rem * * * git push origin master
+git push https://github.com/marcospcruz/gestorloja.git
 
 call mvn eclipse:eclipse
