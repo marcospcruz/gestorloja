@@ -146,7 +146,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 			limpaFormulario();
 
-			btnDeletar.setEnabled(false);
+			habilitaBotaoExcluir(false);
 
 		} else if (actionCommand.equals(EXCLUIR_BUTTON_LBL)) {
 
@@ -154,16 +154,22 @@ public class ProdutoDialog extends AbstractDialog {
 
 		} else {
 
-			acaoBuscar = true;
-
-			limpaFormulario();
-
-			controller.busca(txtBusca.getText());
-
-			populaFormulario();
+			buscarItem();
 
 		}
 
+	}
+
+	private void buscarItem() throws Exception {
+		acaoBuscar = true;
+
+		limpaFormulario();
+
+		controller.busca(txtBusca.getText());
+
+		populaFormulario();
+		
+		btnDeletar.setEnabled(acaoBuscar);
 	}
 
 	@Override
@@ -242,7 +248,7 @@ public class ProdutoDialog extends AbstractDialog {
 		try {
 			fabricanteController = ControllerAbstractFactory.createController(ControllerAbstractFactory.FABRICANTE);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
+	
 			e.printStackTrace();
 		}
 
@@ -313,13 +319,13 @@ public class ProdutoDialog extends AbstractDialog {
 
 			int indiceLinha = table.getSelectedRow();
 
-			int idPecaRoupa = (Integer) table.getModel().getValueAt(indiceLinha, 0);
+			int idProduto = (Integer) table.getModel().getValueAt(indiceLinha, 0);
 
-			controller.busca(idPecaRoupa);
+			controller.busca(idProduto);
 
 			populaFormulario();
 
-			btnDeletar.setEnabled(true);
+			habilitaBotaoExcluir(true);
 
 		}
 

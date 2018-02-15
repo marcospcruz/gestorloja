@@ -327,11 +327,14 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 		}
 
 	}
-	
-	
 
 	public void setControllerNameClass(String controllerClassName) {
 		this.controllerClassName = controllerClassName;
+
+	}
+
+	protected void habilitaBotaoExcluir(boolean enabled) {
+		btnDeletar.setEnabled(enabled);
 
 	}
 }

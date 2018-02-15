@@ -25,9 +25,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 public class RelatorioEstoqueGeral {
 
-	private final static String PASTA_PROJETO = App.CONTROLE_ESTOQUE_HOME + "\\";
+	private static final String PASTA_PROJETO = App.CONTROLE_ESTOQUE_HOME + "/";
 
-	private final static String ARQUIVO_JASPER = "/relatorios_jaspers/relatorio_estoque_geral.jasper";
+	private static final String ARQUIVO_JASPER = "META-INF/relatorios_jaspers/relatorio_estoque_geral.jasper";
 
 	private static final String RELATORIO_GERADO = "relatorio_estoque.pdf";
 
@@ -54,9 +54,10 @@ public class RelatorioEstoqueGeral {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void gerarRelatorio(JRDataSource jrDataSource, Map parametros) throws Exception {
 
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("META-INF" + ARQUIVO_JASPER);
-		
-		if(inputStream==null) throw new Exception("Necessário refatorar o Relatório.");
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(ARQUIVO_JASPER);
+
+		if (inputStream == null)
+			throw new Exception("Necessário refatorar o Relatório.");
 
 		FileOutputStream outPut = null;
 

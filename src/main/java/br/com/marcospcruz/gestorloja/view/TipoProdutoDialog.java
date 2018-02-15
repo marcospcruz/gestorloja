@@ -12,7 +12,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,7 +21,6 @@ import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
-import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
@@ -471,7 +469,8 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 			SubTipoProduto subTipoProduto = ((SubTipoProduto) controller.getItem()).getSuperTipoProduto();
 
-			cmbTiposProduto.setSelectedItem(subTipoProduto);
+//			cmbTiposProduto.setSelectedItem(subTipoProduto);
+			cmbTiposProduto.getModel().setSelectedItem(subTipoProduto);
 
 		} else {
 

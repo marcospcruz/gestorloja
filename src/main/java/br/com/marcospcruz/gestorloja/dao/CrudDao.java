@@ -90,6 +90,8 @@ public class CrudDao<T> implements Crud<T> {
 
 	public T busca(Class clazz, int id) {
 
+		inicializaEntityManager();
+
 		T entity = (T) entityManager.find(clazz, id);
 
 		return entity;

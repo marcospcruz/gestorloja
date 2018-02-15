@@ -85,7 +85,11 @@ public class FabricanteController extends AbstractController {
 
 	}
 
-	public void excluir() {
+	public void excluir() throws Exception {
+		
+		if(!fabricante.getProdutos().isEmpty()) {
+			throw new Exception("Exclusão não permitida! Há produtos cadastrados para este fabricante.");
+		}
 
 		fabricanteDao.delete(fabricante);
 

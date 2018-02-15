@@ -2,8 +2,10 @@ package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -11,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -35,6 +38,9 @@ public class Fabricante implements Serializable {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date dataInsercao;
+
+	@OneToMany(mappedBy="fabricante")
+	private List<Produto> produtos;
 
 	public Fabricante() {
 		dataInsercao = new Date();
@@ -73,6 +79,14 @@ public class Fabricante implements Serializable {
 		this.dataInsercao = dataInsercao;
 	}
 
+	public List<Produto> getProdutos() {
+		return produtos;
+	}
+
+	public void setProdutos(List<Produto> produtos) {
+		this.produtos = produtos;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -81,6 +95,7 @@ public class Fabricante implements Serializable {
 		result = prime * result + ((idFabricante == null) ? 0 : idFabricante.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
+		result = prime * result + ((produtos == null) ? 0 : produtos.hashCode());
 		return result;
 	}
 
@@ -112,6 +127,11 @@ public class Fabricante implements Serializable {
 			if (other.operador != null)
 				return false;
 		} else if (!operador.equals(other.operador))
+			return false;
+		if (produtos == null) {
+			if (other.produtos != null)
+				return false;
+		} else if (!produtos.equals(other.produtos))
 			return false;
 		return true;
 	}
