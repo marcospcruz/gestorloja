@@ -57,7 +57,7 @@ public class RelatorioEstoqueGeral {
 		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(ARQUIVO_JASPER);
 
 		if (inputStream == null)
-			throw new Exception("Necessário refatorar o Relatório.");
+			throw new Exception("Necessário compilar o Relatório.");
 
 		FileOutputStream outPut = null;
 

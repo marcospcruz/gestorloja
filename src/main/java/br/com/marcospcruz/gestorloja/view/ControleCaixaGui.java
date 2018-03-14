@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,14 +19,16 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
+import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
-public class ControleCaixaGui extends AbstractDialog {
+public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 
 	private static final String ABRIR_CAIXA = "Abrir Caixa";
+	private static final String FECHAR_CAIXA = "Fechar Caixa";
 	private static final Object[] COLUNAS_JTABLE = new Object[] { "Abertura", "Operador Abertura", "Saldo Abertura",
 			"Saldo Fechamento", "Fechamento", "Operador Fechamento" };
 	private JPanel jpanel;
@@ -44,7 +48,7 @@ public class ControleCaixaGui extends AbstractDialog {
 	private void atualizaJTable() {
 		if (jpanel == null) {
 			jpanel = new JPanel();
-//			jpanel.setBorder(new TitledBorder("xxxxxxxxxxxx"));
+			// jpanel.setBorder(new TitledBorder("xxxxxxxxxxxx"));
 			jpanel.setSize(new Dimension(getWidth(), getHeight()));
 			jpanel.setLayout(new BorderLayout());
 
@@ -56,7 +60,7 @@ public class ControleCaixaGui extends AbstractDialog {
 		carregaTableModel();
 		jTable = inicializaJTable();
 
-//		JScrollPane 
+		// JScrollPane
 		jScrollPane = new JScrollPane(jTable);
 
 		jScrollPane.setSize(jpanel.getWidth() - 15, jpanel.getHeight() - 20);
@@ -102,14 +106,28 @@ public class ControleCaixaGui extends AbstractDialog {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		switch (arg0.getActionCommand()) {
-		case ABRIR_CAIXA:
-			new FormAberturaCaixaDialog(this, controller);
-			break;
+		try {
+			switch (arg0.getActionCommand()) {
+			case ABRIR_CAIXA:
+
+				((CaixaController) controller).validateCaixaAberto();
+				new FormAberturaCaixaDialog(this, controller);
+
+				break;
+			case FECHAR_CAIXA:
+				((CaixaController) controller).validateCaixaFechado();
+				new FormFechamentoCaixaDialog(this, controller);
+			}
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			showMessage(e.getMessage());
+		} finally {
+			controller.setList(null);
+			// atualizaTableModel(null);
+			atualizaJTable();
 		}
-		controller.setList(null);
-//		atualizaTableModel(null);
-		atualizaJTable();
+
 	}
 
 	@Override
@@ -182,24 +200,21 @@ public class ControleCaixaGui extends AbstractDialog {
 		return linhas;
 	}
 
-	//@formatter:off
-	private Object[] processaLinha(Caixa linha){
+	// @formatter:off
+	private Object[] processaLinha(Caixa linha) {
 
 		Usuario usuarioAbertura = linha.getUsuarioAbertura();
 		Usuario usuarioFechamento = linha.getUsuarioFechamento();
-		String nomeCompletoUsuarioAbertura=usuarioAbertura.getNomeCompleto();
-		String nomeCompletoUsuarioFechamento=usuarioFechamento!=null?usuarioFechamento.getNomeCompleto():"";
-		return new Object[] { 
-				linha.getDataAbertura(), 
-				nomeCompletoUsuarioAbertura, 
-				linha.getSaldoInicial(),
-				linha.getSaldoFinal(), 
-				linha.getDataFechamento()==null?"":linha.getDataFechamento(), 
+		String nomeCompletoUsuarioAbertura = usuarioAbertura.getNomeCompleto();
+		String nomeCompletoUsuarioFechamento = usuarioFechamento != null ? usuarioFechamento.getNomeCompleto() : "";
+		return new Object[] { linha.getDataAbertura(), nomeCompletoUsuarioAbertura, linha.getSaldoInicial(),
+				linha.getSaldoFinal(), linha.getDataFechamento() == null ? "" : linha.getDataFechamento(),
 				nomeCompletoUsuarioFechamento
 
 		};
 	}
-	//@formatter:on
+
+	// @formatter:on
 	@Override
 	protected void excluiItem() throws Exception {
 		// TODO Auto-generated method stub
@@ -214,6 +229,49 @@ public class ControleCaixaGui extends AbstractDialog {
 
 	@Override
 	protected void populaFormulario() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+
+		// controller
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
 		// TODO Auto-generated method stub
 
 	}

@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import br.com.marcospcruz.gestorloja.model.Fabricante;

@@ -337,4 +337,10 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 		btnDeletar.setEnabled(enabled);
 
 	}
+
+	protected void showMessage(String message) {
+		JOptionPane.showMessageDialog(this, message);
+
+	}
+
 }

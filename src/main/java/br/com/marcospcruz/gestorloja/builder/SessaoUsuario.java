@@ -27,6 +27,10 @@ import br.com.marcospcruz.gestorloja.model.Usuario;
 })
 //@formatter:on
 public class SessaoUsuario implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1033772109526153933L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idSessaoUsuario;

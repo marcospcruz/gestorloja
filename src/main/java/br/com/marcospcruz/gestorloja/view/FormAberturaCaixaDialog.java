@@ -42,11 +42,11 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 		criaFormPanel();
 
 		try {
-			validaCaixaAberto();
+		
 			criaCommandPanel();
 
-			carregaController();
-			
+//			carregaController();
+
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setVisible(true);
 
@@ -55,11 +55,6 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 			e.printStackTrace();
 			showMessage(e.getMessage());
 		}
-	}
-
-	private void validaCaixaAberto() throws Exception {
-		((CaixaController)caixaController).validateCaixaAberto();
-		
 	}
 
 	private void criaCommandPanel() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -157,28 +152,24 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 
 					e1.printStackTrace();
 				}
-				
+
 				dispose();
 				return;
+			case "Fechar Caixa":
+				System.out.println();
 			}
 
 		atualizaDataAbertura();
 	}
 
 	private void abreCaixa() {
-		Caixa caixa = new Caixa();
-		float saldoInicial = 0f;
-		if (!saldoTextField.getText().isEmpty()) {
-
-			saldoInicial = Float.parseFloat(saldoTextField.getText());
-		}
-		caixa.setSaldoInicial(saldoInicial);
-		caixa.setUsuarioAbertura(operador);
+		
+		
 		String message = null;
 		try {
-			caixaController.salva(caixa);
+			((CaixaController)caixaController).abreCaixa(saldoTextField.getText());
 			message = "Caixa aberto com sucesso!";
-			
+
 		} catch (Exception e) {
 			message = e.getMessage();
 		} finally {
@@ -189,7 +180,7 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 
 	private void showMessage(String message) {
 		JOptionPane.showMessageDialog(this, message);
-		
+
 	}
 
 	private void atualizaDataAbertura() {
@@ -205,13 +196,12 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 
 	@Override
 	public void windowClosed(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
+		System.out.println("closed");
 	}
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		// TODO Auto-generated method stub
+
 		timer.stop();
 
 	}
