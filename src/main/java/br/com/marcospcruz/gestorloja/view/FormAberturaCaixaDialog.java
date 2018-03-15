@@ -42,10 +42,10 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 		criaFormPanel();
 
 		try {
-		
+
 			criaCommandPanel();
 
-//			carregaController();
+			// carregaController();
 
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			setVisible(true);
@@ -71,6 +71,7 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 
 	private void criaFormPanel() {
 		initTimer();
+		Caixa ultimoCaixa = ((CaixaController) caixaController).getUltimoCaixa();
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
@@ -118,8 +119,12 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 		gbc_lblSaldoDoCaixa.gridy = 1;
 		panel.add(lblSaldoDoCaixa, gbc_lblSaldoDoCaixa);
 
+//		String saldoFinal = "500";//ultimoCaixa != null ? ultimoCaixa.getSaldoFinal().toString() : "";
 		saldoTextField = new JFormattedTextField();
 		saldoTextField.setDocument(new NumberDocument(true));
+		
+		saldoTextField.setColumns(10);
+		saldoTextField.setValue(ultimoCaixa != null ? ultimoCaixa.getSaldoFinal() : "");
 		GridBagConstraints gbc_lbl_data = new GridBagConstraints();
 		gbc_lbl_data.anchor = GridBagConstraints.WEST;
 		gbc_lbl_data.gridwidth = 2;
@@ -127,7 +132,7 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 		gbc_lbl_data.gridx = 1;
 		gbc_lbl_data.gridy = 1;
 		panel.add(saldoTextField, gbc_lbl_data);
-		saldoTextField.setColumns(10);
+
 	}
 
 	private void initTimer() {
@@ -163,11 +168,10 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 	}
 
 	private void abreCaixa() {
-		
-		
+
 		String message = null;
 		try {
-			((CaixaController)caixaController).abreCaixa(saldoTextField.getText());
+			((CaixaController) caixaController).abreCaixa(saldoTextField.getValue().toString());
 			message = "Caixa aberto com sucesso!";
 
 		} catch (Exception e) {

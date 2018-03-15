@@ -55,7 +55,7 @@ public class Caixa implements Serializable {
 		this.saldoInicial = saldoInicial;
 	}
 
-	public float getSaldoFinal() {
+	public Float getSaldoFinal() {
 		return saldoFinal;
 	}
 

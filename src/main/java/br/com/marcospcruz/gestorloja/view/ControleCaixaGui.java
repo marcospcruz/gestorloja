@@ -23,6 +23,7 @@ import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
 public class ControleCaixaGui extends AbstractDialog implements WindowListener {
@@ -207,8 +208,12 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		Usuario usuarioFechamento = linha.getUsuarioFechamento();
 		String nomeCompletoUsuarioAbertura = usuarioAbertura.getNomeCompleto();
 		String nomeCompletoUsuarioFechamento = usuarioFechamento != null ? usuarioFechamento.getNomeCompleto() : "";
-		return new Object[] { linha.getDataAbertura(), nomeCompletoUsuarioAbertura, linha.getSaldoInicial(),
-				linha.getSaldoFinal(), linha.getDataFechamento() == null ? "" : linha.getDataFechamento(),
+		return new Object[] { 
+				Util.formataData(linha.getDataAbertura()), 
+				nomeCompletoUsuarioAbertura, 
+				Util.formataMoeda(linha.getSaldoInicial()),
+				Util.formataMoeda(linha.getSaldoFinal()), 
+				linha.getDataFechamento() == null ? "" : Util.formataData(linha.getDataFechamento()),
 				nomeCompletoUsuarioFechamento
 
 		};

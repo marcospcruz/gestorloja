@@ -24,7 +24,7 @@ public class CaixaController extends AbstractController {
 	@Override
 	public List buscaTodos() {
 		Crud<Caixa> dao = getDao();
-		if (caixaList == null)
+		if (caixaList == null||caixaList.isEmpty())
 			caixaList = dao.busca(QUERY_BUSCA_TODOS);
 
 		return caixaList;
@@ -96,7 +96,6 @@ public class CaixaController extends AbstractController {
 	@Override
 	public void salva(Object object) throws Exception {
 
-		
 		caixa = (Caixa) object;
 		ajustaSaldoFinalZeroCaixa();
 		Crud<Caixa> dao = getDao();
@@ -132,15 +131,23 @@ public class CaixaController extends AbstractController {
 	public void abreCaixa(String saldoAbertura) throws Exception {
 		caixa = new Caixa();
 		float saldoInicial = 0f;
-		if (saldoAbertura!=null) {
+		if (saldoAbertura != null) {
 
 			saldoInicial = Float.parseFloat(saldoAbertura);
 		}
 		caixa.setSaldoInicial(saldoInicial);
 		caixa.setUsuarioAbertura(getLoginFacade().getUsuarioLogado());
-		
+
 		salva(caixa);
 
+	}
+
+	public Caixa getUltimoCaixa() {
+		int ultimoIndice = getList().size() - 1;
+		Caixa ultimoCaixa = null;
+		if (ultimoIndice >= 0)
+			ultimoCaixa = (Caixa) getList().get(ultimoIndice);
+		return ultimoCaixa;
 	}
 
 }
