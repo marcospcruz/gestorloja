@@ -14,21 +14,32 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+//@formatter:off
 @Entity
 @Table(name = "Estoque")
 @NamedQueries({
+		@NamedQuery(name = "itemestoque.readCodigo", query = "select ie from ItemEstoque ie "
+			+ "JOIN ie.produto p " 
+			+ "where upper(p.codigoDeBarras) = :codigo"),
+		@NamedQuery(name = "itemestoque.readCodigoEstoque", query = "select ie from ItemEstoque ie "
+				+ "JOIN ie.produto p " 
+				+ "WHERE upper(p.codigoDeBarras) = :codigo "
+				+ "AND ie.quantidade>0"),
 		@NamedQuery(name = "itemestoque.readDescricaoPecao", query = "select ie from ItemEstoque ie "
-				+ "JOIN ie.produto p " + "where upper(p.descricaoProduto) like :descricao"),
-		@NamedQuery(name = "itemEstoque.readAll", query = "select ie from ItemEstoque ie " + "JOIN ie.produto p "
+				+ "JOIN ie.produto p " 
+				+ "where upper(p.descricaoProduto) like :descricao"),
+		@NamedQuery(name = "itemEstoque.readAll", query = "select ie from ItemEstoque ie " 
+				+ "JOIN ie.produto p "
 				+ "order by p.descricaoProduto")
 
 })
+//@formatter:on
 public class ItemEstoque implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -3771838971214907284L;
+	private static final long serialVersionUID = 8193836692123395239L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

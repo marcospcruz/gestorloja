@@ -1,17 +1,17 @@
 package br.com.marcospcruz.gestorloja.view;
 
-import javax.swing.JDialog;
-import java.awt.GridLayout;
-import java.awt.GridBagLayout;
-import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
-import javax.swing.JTextField;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
-import javax.swing.JPasswordField;
-import javax.swing.JPanel;
-import javax.swing.JButton;
 
 public class UsuarioGui extends JDialog {
 	private JPanel panel;

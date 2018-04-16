@@ -75,7 +75,7 @@ public class EstoqueController implements Serializable {
 			int qt = parseInt(quantidade);
 
 			itemEstoque.setQuantidade(qt);
-			
+
 			itemEstoque.setOperador(loginFacade.getUsuarioLogado());
 
 			itemEstoque = itemEstoqueDao.update(itemEstoque);
@@ -115,6 +115,11 @@ public class EstoqueController implements Serializable {
 		}
 
 		return qt;
+	}
+
+	public ItemEstoque buscaItemPorCodigoDeBarras(String codigoProduto) {
+		ItemEstoque item = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo", codigoProduto);
+		return item;
 	}
 
 	public void buscaItemEstoque(String descricao) throws Exception {
@@ -177,8 +182,8 @@ public class EstoqueController implements Serializable {
 	}
 
 	public void setLoginFacade(LoginFacade loginFacade) {
-		
-		this.loginFacade=loginFacade;
+
+		this.loginFacade = loginFacade;
 	}
 
 	public LoginFacade getLoginFacade() {

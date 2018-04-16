@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class App {
 		if (args.length > 0)
 			switch (args[0]) {
 			case "1":
+				checkAndCreateAppHome();
 				criaUsuario();
 			}
 		initApp();
@@ -32,22 +34,24 @@ public class App {
 	 */
 	private static void initApp() {
 
-		// File file = new File(CONTROLE_ESTOQUE_HOME);
-		//
-		// if (!file.exists()) {
-		//
-		// file.mkdir();
-		//
-		// File subdir = new File(DB_HOME);
-		//
-		// subdir.mkdir();
-		//
-		// }
-
 		// new EstoquePrincipalGui("Controle de Estoque");
 		new LoginGui("Gestão Loja - Login de Usuário").setVisible(true);
 		// new UsuarioGui().setVisible(true);
 
+	}
+
+	private static void checkAndCreateAppHome() {
+		File file = new File(CONTROLE_ESTOQUE_HOME);
+
+		if (!file.exists()) {
+
+			file.mkdir();
+
+			// File subdir = new File(DB_HOME);
+			//
+			// subdir.mkdir();
+
+		}
 	}
 
 	private static void criaUsuario() {
@@ -62,12 +66,14 @@ public class App {
 	 * @return
 	 */
 	private static Crud<InterfaceGrafica> criaInterfaceGrafica() {
-		String pack = "br.com.marcospcruz.gestorloja.view.";
-		List<InterfaceGrafica> interfaces = Arrays
-				.asList(new InterfaceGrafica[] { new InterfaceGrafica(pack + "EstoquePrincipalGui", "Estoque"),
-						new InterfaceGrafica(pack + "ControleCaixaGui", "Controle de Caixa")
+		
+		List<InterfaceGrafica> interfaces = Arrays.asList(
+				new InterfaceGrafica[] { 
+						new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_ESTOQUE , InterfaceGrafica.ESTOQUE),
+						new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_CAIXA, InterfaceGrafica.CONTROLE_DE_CAIXA),
+						new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_PDV, InterfaceGrafica.PONTO_DE_VENDA)
 				// new InterfaceGrafica(pack + "VendaPrincipalGui","Venda")
-		});
+				});
 		Crud<InterfaceGrafica> iDao = new CrudDao<>();
 		interfaces.stream().forEach(i -> {
 			try {

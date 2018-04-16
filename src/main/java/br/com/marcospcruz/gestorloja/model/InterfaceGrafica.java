@@ -17,12 +17,19 @@ import javax.persistence.NamedQuery;
 		@NamedQuery(name = "interface.findinterface", query = "select i from InterfaceGrafica i where i.className=:className"),
 		@NamedQuery(name = "interface.findall", query = "select i from InterfaceGrafica i") })
 public class InterfaceGrafica implements Serializable {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -8000151228417933839L;
+	private static final long serialVersionUID = -8914269988172254274L;
+
+	private static final String PACKAGE = "br.com.marcospcruz.gestorloja.view.";
 	public static final String ESTOQUE = "Estoque";
 	public static final String CONTROLE_DE_CAIXA = "Controle de Caixa";
+	public static final String PONTO_DE_VENDA = "Ponto de Venda";
+	public static final String CLASS_NAME_ESTOQUE = PACKAGE + "EstoquePrincipalGui";
+	public static final String CLASS_NAME_PDV = PACKAGE + "ControleVendaGui";
+	public static final String CLASS_NAME_CAIXA = PACKAGE + "ControleCaixaGui";
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idInterfaceGrafica;
@@ -42,9 +49,9 @@ public class InterfaceGrafica implements Serializable {
 		this.operador = operador;
 	}
 
-	public InterfaceGrafica(String string, String string2) {
-		this(string);
-		this.nomeModulo = string2;
+	public InterfaceGrafica(String className, String nomeModulo) {
+		this(className);
+		this.nomeModulo = nomeModulo;
 	}
 
 	public InterfaceGrafica() {
@@ -71,12 +78,6 @@ public class InterfaceGrafica implements Serializable {
 		this.className = className;
 	}
 
-	@Override
-	public String toString() {
-		return "InterfaceGrafica [idInterfaceGrafica=" + idInterfaceGrafica + ", className=" + className + ", operador="
-				+ operador + "]";
-	}
-
 	public String getNomeModulo() {
 		return nomeModulo;
 	}
@@ -91,6 +92,7 @@ public class InterfaceGrafica implements Serializable {
 		int result = 1;
 		result = prime * result + ((className == null) ? 0 : className.hashCode());
 		result = prime * result + idInterfaceGrafica;
+		result = prime * result + ((nomeModulo == null) ? 0 : nomeModulo.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		return result;
 	}
@@ -111,12 +113,23 @@ public class InterfaceGrafica implements Serializable {
 			return false;
 		if (idInterfaceGrafica != other.idInterfaceGrafica)
 			return false;
+		if (nomeModulo == null) {
+			if (other.nomeModulo != null)
+				return false;
+		} else if (!nomeModulo.equals(other.nomeModulo))
+			return false;
 		if (operador == null) {
 			if (other.operador != null)
 				return false;
 		} else if (!operador.equals(other.operador))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "InterfaceGrafica [idInterfaceGrafica=" + idInterfaceGrafica + ", className=" + className + ", operador="
+				+ operador + ", nomeModulo=" + nomeModulo + "]";
 	}
 
 }

@@ -48,7 +48,8 @@ public enum ConstantesEnum {
 	NO_DATA_FOUND(44), 
 	FABRICANTE(45), 
 	FABRICANTE_NAO_ENCONTRADO(46), 
-	ITEM_DO_ESTOQUE_NAO_ENCONTRADO(47);
+	ITEM_DO_ESTOQUE_NAO_ENCONTRADO(47), 
+	CODIGO_DE_BARRAS(48);
 //@formatter:on
 	private int index;
 
@@ -101,9 +102,10 @@ public enum ConstantesEnum {
 			"É necessário selecionar um ítem de Estoque antes.", // 42
 			"Exclusão não permitida! Há ítens deste Produto no estoque.", // 43
 			"Não há Dados no Estoque.", // 44
-			"Fabricante / Marca", 
-			"Fabricante / Marca não encontrado",
-			"Ítem não encontrado no Estoque"
+			"Fabricante / Marca", //45
+			"Fabricante / Marca não encontrado", //46
+			"Ítem não encontrado no Estoque", //47
+			"Código de Barras" //48
 			};
 
 	public Object getValue() {

@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -45,7 +46,7 @@ public class Produto implements Serializable {
 	private String unidadeMedida;
 
 	private float valorUnitario;
-
+	@Column(unique = true)
 	private String codigoDeBarras;
 
 	@OneToOne(targetEntity = ItemEstoque.class, fetch = FetchType.EAGER, mappedBy = "produto")

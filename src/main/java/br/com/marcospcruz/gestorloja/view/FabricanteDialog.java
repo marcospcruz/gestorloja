@@ -240,27 +240,27 @@ public class FabricanteDialog extends AbstractDialog {
 
 		reloadJFrame();
 	}
-
-	/**
-	 * x
-	 */
-	private void reloadJFrame() {
-
-		Rectangle retangulo = jScrollPane.getBounds();
-
-		jPanelTable.remove(jScrollPane);
-
-		jTable = inicializaJTable();
-
-		jScrollPane = new JScrollPane(jTable);
-
-		jScrollPane.setBounds(retangulo);
-
-		jPanelTable.add(jScrollPane);
-
-		jPanelTable.repaint();
-
-	}
+//
+//	/**
+//	 * x
+//	 */
+//	private void reloadJFrame() {
+//
+//		Rectangle retangulo = jScrollPane.getBounds();
+//
+//		jPanelTable.remove(jScrollPane);
+//
+//		jTable = inicializaJTable();
+//
+//		jScrollPane = new JScrollPane(jTable);
+//
+//		jScrollPane.setBounds(retangulo);
+//
+//		jPanelTable.add(jScrollPane);
+//
+//		jPanelTable.repaint();
+//
+//	}
 
 	@SuppressWarnings("rawtypes")
 	@Override

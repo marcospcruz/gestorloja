@@ -53,4 +53,9 @@ public class MyTableModel extends AbstractTableModel {
 
 	}
 
+	public List getLinhas() {
+	
+		return linhas;
+	}
+
 }

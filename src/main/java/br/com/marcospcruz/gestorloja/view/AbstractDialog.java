@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -15,8 +16,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.AbstractController;
@@ -60,7 +63,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	protected AbstractController controller;
 
-	private String controllerClassName;
+	protected DefaultTableCellRenderer direita;
 
 	// private LoginFacade loginFacade;
 
@@ -136,6 +139,27 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 
 		return toolkit.getScreenSize();
+
+	}
+
+	/**
+	 * x
+	 */
+	protected void reloadJFrame() {
+
+		Rectangle retangulo = jScrollPane.getBounds();
+
+		jPanelTable.remove(jScrollPane);
+
+		jTable = inicializaJTable();
+
+		jScrollPane = new JScrollPane(jTable);
+
+		jScrollPane.setBounds(retangulo);
+
+		jPanelTable.add(jScrollPane);
+
+		jPanelTable.repaint();
 
 	}
 
@@ -240,6 +264,10 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 		JTable jTable = new JTable(myTableModel);
 
 		jTable.addMouseListener(this);
+		
+		direita = new DefaultTableCellRenderer();
+
+		direita.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		return jTable;
 
@@ -329,7 +357,6 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 	}
 
 	public void setControllerNameClass(String controllerClassName) {
-		this.controllerClassName = controllerClassName;
 
 	}
 

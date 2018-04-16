@@ -20,6 +20,11 @@ import javax.swing.JOptionPane;
 public class PrincipalGui extends AbstractJFrame implements WindowListener {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2738133745490348435L;
+
+	/**
 	 * @param loginFacade
 	 */
 	public PrincipalGui(LoginFacade loginFacade) {
@@ -67,15 +72,17 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 		try {
 			switch (e.getActionCommand()) {
 			case InterfaceGrafica.ESTOQUE:
-				new EstoquePrincipalGui(InterfaceGrafica.ESTOQUE, this);
+				JDialogFactory.createDialog(InterfaceGrafica.ESTOQUE,this,InterfaceGrafica.CLASS_NAME_ESTOQUE);
 				break;
 			case InterfaceGrafica.CONTROLE_DE_CAIXA:
-
-				new ControleCaixaGui(getLoginFacade(), InterfaceGrafica.CONTROLE_DE_CAIXA, this);
-
+				JDialogFactory.createDialog(getLoginFacade(), InterfaceGrafica.CONTROLE_DE_CAIXA, this,InterfaceGrafica.CLASS_NAME_CAIXA);
+//				new ControleCaixaGui(getLoginFacade(), InterfaceGrafica.CONTROLE_DE_CAIXA, this);
+				break;
+			case InterfaceGrafica.PONTO_DE_VENDA:
+				JDialogFactory.createDialog(getLoginFacade(), InterfaceGrafica.CLASS_NAME_PDV, this,InterfaceGrafica.CLASS_NAME_PDV);
 			}
 		} catch (Exception e1) {
-			
+
 			e1.printStackTrace();
 			JOptionPane.showMessageDialog(null, e1.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
 		}

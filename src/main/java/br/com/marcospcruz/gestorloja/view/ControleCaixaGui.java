@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -24,14 +23,24 @@ import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.util.Util;
-import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
 public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7955099211492942797L;
 	private static final String ABRIR_CAIXA = "Abrir Caixa";
 	private static final String FECHAR_CAIXA = "Fechar Caixa";
-	private static final Object[] COLUNAS_JTABLE = new Object[] { "Abertura", "Operador Abertura", "Saldo Abertura",
-			"Saldo Fechamento", "Fechamento", "Operador Fechamento" };
+	//@formatter:off
+	private static final Object[] COLUNAS_JTABLE = new Object[] { 
+			"Abertura", 
+			"Operador Abertura", 
+			"Saldo Abertura",
+			"Saldo Fechamento", 
+			"Fechamento", 
+			"Operador Fechamento" };
+	//@formatter:on
 	private JPanel jpanel;
 
 	public ControleCaixaGui(LoginFacade loginFacade, String tituloJanela, JFrame owner) throws Exception {

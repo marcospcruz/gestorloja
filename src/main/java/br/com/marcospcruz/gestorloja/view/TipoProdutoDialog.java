@@ -50,12 +50,13 @@ public class TipoProdutoDialog extends AbstractDialog {
 	/**
 	 * 
 	 * @param owner
-	 * @param loginFacade 
+	 * @param loginFacade
 	 * @throws Exception
 	 */
 	public TipoProdutoDialog(JDialog owner, LoginFacade loginFacade) throws Exception {
 
-		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(), ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true, loginFacade);
+		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(),
+				ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true, loginFacade);
 
 		atualizaTable = true;
 
@@ -281,27 +282,6 @@ public class TipoProdutoDialog extends AbstractDialog {
 		reloadJFrame();
 	}
 
-	/**
-	 * x
-	 */
-	private void reloadJFrame() {
-
-		Rectangle retangulo = jScrollPane.getBounds();
-
-		jPanelTable.remove(jScrollPane);
-
-		jTable = inicializaJTable();
-
-		jScrollPane = new JScrollPane(jTable);
-
-		jScrollPane.setBounds(retangulo);
-
-		jPanelTable.add(jScrollPane);
-
-		jPanelTable.repaint();
-
-	}
-
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void carregaTableModel() {
@@ -469,7 +449,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 			SubTipoProduto subTipoProduto = ((SubTipoProduto) controller.getItem()).getSuperTipoProduto();
 
-//			cmbTiposProduto.setSelectedItem(subTipoProduto);
+			// cmbTiposProduto.setSelectedItem(subTipoProduto);
 			cmbTiposProduto.getModel().setSelectedItem(subTipoProduto);
 
 		} else {

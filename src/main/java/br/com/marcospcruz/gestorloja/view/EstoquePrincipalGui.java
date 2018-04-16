@@ -23,9 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
@@ -35,7 +33,6 @@ import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.MyFormatador;
-import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
 public class EstoquePrincipalGui extends AbstractDialog {
 
@@ -43,15 +40,18 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = 2191305646130817805L;
-
-	private static final Object[] COLUNAS_JTABLE = { ConstantesEnum.CODIGO_LABEL.getValue().toString(),
-			ConstantesEnum.FABRICANTE.getValue().toString(), ConstantesEnum.CATEGORIA_LABEL.getValue().toString(),
+	//@formatter:off
+	private static final Object[] COLUNAS_JTABLE = {
+			ConstantesEnum.CODIGO_LABEL.getValue().toString(),
+			ConstantesEnum.FABRICANTE.getValue().toString(), 
+			ConstantesEnum.CATEGORIA_LABEL.getValue().toString(),
 			ConstantesEnum.TIPO_ITEM_LABEL.getValue().toString(),
 			ConstantesEnum.DESCRICAO_ITEM_LABEL.getValue().toString(),
+			ConstantesEnum.CODIGO_DE_BARRAS.getValue().toString(),
 			ConstantesEnum.QUANTIDADE_LABEL.getValue().toString(),
 			ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString(),
 			ConstantesEnum.VALOR_TOTAL_LABEL.getValue().toString() };
-
+//@formatter:on
 	private JPanel jPanelEstoque;
 
 	private JPanel jPanelCadastros;
@@ -60,9 +60,9 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	private EstoqueController controller;
 
-//	private MyTableModel myTableModel;
+	// private MyTableModel myTableModel;
 
-	private JTable jTable;
+	// private JTable jTable;
 
 	private JScrollPane jScrollPane;
 
@@ -171,10 +171,15 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		carregaTableModel(linhas);
 	}
 
+	/**
+	 * Método responsável em passar linhas para o tableModel.
+	 * 
+	 * @param linhas
+	 */
 	@SuppressWarnings("rawtypes")
 	protected void carregaTableModel(List linhas) {
 
-		carregaTableModel(linhas, COLUNAS_JTABLE);
+		super.carregaTableModel(linhas, COLUNAS_JTABLE);
 	}
 
 	@Override
@@ -184,7 +189,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		for (Object itemEstoque : itensEstoque) {
 
-			linhas.add(processaColuna((ItemEstoque) itemEstoque));
+			linhas.add(parseRow((ItemEstoque) itemEstoque));
 
 		}
 
@@ -192,7 +197,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	}
 
-	private Object[] processaColuna(ItemEstoque itemEstoque) {
+	private Object[] parseRow(ItemEstoque itemEstoque) {
 
 		float valor = itemEstoque.getQuantidade() * itemEstoque.getProduto().getValorUnitario();
 
@@ -213,6 +218,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 				tipoProduto.getSuperTipoProduto().getDescricaoTipo(),
 				tipoProduto.getDescricaoTipo(),
 				produto.getDescricaoProduto(),
+				produto.getCodigoDeBarras(),
 				itemEstoque.getQuantidade(), 
 				valorUnitario, 
 				valorTotal 
@@ -491,13 +497,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	JTable inicializaJTable() {
 
-		JTable jTable = new JTable(myTableModel);
-
-		jTable.addMouseListener(this);
-
-		DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
-
-		direita.setHorizontalAlignment(SwingConstants.RIGHT);
+		JTable jTable = super.inicializaJTable();
 
 		jTable.getColumnModel().getColumn(0).setCellRenderer(direita);
 
