@@ -18,6 +18,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
@@ -43,9 +44,9 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 	//@formatter:on
 	private JPanel jpanel;
 
-	public ControleCaixaGui(LoginFacade loginFacade, String tituloJanela, JFrame owner) throws Exception {
+	public ControleCaixaGui(String tituloJanela, JFrame owner) throws Exception {
 
-		super(owner, tituloJanela, true, loginFacade);
+		super(owner, tituloJanela, ControllerAbstractFactory.CONTROLE_CAIXA, true);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		getContentPane().add(configuraOperacoesPanel(), BorderLayout.NORTH);
 

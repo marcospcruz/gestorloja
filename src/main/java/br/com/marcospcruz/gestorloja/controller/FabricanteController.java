@@ -8,13 +8,14 @@ import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.TipoProdutoNotFoundException;
 
-public class FabricanteController extends AbstractController {
+public class FabricanteController implements AbstractController {
 	private static final String FABRICANTE_INVALIDO = "Fabricante inválido!";
 	private Crud<Fabricante> fabricanteDao;
 	private List<Fabricante> fabricantes;
 	private Fabricante fabricante;
 
 	public FabricanteController() {
+		super();
 		fabricanteDao = new CrudDao<>();
 	}
 
@@ -79,8 +80,8 @@ public class FabricanteController extends AbstractController {
 		return fabricante;
 	}
 
-	public void busca(int idFabricante) {
-
+	public void busca(Object id) {
+		int idFabricante=Integer.valueOf(id.toString());
 		fabricante = fabricanteDao.busca(Fabricante.class, idFabricante);
 
 	}
@@ -132,12 +133,13 @@ public class FabricanteController extends AbstractController {
 		} else {
 			fabricante = (Fabricante) object;
 		}
-		fabricante.setOperador(getLoginFacade().getUsuarioLogado());
+		fabricante.setOperador(getUsuarioLogado());
 
 		// validaNovoFabricante();
 
 		fabricanteDao.update(fabricante);
 
 	}
+
 
 }

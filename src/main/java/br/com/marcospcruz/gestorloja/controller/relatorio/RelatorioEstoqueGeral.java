@@ -12,8 +12,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import br.com.marcospcruz.gestorloja.App;
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -97,9 +99,9 @@ public class RelatorioEstoqueGeral {
 
 	}
 
-	public static Collection<ItemEstoque> listaEstoque() {
+	public static Collection<ItemEstoque> listaEstoque() throws Exception {
 
-		EstoqueController controller = new EstoqueController();
+		EstoqueController controller = (EstoqueController) SingletonManager.getInstance().getController(ControllerAbstractFactory.ESTOQUE);
 
 		return controller.getItensEstoque();
 

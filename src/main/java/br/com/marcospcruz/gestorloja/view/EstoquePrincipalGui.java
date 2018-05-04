@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.controller.relatorio.RelatorioEstoqueGeral;
@@ -68,12 +69,11 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	private JPanel jPanelTableEstoque;
 
-	public EstoquePrincipalGui(String tituloJanela, JFrame owner) {
+	public EstoquePrincipalGui(String tituloJanela, JFrame owner) throws Exception {
 
-		super(owner, tituloJanela, true);
+		super(owner, tituloJanela, ControllerAbstractFactory.ESTOQUE, true);
 
-		controller = new EstoqueController();
-		controller.setLoginFacade(((PrincipalGui) owner).getLoginFacade());
+		controller = (EstoqueController) super.controller;
 
 		carregaJPanel();
 
@@ -391,7 +391,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	}
 
 	protected void selecionaAcao(String actionCommand) throws Exception {
-		LoginFacade loginFacade = controller.getLoginFacade();
+
 		if (actionCommand.equals(ConstantesEnum.LBL_BTN_NOVO_ITEM_ESTOQUE.getValue().toString())) {
 
 			new ItemEstoqueDialog(controller, this);
@@ -408,13 +408,13 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		} else if (actionCommand.equals(ConstantesEnum.LBL_BTN_TIPO_PRODUTO.getValue().toString())) {
 
-			new TipoProdutoDialog(this, loginFacade);
+			new TipoProdutoDialog(this);
 
 			// atualizaView();
 
 		} else if (actionCommand.equals(ConstantesEnum.PRODUTO_LABEL.getValue().toString())) {
 
-			new ProdutoDialog(this, loginFacade);
+			new ProdutoDialog(this);
 
 			// atualizaView();
 
@@ -428,7 +428,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		} else if (actionCommand.equals(ConstantesEnum.FABRICANTE.getValue().toString())) {
 
-			new FabricanteDialog(this, loginFacade);
+			new FabricanteDialog(this);
 
 			// atualizaView();
 

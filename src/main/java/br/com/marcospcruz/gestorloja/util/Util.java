@@ -25,4 +25,13 @@ public class Util {
 		
 	}
 
+	public static Float moedaToFloat(String text) {
+		
+		String valor=text.replace(',', '.');
+		
+		valor=valor.substring(3);
+		
+		return Float.valueOf(valor);
+	}
+
 }

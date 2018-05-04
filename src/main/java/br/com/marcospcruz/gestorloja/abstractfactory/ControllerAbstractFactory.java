@@ -1,6 +1,11 @@
 package br.com.marcospcruz.gestorloja.abstractfactory;
 
+import java.lang.reflect.InvocationTargetException;
+
+import javax.swing.JFrame;
+
 import br.com.marcospcruz.gestorloja.controller.AbstractController;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 
 public class ControllerAbstractFactory {
 
@@ -10,15 +15,15 @@ public class ControllerAbstractFactory {
 	public static final String PRODUTO = PACKAGE + "ProdutoController";
 	public static final String ESTOQUE = PACKAGE + "EstoqueController";
 	public static final String CONTROLE_CAIXA = PACKAGE + "CaixaController";
-	
+	public static final String CONTROLE_VENDA = PACKAGE + "VendaController";
 
 	private ControllerAbstractFactory() {
 	}
 
-	public static AbstractController createController(String string)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public static AbstractController createController(String string) throws Exception {
 
 		Class controllerClass = Class.forName(string);
+		
 		return (AbstractController) controllerClass.newInstance();
 
 	}

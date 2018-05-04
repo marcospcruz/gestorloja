@@ -8,19 +8,15 @@ import java.awt.event.MouseListener;
 import javax.swing.JFrame;
 
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
+import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 public abstract class AbstractJFrame extends JFrame implements ActionListener, MouseListener {
-	private LoginFacade loginFacade;
 
 	public AbstractJFrame(String tituloJanela) {
 		super(tituloJanela);
 		setSize(configuraDimensaoJanela());
 
-	}
-
-	public AbstractJFrame(String string, LoginFacade loginFacade) {
-		this(string);
-		this.loginFacade = loginFacade;
 	}
 
 	protected Dimension configuraDimensaoJanela() {
@@ -31,12 +27,7 @@ public abstract class AbstractJFrame extends JFrame implements ActionListener, M
 
 	}
 
-	public LoginFacade getLoginFacade() {
-		return loginFacade;
+	protected Usuario getUsuarioLogado(){
+		return SingletonManager.getInstance().getUsuarioLogado();
 	}
-
-	public void setLoginFacade(LoginFacade loginFacade) {
-		this.loginFacade = loginFacade;
-	}
-
 }

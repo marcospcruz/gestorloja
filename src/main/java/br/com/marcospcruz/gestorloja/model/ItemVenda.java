@@ -11,8 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "venda")
-public class Venda implements Serializable {
+@Table(name = "itemVenda")
+public class ItemVenda implements Serializable {
 	/**
 	 * 
 	 */
@@ -78,7 +78,7 @@ public class Venda implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Venda other = (Venda) obj;
+		ItemVenda other = (ItemVenda) obj;
 		if (idVenda != other.idVenda)
 			return false;
 		if (itemEstoque == null) {

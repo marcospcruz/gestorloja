@@ -46,6 +46,7 @@ public class ItemEstoque implements Serializable {
 	private Integer idItemEstoque;
 
 	@OneToOne
+	@JoinColumn(name="idProduto")
 	private Produto produto;
 
 	private Integer quantidade;

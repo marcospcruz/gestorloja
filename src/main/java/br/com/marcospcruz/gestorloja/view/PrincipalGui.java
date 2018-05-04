@@ -8,6 +8,7 @@ import java.awt.event.WindowListener;
 import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -23,29 +24,29 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 2738133745490348435L;
+	private LoginFacade loginFacade;
 
 	/**
 	 * @param loginFacade
+	 * @param loginFacade
 	 */
 	public PrincipalGui(LoginFacade loginFacade) {
-		super("Gestor Loja", loginFacade);
+		super("Gestor Loja");
 		addWindowListener(this);
-
-		carregaBotoesModulos(loginFacade);
-
-		setVisible(true);
+		this.loginFacade = loginFacade;
+		carregaBotoesModulos();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setVisible(true);
 
 	}
 
-	private void carregaBotoesModulos(LoginFacade loginFacade) {
+	private void carregaBotoesModulos() {
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder("Módulos"));
 		getContentPane().add(panel, BorderLayout.NORTH);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		//@formatter:off
-		loginFacade
-			.getUsuarioLogado()
+		getUsuarioLogado()
 			.getPerfisUsuario()
 			.stream()
 			.forEach(perfilUsuario->{
@@ -72,14 +73,16 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 		try {
 			switch (e.getActionCommand()) {
 			case InterfaceGrafica.ESTOQUE:
-				JDialogFactory.createDialog(InterfaceGrafica.ESTOQUE,this,InterfaceGrafica.CLASS_NAME_ESTOQUE);
+				JDialogFactory.createDialog(InterfaceGrafica.ESTOQUE, this, InterfaceGrafica.CLASS_NAME_ESTOQUE);
 				break;
 			case InterfaceGrafica.CONTROLE_DE_CAIXA:
-				JDialogFactory.createDialog(getLoginFacade(), InterfaceGrafica.CONTROLE_DE_CAIXA, this,InterfaceGrafica.CLASS_NAME_CAIXA);
-//				new ControleCaixaGui(getLoginFacade(), InterfaceGrafica.CONTROLE_DE_CAIXA, this);
+				JDialogFactory.createDialog(InterfaceGrafica.CONTROLE_DE_CAIXA, this,
+						InterfaceGrafica.CLASS_NAME_CAIXA);
+				// new ControleCaixaGui(getLoginFacade(), InterfaceGrafica.CONTROLE_DE_CAIXA,
+				// this);
 				break;
 			case InterfaceGrafica.PONTO_DE_VENDA:
-				JDialogFactory.createDialog(getLoginFacade(), InterfaceGrafica.CLASS_NAME_PDV, this,InterfaceGrafica.CLASS_NAME_PDV);
+				JDialogFactory.createDialog(InterfaceGrafica.CLASS_NAME_PDV, this, InterfaceGrafica.CLASS_NAME_PDV);
 			}
 		} catch (Exception e1) {
 
@@ -132,7 +135,7 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		getLoginFacade().fechaSessaoUsuario();
+		loginFacade.fechaSessaoUsuario();
 
 	}
 

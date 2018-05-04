@@ -20,10 +20,10 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.text.AbstractDocument.Content;
 
-import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.AbstractController;
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.NumberDocument;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
@@ -65,6 +65,8 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	protected DefaultTableCellRenderer direita;
 
+	protected int indiceLinhaTableModel;
+
 	// private LoginFacade loginFacade;
 
 	protected static final Border BUSCAR_TITLED_BORDER = new TitledBorder("Busca");
@@ -74,6 +76,10 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	private static final String MESSAGE_CONFIRMING_SAVING = ConstantesEnum.CONFIRMACAO_SALVAMENTO.getValue().toString();
 
+	protected static final boolean IS_DECIMAL = true;
+	
+	protected boolean atualizaTable;
+
 	public AbstractDialog(JDialog owner, String tituloJanela, boolean modal) {
 
 		super(owner, tituloJanela, modal);
@@ -82,48 +88,36 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	public AbstractDialog(JDialog owner, String tituloJanela, String controllerClassName, boolean modal,
-			LoginFacade loginFacade) throws Exception {
+	public AbstractDialog(JDialog owner, String tituloJanela, String controllerClassName, boolean modal)
+			throws Exception {
 
 		this(owner, tituloJanela, modal);
 
-		criaController(controllerClassName, loginFacade);
+		criaController(controllerClassName);
 
+		atualizaTable = true;
+
+		configuraJPanel();
+
+		setVisible(true);
 	}
 
-	public AbstractDialog(JFrame owner, String tituloJanela, boolean modal) {
+	protected AbstractDialog(JFrame owner, String tituloJanela, boolean modal) {
 		super(owner, tituloJanela, modal);
 
 		setSize(configuraDimensaoJanela());
 
 	}
 
-	public AbstractDialog(JFrame owner, String tituloJanela, boolean b, LoginFacade loginFacade) throws Exception {
-		this(owner, tituloJanela, b);
-
-		criaController(ControllerAbstractFactory.CONTROLE_CAIXA, loginFacade);
-
+	public AbstractDialog(JFrame owner, String tituloJanela, String className, boolean isModal) throws Exception {
+		this(owner, tituloJanela, isModal);
+		criaController(className);
 	}
 
-	private void criaController(String controllerClassName, LoginFacade loginFacade) throws Exception {
-		try {
-			controller = ControllerAbstractFactory.createController(controllerClassName);
-			controller.setLoginFacade(loginFacade);
-		} catch (ClassNotFoundException e) {
+	private void criaController(String controllerClass) throws Exception {
 
-			e.printStackTrace();
+		controller = SingletonManager.getInstance().getController(controllerClass);
 
-			throw new Exception(controllerClassName + " não encontrado.");
-
-		} catch (InstantiationException e) {
-
-			e.printStackTrace();
-
-		} catch (IllegalAccessException e) {
-
-			e.printStackTrace();
-
-		}
 	}
 
 	private void configuraDialog() {
@@ -264,7 +258,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 		JTable jTable = new JTable(myTableModel);
 
 		jTable.addMouseListener(this);
-		
+
 		direita = new DefaultTableCellRenderer();
 
 		direita.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -338,17 +332,20 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	public void mouseClicked(MouseEvent e) {
 
-		// TipoProdutoController controller = new TipoProdutoController();
-
 		if (e.getSource() instanceof JTable) {
 
 			JTable table = (JTable) e.getSource();
 
-			int indiceLinha = table.getSelectedRow();
+			indiceLinhaTableModel = table.getSelectedRow();
 
-			int id = (Integer) table.getModel().getValueAt(indiceLinha, 0);
+			Object id = table.getModel().getValueAt(indiceLinhaTableModel, 0);
 
-			controller.busca(id);
+			try {
+				controller.busca(id);
+			} catch (Exception e1) {
+
+				e1.printStackTrace();
+			}
 
 			populaFormulario();
 

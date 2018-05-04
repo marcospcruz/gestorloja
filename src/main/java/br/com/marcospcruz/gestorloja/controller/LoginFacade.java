@@ -10,12 +10,11 @@ import br.com.marcospcruz.gestorloja.builder.UsuarioBuilder;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.view.LoginGui;
 import br.com.marcospcruz.gestorloja.view.PrincipalGui;
 
 public class LoginFacade {
-
-	private UsuarioBuilder builder;
 
 	private LoginGui loginGui;
 
@@ -24,7 +23,7 @@ public class LoginFacade {
 	private CrudDao<SessaoUsuario> sessaoUsuarioDao;
 
 	public LoginFacade(LoginGui loginGui) {
-		builder = new UsuarioBuilder();
+		new UsuarioBuilder();
 		this.loginGui = loginGui;
 		sessaoUsuarioDao = new CrudDao<>();
 	}
@@ -35,7 +34,8 @@ public class LoginFacade {
 		comparaSenhaUsuario(usuario, senha);
 		buscaSessaoUsuarioAtiva(usuario);
 		criaSessaoUsuario(usuario);
-		abreInterfacePrincial();
+		SingletonManager.getInstance().setUsuarioLogado(getUsuarioLogado());
+		abreInterfacePrincipal();
 		closeLoginGui();
 	}
 
@@ -73,7 +73,7 @@ public class LoginFacade {
 		new CrudDao<Usuario>().update(usuario);
 	}
 
-	private void abreInterfacePrincial() {
+	private void abreInterfacePrincipal() {
 
 		new PrincipalGui(this);
 

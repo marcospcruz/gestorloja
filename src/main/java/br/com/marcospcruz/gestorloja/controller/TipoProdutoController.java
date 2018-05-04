@@ -21,7 +21,7 @@ import br.com.marcospcruz.gestorloja.util.TipoProdutoNotFoundException;
  * @author Marcos
  * 
  */
-public class TipoProdutoController extends AbstractController {
+public class TipoProdutoController implements AbstractController {
 
 	private static final String RESULTADO_NAO_ENCONTRADO = ConstantesEnum.TIPO_PRODUTO_NAO_ENCONTRADO.getValue()
 			.toString();
@@ -53,8 +53,6 @@ public class TipoProdutoController extends AbstractController {
 	 */
 	public TipoProdutoController() {
 
-		super();
-
 		tipoProdutoDao = new CrudDao<SubTipoProduto>();
 
 	}
@@ -82,8 +80,8 @@ public class TipoProdutoController extends AbstractController {
 
 		validaCriaTipoProduto(subTipo, superTipoProduto, descricao);
 
-		Usuario operador = getLoginFacade().getUsuarioLogado();
-		
+		Usuario operador = getUsuarioLogado();
+
 		tipoProduto.setOperador(operador);
 		tipoProduto.setDataInsercao(new Date());
 
@@ -306,8 +304,8 @@ public class TipoProdutoController extends AbstractController {
 	 * 
 	 * @param idSubProduto
 	 */
-	public void busca(int idSubProduto) {
-
+	public void busca(Object id) {
+		Integer idSubProduto = Integer.valueOf(id.toString());
 		tipoProduto = tipoProdutoDao.busca(SubTipoProduto.class, idSubProduto);
 
 	}

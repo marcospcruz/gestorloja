@@ -7,7 +7,12 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 
-public class CaixaController extends AbstractController {
+public class CaixaController implements AbstractController {
+
+	public CaixaController() {
+		super();
+
+	}
 
 	private static final String QUERY_BUSCA_TODOS = "caixa.findAll";
 	private static final String BUSCA_CAIXA_ABERTO = "caixa.findCaixaAberto";
@@ -16,7 +21,7 @@ public class CaixaController extends AbstractController {
 	private Caixa caixa;
 
 	@Override
-	public void busca(int id) {
+	public void busca(Object id) {
 		// TODO Auto-generated method stub
 
 	}
@@ -24,7 +29,7 @@ public class CaixaController extends AbstractController {
 	@Override
 	public List buscaTodos() {
 		Crud<Caixa> dao = getDao();
-		if (caixaList == null||caixaList.isEmpty())
+		if (caixaList == null || caixaList.isEmpty())
 			caixaList = dao.busca(QUERY_BUSCA_TODOS);
 
 		return caixaList;
@@ -123,7 +128,7 @@ public class CaixaController extends AbstractController {
 
 	public void fechaCaixa() throws Exception {
 		caixa.setDataFechamento(new Date());
-		caixa.setUsuarioFechamento(getLoginFacade().getUsuarioLogado());
+		caixa.setUsuarioFechamento(getUsuarioLogado());
 
 		salva(caixa);
 	}
@@ -136,7 +141,7 @@ public class CaixaController extends AbstractController {
 			saldoInicial = Float.parseFloat(saldoAbertura);
 		}
 		caixa.setSaldoInicial(saldoInicial);
-		caixa.setUsuarioAbertura(getLoginFacade().getUsuarioLogado());
+		caixa.setUsuarioAbertura(getUsuarioLogado());
 
 		salva(caixa);
 

@@ -1,6 +1,5 @@
 package br.com.marcospcruz.gestorloja.view;
 
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
@@ -30,31 +28,21 @@ public class FabricanteDialog extends AbstractDialog {
 	 */
 	private static final long serialVersionUID = 1224811020311576735L;
 
-	private static final Object[] COLUNAS_TABLE_MODEL = { ConstantesEnum.CODIGO_LABEL.getValue().toString(), "Nome"
-
-	};
+	private static final Object[] COLUNAS_TABLE_MODEL = { ConstantesEnum.CODIGO_LABEL.getValue().toString(), "Nome" };
 
 	private static final String DESCRICAO_LABEL = COLUNAS_TABLE_MODEL[1] + ":";
 
 	private static final String FABRICANTES_TITLE = "Fabricantes";
-
-	private boolean atualizaTable;
 
 	/**
 	 * 
 	 * @param owner
 	 * @throws Exception
 	 */
-	public FabricanteDialog(JDialog owner, LoginFacade loginFacade) throws Exception {
+	public FabricanteDialog(JDialog owner) throws Exception {
 
 		super(owner, "Cadastro de " + ConstantesEnum.FABRICANTE.getValue().toString(),
-				ControllerAbstractFactory.FABRICANTE, true, loginFacade);
-
-		atualizaTable = true;
-
-		configuraJPanel();
-
-		setVisible(true);
+				ControllerAbstractFactory.FABRICANTE, true);
 
 	}
 
@@ -240,27 +228,27 @@ public class FabricanteDialog extends AbstractDialog {
 
 		reloadJFrame();
 	}
-//
-//	/**
-//	 * x
-//	 */
-//	private void reloadJFrame() {
-//
-//		Rectangle retangulo = jScrollPane.getBounds();
-//
-//		jPanelTable.remove(jScrollPane);
-//
-//		jTable = inicializaJTable();
-//
-//		jScrollPane = new JScrollPane(jTable);
-//
-//		jScrollPane.setBounds(retangulo);
-//
-//		jPanelTable.add(jScrollPane);
-//
-//		jPanelTable.repaint();
-//
-//	}
+	//
+	// /**
+	// * x
+	// */
+	// private void reloadJFrame() {
+	//
+	// Rectangle retangulo = jScrollPane.getBounds();
+	//
+	// jPanelTable.remove(jScrollPane);
+	//
+	// jTable = inicializaJTable();
+	//
+	// jScrollPane = new JScrollPane(jTable);
+	//
+	// jScrollPane.setBounds(retangulo);
+	//
+	// jPanelTable.add(jScrollPane);
+	//
+	// jPanelTable.repaint();
+	//
+	// }
 
 	@SuppressWarnings("rawtypes")
 	@Override

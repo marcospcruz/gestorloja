@@ -1,16 +1,16 @@
 package br.com.marcospcruz.gestorloja.controller;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
-public class EstoqueController implements Serializable {
+public class EstoqueController implements AbstractController {
 
 	private static final String MESSAGE_QT_INVALIDA_EXCEPTION = "Quantidade informada Inv�lida!";
 
@@ -22,13 +22,11 @@ public class EstoqueController implements Serializable {
 
 	private ProdutoController produtoController;
 
-	private LoginFacade loginFacade;
-
-	public EstoqueController() {
+	public EstoqueController() throws Exception {
 
 		itemEstoqueDao = new CrudDao<ItemEstoque>();
 
-		produtoController = new ProdutoController();
+		produtoController = (ProdutoController) getController(ControllerAbstractFactory.PRODUTO);
 
 	}
 
@@ -76,7 +74,7 @@ public class EstoqueController implements Serializable {
 
 			itemEstoque.setQuantidade(qt);
 
-			itemEstoque.setOperador(loginFacade.getUsuarioLogado());
+			itemEstoque.setOperador(getUsuarioLogado());
 
 			itemEstoque = itemEstoqueDao.update(itemEstoque);
 
@@ -117,9 +115,9 @@ public class EstoqueController implements Serializable {
 		return qt;
 	}
 
-	public ItemEstoque buscaItemPorCodigoDeBarras(String codigoProduto) {
-		ItemEstoque item = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo", codigoProduto);
-		return item;
+	public void buscaItemPorCodigoDeBarras(String codigoProduto) {
+		itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo", codigoProduto);
+
 	}
 
 	public void buscaItemEstoque(String descricao) throws Exception {
@@ -181,13 +179,64 @@ public class EstoqueController implements Serializable {
 
 	}
 
-	public void setLoginFacade(LoginFacade loginFacade) {
+	@Override
+	public void busca(Object id) throws Exception {
+		// TODO Auto-generated method stub
 
-		this.loginFacade = loginFacade;
 	}
 
-	public LoginFacade getLoginFacade() {
-		return loginFacade;
+	@Override
+	public List buscaTodos() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List getList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void busca(String text) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Object getItem() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setList(List list) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setItem(Object object) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void excluir() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void salva(String text, boolean b, Object object) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void salva(Object object) throws Exception {
+		// TODO Auto-generated method stub
+
 	}
 
 }

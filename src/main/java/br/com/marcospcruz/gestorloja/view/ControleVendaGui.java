@@ -4,11 +4,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,21 +28,24 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.VendaController;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
-import br.com.marcospcruz.gestorloja.model.Venda;
+import br.com.marcospcruz.gestorloja.model.ItemVenda;
+import br.com.marcospcruz.gestorloja.util.NumberDocument;
 import br.com.marcospcruz.gestorloja.util.Util;
 
 public class ControleVendaGui extends AbstractDialog {
 	//@formatter:off
-	private static final Object[] COLUNAS_JTABLE = {
+	private static final Object[] COLUNAS_JTABLE = {"Código Produto",
 			"Marca / Fabricante",
 			"Produto",
 			"Quantidade",
 			"Valor Unitário",
 			"Valor Total"
 	};
+	private static final Integer INDICE_QUANTIDADE = 3;
+	
 	private static final String UM = "1";
 	//@formatter:on
 	private JTextField txtCodigoProduto;
@@ -46,11 +55,12 @@ public class ControleVendaGui extends AbstractDialog {
 	private JLabel descricaoProdutoValue;
 	private JLabel valorUnitarioValue;
 	private JLabel fabricanteValue;
-	private ItemEstoque itemEstoque;
+	private JLabel lblValorTotal;
+	private JLabel lblValorTotalValue;
 
-	public ControleVendaGui(LoginFacade loginFacade, String tituloJanela, JFrame owner) throws Exception {
-		super(owner, tituloJanela, true, loginFacade);
-		vendaController = new VendaController();
+	public ControleVendaGui(String tituloJanela, JFrame owner) throws Exception {
+		super(owner, tituloJanela, ControllerAbstractFactory.CONTROLE_VENDA, true);
+		vendaController = (VendaController) super.controller;
 		Font fontTahoma32 = new Font("Tahoma", Font.PLAIN, 32);
 
 		JPanel panel = new JPanel();
@@ -108,9 +118,9 @@ public class ControleVendaGui extends AbstractDialog {
 		descricaoProdutoValue.setFont(fontTahoma32);
 		produto.add(descricaoProdutoValue);
 
-		JLabel lblValorUnitrio = new JLabel("Valor Unit\u00E1rio:");
-		lblValorUnitrio.setFont(fontTahoma32);
-		produto.add(lblValorUnitrio);
+		JLabel lblValorUnitario = new JLabel("Valor Unit\u00E1rio:");
+		lblValorUnitario.setFont(fontTahoma32);
+		produto.add(lblValorUnitario);
 
 		valorUnitarioValue = new JLabel("");
 		valorUnitarioValue.setForeground(Color.BLUE);
@@ -124,13 +134,23 @@ public class ControleVendaGui extends AbstractDialog {
 		txtQuantidade = new JTextField();
 		txtQuantidade.setFont(fontTahoma32);
 		txtQuantidade.setForeground(Color.BLUE);
-		txtQuantidade.setText(UM);
+
 		produto.add(txtQuantidade);
 		txtQuantidade.setColumns(10);
+		txtQuantidade.setDocument(new NumberDocument(IS_DECIMAL));
 
+		txtQuantidade.setText(UM);
 		JButton btnAdicionar = new JButton("Adicionar");
 		btnAdicionar.setFont(fontTahoma32);
 		btnAdicionar.addActionListener(this);
+
+		lblValorTotal = new JLabel("Valor Total:");
+		lblValorTotal.setFont(new Font("Tahoma", Font.PLAIN, 32));
+		produto.add(lblValorTotal);
+
+		 lblValorTotalValue = new JLabel(Util.formataMoeda(0f));
+		lblValorTotalValue.setFont(new Font("Tahoma", Font.PLAIN, 32));
+		produto.add(lblValorTotalValue);
 		produto.add(btnAdicionar);
 
 		JButton btnCancelar = new JButton("Cancelar");
@@ -146,7 +166,34 @@ public class ControleVendaGui extends AbstractDialog {
 		jTable = inicializaJTable();
 		jScrollPane = new JScrollPane(jTable);
 		jPanelTable.add(jScrollPane);
+		//
+		txtQuantidade.addKeyListener(new KeyListener() {
 
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+				String quantidade = txtQuantidade.getText();
+				if (quantidade.length() == 0) {
+					quantidade = UM;
+					txtQuantidade.setText(quantidade);
+					txtQuantidade.setSelectionStart(0);
+				}
+				Float valorUnitario = Util.moedaToFloat(valorUnitarioValue.getText());
+				lblValorTotalValue.setText(Util.formataMoeda(Float.valueOf(quantidade)*valorUnitario));
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 		setVisible(true);
 	}
 
@@ -159,40 +206,13 @@ public class ControleVendaGui extends AbstractDialog {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			switch (e.getActionCommand()) {
-			case "Cancelar":
-				fabricanteValue.setText("");
-				codigoProdutoValue.setText("");
-				valorUnitarioValue.setText("");
-				descricaoProdutoValue.setText("");
-				txtQuantidade.setText(UM);
-				break;
-			case "Adicionar":
-				System.out.println("Adicionar");
-				if (itemEstoque != null) {
-					Venda venda = new Venda();
-					venda.setItemEstoque(itemEstoque);
-					venda.setQuantidade(Integer.valueOf(txtQuantidade.getText()));
-					if (verificaSacola(venda.getItemEstoque(), myTableModel.getLinhas()))
-						throw new Exception("Produto já adicionado ao Carrinho!");
-
-					adicionarItemCarrinho(venda);
-					limpaProdutoTela();
-					itemEstoque=null;
-				}
-				break;
-			case "Buscar":
-				String codigoProduto = txtCodigoProduto.getText();
-
-				preencheProdutoInterface(codigoProduto);
-
-			}
+			selecionaAcao(e.getActionCommand());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(null, ex.getMessage());
 		} finally {
 			atualizaTableModel();
-			
+
 		}
 	}
 
@@ -205,15 +225,24 @@ public class ControleVendaGui extends AbstractDialog {
 		codigoProdutoValue.setText("");
 		valorUnitarioValue.setText("");
 		descricaoProdutoValue.setText("");
-
+		txtQuantidade.setText(UM);
 	}
 
-	private void preencheProdutoInterface(String codigoProduto) throws Exception {
-		itemEstoque = vendaController.buscaProduto(codigoProduto);
+	private void preencheProdutoInterface() throws Exception {
+
+		ItemEstoque itemEstoque = vendaController.getItemVenda().getItemEstoque();
 		fabricanteValue.setText(itemEstoque.getProduto().getFabricante().getNome());
 		codigoProdutoValue.setText(itemEstoque.getProduto().getCodigoDeBarras());
 		valorUnitarioValue.setText(Util.formataMoeda(itemEstoque.getProduto().getValorUnitario()));
 		descricaoProdutoValue.setText(itemEstoque.getProduto().getDescricaoProduto());
+		Integer quantidade = vendaController.getItemVenda().getQuantidade() == null
+				? Integer.valueOf(txtQuantidade.getText())
+				: vendaController.getItemVenda().getQuantidade();
+		txtQuantidade.setText(quantidade.toString());
+
+		lblValorTotalValue
+				.setText(Util.formataMoeda(quantidade * Float.valueOf(itemEstoque.getProduto().getValorUnitario())));
+
 	}
 
 	private void atualizaTableModel() {
@@ -225,7 +254,7 @@ public class ControleVendaGui extends AbstractDialog {
 
 	}
 
-	private void adicionarItemCarrinho(Venda venda) throws Exception {
+	private void adicionarItemCarrinho(ItemVenda venda) throws Exception {
 		vendaController.subtraiEstoque(venda);
 		List linhas = myTableModel.getLinhas();
 		if (linhas == null)
@@ -234,9 +263,10 @@ public class ControleVendaGui extends AbstractDialog {
 		carregaTableModel(linhas);
 	}
 
-	private Object parseVenda(Venda venda) {
+	private Object parseVenda(ItemVenda venda) {
 		//@formatter:off
 		String[] colunas= {
+				venda.getItemEstoque().getProduto().getCodigoDeBarras(),
 				venda.getItemEstoque().getProduto().getFabricante().getNome(),
 				venda.getItemEstoque().getProduto().toString(),
 				Integer.toString(venda.getQuantidade()),
@@ -261,7 +291,53 @@ public class ControleVendaGui extends AbstractDialog {
 
 	@Override
 	protected void selecionaAcao(String actionCommand) throws Exception {
-		// TODO Auto-generated method stub
+		ItemVenda venda = vendaController.getItemVenda();
+		switch (actionCommand) {
+		case "Cancelar":
+
+			try {
+				int quantidadeEstoque = venda.getQuantidade() + venda.getItemEstoque().getQuantidade();
+				venda.getItemEstoque().setQuantidade(quantidadeEstoque);
+				vendaController.devolveProduto();
+				limpaProdutoTela();
+
+				// indiceLinhaTableModel
+			} catch (NullPointerException e) {
+				throw new Exception("Selecione na sacola o ítem que deseja cancelar.");
+			}
+
+			break;
+		case "Adicionar":
+
+			ItemEstoque itemEstoque = venda.getItemEstoque();
+			if (itemEstoque != null) {
+
+				venda.setQuantidade(Integer.valueOf(txtQuantidade.getText()));
+				if (verificaSacola(venda.getItemEstoque(), myTableModel.getLinhas()))
+					throw new Exception("Produto já adicionado ao Carrinho!");
+
+				adicionarItemCarrinho(venda);
+
+				limpaProdutoTela();
+				vendaController.resetItemVenda();
+			}
+			break;
+		case "Buscar":
+			String codigoProduto = txtCodigoProduto.getText();
+			vendaController.buscaProduto(codigoProduto);
+			preencheProdutoInterface();
+
+		}
+
+	}
+
+	private void removeProdutoSacola() {
+		Object produtoSacola = parseVenda(vendaController.getItemVenda());
+		List produtosSacola = super.myTableModel.getLinhas();
+
+		Predicate<String[]> p1 = produto -> produto[0].equals(Array.get(produtoSacola, 0));
+
+		produtosSacola.removeIf(p1);
 
 	}
 
@@ -320,9 +396,42 @@ public class ControleVendaGui extends AbstractDialog {
 	}
 
 	@Override
-	protected void populaFormulario() {
-		// TODO Auto-generated method stub
+	public void mouseClicked(MouseEvent e) {
+		JTable table = (JTable) e.getSource();
 
+		indiceLinhaTableModel = table.getSelectedRow();
+		ItemVenda itemVenda = vendaController.getItemVenda();
+		itemVenda.setQuantidade(Integer.valueOf(table.getValueAt(indiceLinhaTableModel, INDICE_QUANTIDADE).toString()));
+		String codigoDeBarras = table.getValueAt(indiceLinhaTableModel, 0).toString();
+		Integer quantidade = Integer.valueOf(table.getValueAt(indiceLinhaTableModel, 3).toString());
+		try {
+			vendaController.buscaProduto(codigoDeBarras);
+		} catch (Exception e1) {
+
+			e1.printStackTrace();
+		}
+		itemVenda.setQuantidade(quantidade);
+		// vendaController.setItemVenda(itemVenda);
+		vendaController.devolveProduto();
+		populaFormulario();
+		removeProdutoSacola(indiceLinhaTableModel);
+		table.clearSelection();
+		atualizaTableModel();
+	}
+
+	private void removeProdutoSacola(int indiceLinhaTableModel) {
+		myTableModel.getLinhas().remove(indiceLinhaTableModel);
+
+	}
+
+	@Override
+	protected void populaFormulario() {
+		try {
+			preencheProdutoInterface();
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
 	}
 
 }

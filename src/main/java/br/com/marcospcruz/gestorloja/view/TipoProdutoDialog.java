@@ -21,6 +21,7 @@ import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
+import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
@@ -45,24 +46,18 @@ public class TipoProdutoDialog extends AbstractDialog {
 	private JComboBox cmbTiposProduto;
 	// private JComboBox cmbSexo;
 
-	private boolean atualizaTable;
+
 
 	/**
 	 * 
 	 * @param owner
-	 * @param loginFacade
 	 * @throws Exception
 	 */
-	public TipoProdutoDialog(JDialog owner, LoginFacade loginFacade) throws Exception {
+	public TipoProdutoDialog(JDialog owner) throws Exception {
 
-		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(),
-				ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true, loginFacade);
+		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(),ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true);
 
-		atualizaTable = true;
-
-		configuraJPanel();
-
-		setVisible(true);
+	
 
 	}
 
@@ -524,25 +519,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 	}
 
-	public void mouseClicked(MouseEvent e) {
-
-		// TipoProdutoController controller = new TipoProdutoController();
-
-		if (e.getSource() instanceof JTable) {
-
-			JTable table = (JTable) e.getSource();
-
-			int indiceLinha = table.getSelectedRow();
-
-			int idSubTipo = (Integer) table.getModel().getValueAt(indiceLinha, 0);
-
-			controller.busca(idSubTipo);
-
-			populaFormulario();
-
-		}
-
-	}
+	
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override

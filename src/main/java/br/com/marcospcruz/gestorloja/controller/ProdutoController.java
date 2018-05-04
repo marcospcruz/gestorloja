@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja.controller;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,9 +10,10 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
-public class ProdutoController extends AbstractController {
+public class ProdutoController implements AbstractController {
 
 	private static final String RESULTADO_NAO_ENCONTRADO = "Produto não encontrado";
 
@@ -56,12 +58,11 @@ public class ProdutoController extends AbstractController {
 		TipoProdutoController tipoProdutoController = null;
 		List<TipoProduto> listaTipos = null;
 		try {
-			tipoProdutoController = (TipoProdutoController) ControllerAbstractFactory
-					.createController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+			tipoProdutoController = (TipoProdutoController) getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
 
 			listaTipos = tipoProdutoController.getList();
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+
 			e.printStackTrace();
 		}
 
@@ -91,8 +92,8 @@ public class ProdutoController extends AbstractController {
 			this.produto = (Produto) produto;
 
 		}
-		this.produto.setOperador(getLoginFacade().getUsuarioLogado());
-		
+		this.produto.setOperador(getUsuarioLogado());
+
 		produtoDao.update(this.produto);
 
 		this.produto = null;
@@ -122,8 +123,8 @@ public class ProdutoController extends AbstractController {
 
 	}
 
-	public void busca(int idPecaRoupa) {
-
+	public void busca(Object id) {
+		int idPecaRoupa = Integer.valueOf(id.toString());
 		produto = produtoDao.busca(Produto.class, idPecaRoupa);
 
 	}

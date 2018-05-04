@@ -1,17 +1,28 @@
 package br.com.marcospcruz.gestorloja.controller;
 
-import java.util.Date;
 import java.util.List;
 
-import br.com.marcospcruz.gestorloja.model.Fabricante;
-import br.com.marcospcruz.gestorloja.model.Produto;
+import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
-public abstract class AbstractController {
+public interface AbstractController {
 
-	protected static final String BUSCA_INVALIDA = "Busca Invïálida";
-	private LoginFacade loginFacade;
+	static final String BUSCA_INVALIDA = "Busca Invïálida";
 
-	protected boolean contemAcentuacao(String parametro) {
+	/**
+	 * 
+	 * @return
+	 */
+	default Usuario getUsuarioLogado() {
+		return SingletonManager.getInstance().getUsuarioLogado();
+	}
+
+	/**
+	 * 
+	 * @param parametro
+	 * @return
+	 */
+	default boolean contemAcentuacao(String parametro) {
 
 		String pattern = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
 
@@ -27,7 +38,11 @@ public abstract class AbstractController {
 
 	}
 
-	public abstract void busca(int id);
+	default AbstractController getController(String controllerClass) throws Exception {
+		return SingletonManager.getInstance().getController(controllerClass);
+	}
+
+	public abstract void busca(Object id) throws Exception;
 
 	public abstract List buscaTodos();
 
@@ -46,14 +61,5 @@ public abstract class AbstractController {
 	public abstract void salva(String text, boolean b, Object object) throws Exception;
 
 	public abstract void salva(Object object) throws Exception;
-
-	public void setLoginFacade(LoginFacade loginFacade) {
-		this.loginFacade = loginFacade;
-
-	}
-
-	public LoginFacade getLoginFacade() {
-		return loginFacade;
-	}
 
 }

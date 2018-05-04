@@ -37,7 +37,7 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 		this.caixaController = caixaController;
 		setSize(400, 600);
 
-		operador = caixaController.getLoginFacade().getUsuarioLogado();
+		operador = caixaController.getUsuarioLogado();
 
 		criaFormPanel();
 
@@ -141,7 +141,7 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 
 	}
 
-	private void carregaController() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	private void carregaController() throws Exception {
 		caixaController = ControllerAbstractFactory.createController(ControllerAbstractFactory.CONTROLE_CAIXA);
 
 	}

@@ -40,7 +40,7 @@ public class FormFechamentoCaixaDialog extends JDialog implements ActionListener
 		this.caixaController = caixaController;
 		setSize(400, 600);
 
-		operador = caixaController.getLoginFacade().getUsuarioLogado();
+		operador = caixaController.getUsuarioLogado();
 
 		criaFormPanel();
 

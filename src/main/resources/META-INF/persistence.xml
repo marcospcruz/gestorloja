@@ -11,7 +11,7 @@
 			<property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC" />
 			<property name="javax.persistence.jdbc.url"
 				value="jdbc:sqlite:c:\gestorLoja\controleestoque.db" />
-			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.dialect"
 				value="br.com.marcospcruz.gestorloja.util.SQLiteDialect" />

@@ -66,9 +66,9 @@ public class ProdutoDialog extends AbstractDialog {
 	private JComboBox cmbSubTiposDeProduto;
 	private JComboBox cmbMarca;
 
-	public ProdutoDialog(JDialog owner, LoginFacade loginFacade) throws Exception {
+	public ProdutoDialog(JDialog owner) throws Exception {
 
-		super(owner, "Cadastro de Produtos", ControllerAbstractFactory.PRODUTO, true, loginFacade);
+		super(owner, "Cadastro de Produtos", ControllerAbstractFactory.PRODUTO, true);
 
 		// controller = new ProdutoController();
 
@@ -168,7 +168,7 @@ public class ProdutoDialog extends AbstractDialog {
 		controller.busca(txtBusca.getText());
 
 		populaFormulario();
-		
+
 		btnDeletar.setEnabled(acaoBuscar);
 	}
 
@@ -247,8 +247,8 @@ public class ProdutoDialog extends AbstractDialog {
 		AbstractController fabricanteController = null;
 		try {
 			fabricanteController = ControllerAbstractFactory.createController(ControllerAbstractFactory.FABRICANTE);
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-	
+		} catch (Exception e) {
+
 			e.printStackTrace();
 		}
 
@@ -311,26 +311,6 @@ public class ProdutoDialog extends AbstractDialog {
 
 	}
 
-	public void mouseClicked(MouseEvent e) {
-
-		if (e.getSource() instanceof JTable) {
-
-			JTable table = (JTable) e.getSource();
-
-			int indiceLinha = table.getSelectedRow();
-
-			int idProduto = (Integer) table.getModel().getValueAt(indiceLinha, 0);
-
-			controller.busca(idProduto);
-
-			populaFormulario();
-
-			habilitaBotaoExcluir(true);
-
-		}
-
-	}
-
 	@Override
 	protected void populaFormulario() {
 
@@ -358,6 +338,8 @@ public class ProdutoDialog extends AbstractDialog {
 
 		if (produto.getFabricante() != null)
 			cmbMarca.getModel().setSelectedItem(produto.getFabricante());
+
+		habilitaBotaoExcluir(true);
 
 	}
 
