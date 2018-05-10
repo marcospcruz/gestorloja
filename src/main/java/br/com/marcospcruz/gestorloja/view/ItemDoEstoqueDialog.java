@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -26,10 +27,12 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 	private JLabel lblDescricaoProduto;
 	private JLabel lblValorUnitario;
 	private JFormattedTextField txtQuantidade;
-	private JButton btnSalvar;
+	private JButton btnAdicionar;
 	private JButton btnApagar;
 
 	private EstoqueController controller;
+	private JButton btnSubtrair;
+	private JLabel lblQuantidade;
 
 	private ItemDoEstoqueDialog(JDialog owner, String tituloJanela, boolean modal) throws Exception {
 
@@ -49,9 +52,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 	public ItemDoEstoqueDialog(JDialog owner, EstoqueController controller) throws Exception {
 
-		this(owner, "Item do Estoque: "
-				+ controller.getItemEstoque().getProduto()
-						.getDescricaoProduto(), true);
+		this(owner, "Item do Estoque: " + controller.getItemEstoque().getProduto().getDescricaoProduto(), true);
 
 		this.controller = controller;
 
@@ -65,9 +66,13 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 		JPanel panelBotoes = new JPanel();
 
-		btnSalvar = inicializaJButton(SALVAR_BUTTON_LBL);
+		btnAdicionar = inicializaJButton("Adicionar");
 
-		panelBotoes.add(btnSalvar);
+		panelBotoes.add(btnAdicionar);
+
+		btnSubtrair = inicializaJButton("Subtrair");
+
+		panelBotoes.add(btnSubtrair);
 
 		btnApagar = inicializaJButton(EXCLUIR_BUTTON_LBL);
 
@@ -101,32 +106,30 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 		lblCodigo = new JLabel();
 
-		lblCodigo.setBorder(new TitledBorder(ConstantesEnum.CODIGO_LABEL
-				.getValue().toString()));
+		lblCodigo.setBorder(new TitledBorder(ConstantesEnum.CODIGO_LABEL.getValue().toString()));
 
 		itemEstoquePnl.add(lblCodigo);
 
 		lblDescricaoTipoProduto = new JLabel();
 
-		lblDescricaoTipoProduto.setBorder(new TitledBorder(
-				ConstantesEnum.TIPO_PRODUTO_LABEL.getValue().toString()));
+		lblDescricaoTipoProduto.setBorder(new TitledBorder(ConstantesEnum.TIPO_PRODUTO_LABEL.getValue().toString()));
 
 		itemEstoquePnl.add(lblDescricaoTipoProduto);
 
 		lblDescricaoProduto = new JLabel();
 
-		lblDescricaoProduto.setBorder(new TitledBorder(
-				ConstantesEnum.PRODUTO_LABEL.getValue().toString()));
+		lblDescricaoProduto.setBorder(new TitledBorder(ConstantesEnum.PRODUTO_LABEL.getValue().toString()));
 
 		itemEstoquePnl.add(lblDescricaoProduto);
 
 		lblValorUnitario = new JLabel();
 
-		lblValorUnitario.setBorder(new TitledBorder(
-				ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString()));
+		lblValorUnitario.setBorder(new TitledBorder(ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString()));
 
 		itemEstoquePnl.add(lblValorUnitario);
-
+		lblQuantidade = new JLabel();
+		lblQuantidade.setBorder(new TitledBorder(ConstantesEnum.QUANTIDADE_LABEL.toString()));
+		itemEstoquePnl.add(lblQuantidade);
 		return itemEstoquePnl;
 
 	}
@@ -149,22 +152,16 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 		String codigo = item.getIdItemEstoque().toString() + getEspacos();
 
-		String descricaoTipoRoupa = item.getProduto().getTipoProduto()
-				.toString()
-				+ getEspacos();
+		String descricaoTipoRoupa = item.getProduto().getTipoProduto().toString() + getEspacos();
 
-		String valorUnitario = ConstantesEnum.SIMBOLO_MONETARIO_BR.getValue()
-				.toString()
-				+ MyFormatador.formataStringDecimais(item.getProduto()
-						.getValorUnitario()) + getEspacos();
+		String valorUnitario = ConstantesEnum.SIMBOLO_MONETARIO_BR.getValue().toString()
+				+ MyFormatador.formataStringDecimais(item.getProduto().getValorUnitario()) + getEspacos();
 
 		String quantidade = item.getQuantidade().toString();
 
-		String descricaoRoupa = item.getProduto().getDescricaoProduto()
-				+ getEspacos();
+		String descricaoRoupa = item.getProduto().getDescricaoProduto() + getEspacos();
 
-		preencheFormulario(codigo, descricaoTipoRoupa, descricaoRoupa,
-				valorUnitario, quantidade);
+		preencheFormulario(codigo, descricaoTipoRoupa, descricaoRoupa, valorUnitario, quantidade);
 
 	}
 
@@ -180,8 +177,8 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 	}
 
-	private void preencheFormulario(String codigo, String descricaoTipoRoupa,
-			String descricaoRoupa, String valorUnitario, String quantidade) {
+	private void preencheFormulario(String codigo, String descricaoTipoRoupa, String descricaoRoupa,
+			String valorUnitario, String quantidade) {
 
 		lblCodigo.setText(codigo);
 
@@ -189,7 +186,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 		lblValorUnitario.setText(valorUnitario);
 
-		txtQuantidade.setText(quantidade);
+		lblQuantidade.setText(quantidade);
 
 		lblDescricaoProduto.setText(descricaoRoupa);
 
@@ -204,9 +201,10 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 		try {
 			selecionaAcao(actionCommand);
+			dispose();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			super.showMessage(e.getMessage());
 		}
 	}
 
@@ -214,8 +212,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 		if (controller.getItemEstoque() == null) {
 
-			throw new Exception(
-					"Ã‰ necessÃ¡rio selecionar um Ã�tem no Estoque antes de Excluir.");
+			throw new Exception("Ã‰ necessÃ¡rio selecionar um Ã�tem no Estoque antes de Excluir.");
 
 		}
 
@@ -290,9 +287,9 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 	@Override
 	protected void selecionaAcao(String actionCommand) throws Exception {
 
-		if (actionCommand.equals(SALVAR_BUTTON_LBL)) {
+		if (actionCommand.equals(btnAdicionar.getText())) {
 
-			salvarItem();
+			incrementaItem();
 
 		} else if (actionCommand.equals(EXCLUIR_BUTTON_LBL)) {
 
@@ -300,27 +297,31 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 		}
 
+		
+
+	}
+
+	private void incrementaItem() throws Exception {
+		if (controller.getItemEstoque() == null) {
+
+			throw new Exception(ConstantesEnum.ITEM_DO_ESTOQUE_EXCEPTION_SALVAMENTO.getValue().toString());
+
+		}
+
+		int quantidade;
+		try{
+			 quantidade = Integer.valueOf(txtQuantidade.getText());
+		}catch(NumberFormatException e) {
+			e.printStackTrace();
+			throw new Exception("Quantidade informada inv�lida!");
+		}
+
+		controller.incrementaItem(quantidade);
+
 	}
 
 	@Override
 	protected void salvarItem() throws Exception {
-		// TODO Auto-generated method stub
-
-		if (controller.getItemEstoque() == null) {
-
-			throw new Exception(
-					ConstantesEnum.ITEM_DO_ESTOQUE_EXCEPTION_SALVAMENTO
-							.getValue().toString());
-
-		} else {
-
-			int quantidade = new Integer(txtQuantidade.getText());
-
-			controller.atualizaItem(quantidade);
-
-			dispose();
-
-		}
 
 	}
 

@@ -24,6 +24,8 @@ public class App {
 			case "1":
 				checkAndCreateAppHome();
 				criaUsuario();
+				if (args.length > 1)
+					System.out.print(args[1]);
 			}
 		initApp();
 
@@ -66,14 +68,13 @@ public class App {
 	 * @return
 	 */
 	private static Crud<InterfaceGrafica> criaInterfaceGrafica() {
-		
-		List<InterfaceGrafica> interfaces = Arrays.asList(
-				new InterfaceGrafica[] { 
-						new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_ESTOQUE , InterfaceGrafica.ESTOQUE),
-						new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_CAIXA, InterfaceGrafica.CONTROLE_DE_CAIXA),
-						new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_PDV, InterfaceGrafica.PONTO_DE_VENDA)
+
+		List<InterfaceGrafica> interfaces = Arrays.asList(new InterfaceGrafica[] {
+				new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_ESTOQUE, InterfaceGrafica.ESTOQUE),
+				new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_CAIXA, InterfaceGrafica.CONTROLE_DE_CAIXA),
+				new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_PDV, InterfaceGrafica.PONTO_DE_VENDA)
 				// new InterfaceGrafica(pack + "VendaPrincipalGui","Venda")
-				});
+		});
 		Crud<InterfaceGrafica> iDao = new CrudDao<>();
 		interfaces.stream().forEach(i -> {
 			try {

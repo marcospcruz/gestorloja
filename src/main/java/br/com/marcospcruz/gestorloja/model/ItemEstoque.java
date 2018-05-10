@@ -51,7 +51,7 @@ public class ItemEstoque implements Serializable {
 
 	private Integer quantidade;
 
-	private Date dataContagem;
+	private Date dataEntradaEstoque;
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
@@ -88,12 +88,12 @@ public class ItemEstoque implements Serializable {
 		this.quantidade = quantidade;
 	}
 
-	public Date getDataContagem() {
-		return dataContagem;
+	public Date getDataEntradaEstoque() {
+		return dataEntradaEstoque;
 	}
 
-	public void setDataContagem(Date dataContagem) {
-		this.dataContagem = dataContagem;
+	public void setDataEntradaEstoque(Date dataEntradaEstoque) {
+		this.dataEntradaEstoque = dataEntradaEstoque;
 	}
 
 	public void setQuantidade(Integer quantidade) {
@@ -104,7 +104,7 @@ public class ItemEstoque implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((dataContagem == null) ? 0 : dataContagem.hashCode());
+		result = prime * result + ((dataEntradaEstoque == null) ? 0 : dataEntradaEstoque.hashCode());
 		result = prime * result + ((idItemEstoque == null) ? 0 : idItemEstoque.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((produto == null) ? 0 : produto.hashCode());
@@ -121,10 +121,10 @@ public class ItemEstoque implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ItemEstoque other = (ItemEstoque) obj;
-		if (dataContagem == null) {
-			if (other.dataContagem != null)
+		if (dataEntradaEstoque == null) {
+			if (other.dataEntradaEstoque != null)
 				return false;
-		} else if (!dataContagem.equals(other.dataContagem))
+		} else if (!dataEntradaEstoque.equals(other.dataEntradaEstoque))
 			return false;
 		if (idItemEstoque == null) {
 			if (other.idItemEstoque != null)
@@ -152,7 +152,7 @@ public class ItemEstoque implements Serializable {
 	@Override
 	public String toString() {
 		return "ItemEstoque [idItemEstoque=" + idItemEstoque + ", produto=" + produto + ", quantidade=" + quantidade
-				+ ", dataContagem=" + dataContagem + ", operador=" + operador + "]";
+				+ ", dataContagem=" + dataEntradaEstoque + ", operador=" + operador + "]";
 	}
 
 }

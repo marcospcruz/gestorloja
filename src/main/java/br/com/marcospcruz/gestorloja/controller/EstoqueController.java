@@ -64,7 +64,7 @@ public class EstoqueController implements AbstractController {
 
 		try {
 
-			itemEstoque.setDataContagem(new Date());
+			itemEstoque.setDataEntradaEstoque(new Date());
 
 			produtoController.busca(produto.getDescricaoProduto());
 
@@ -75,8 +75,7 @@ public class EstoqueController implements AbstractController {
 			itemEstoque.setQuantidade(qt);
 
 			itemEstoque.setOperador(getUsuarioLogado());
-
-			itemEstoque = itemEstoqueDao.update(itemEstoque);
+			salva(itemEstoque);
 
 		} catch (NumberFormatException e) {
 
@@ -161,11 +160,11 @@ public class EstoqueController implements AbstractController {
 
 	}
 
-	public void atualizaItem(int quantidade) {
+	public void incrementaItem(int quantidade) throws Exception {
 
-		itemEstoque.setQuantidade(quantidade);
+		itemEstoque.setQuantidade(itemEstoque.getQuantidade() + quantidade);
 
-		itemEstoqueDao.update(itemEstoque);
+		salva(itemEstoque);
 
 		anulaAtributos();
 
@@ -235,7 +234,7 @@ public class EstoqueController implements AbstractController {
 
 	@Override
 	public void salva(Object object) throws Exception {
-		// TODO Auto-generated method stub
+		itemEstoque = itemEstoqueDao.update((ItemEstoque) object);
 
 	}
 

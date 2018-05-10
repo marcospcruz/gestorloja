@@ -148,7 +148,7 @@ public class ControleVendaGui extends AbstractDialog {
 		lblValorTotal.setFont(new Font("Tahoma", Font.PLAIN, 32));
 		produto.add(lblValorTotal);
 
-		 lblValorTotalValue = new JLabel(Util.formataMoeda(0f));
+		lblValorTotalValue = new JLabel(Util.formataMoeda(0f));
 		lblValorTotalValue.setFont(new Font("Tahoma", Font.PLAIN, 32));
 		produto.add(lblValorTotalValue);
 		produto.add(btnAdicionar);
@@ -184,7 +184,7 @@ public class ControleVendaGui extends AbstractDialog {
 					txtQuantidade.setSelectionStart(0);
 				}
 				Float valorUnitario = Util.moedaToFloat(valorUnitarioValue.getText());
-				lblValorTotalValue.setText(Util.formataMoeda(Float.valueOf(quantidade)*valorUnitario));
+				lblValorTotalValue.setText(Util.formataMoeda(Float.valueOf(quantidade) * valorUnitario));
 
 			}
 
@@ -226,6 +226,7 @@ public class ControleVendaGui extends AbstractDialog {
 		valorUnitarioValue.setText("");
 		descricaoProdutoValue.setText("");
 		txtQuantidade.setText(UM);
+		lblValorTotalValue.setText(Util.formataMoeda(0f));
 	}
 
 	private void preencheProdutoInterface() throws Exception {
@@ -296,14 +297,20 @@ public class ControleVendaGui extends AbstractDialog {
 		case "Cancelar":
 
 			try {
+
 				int quantidadeEstoque = venda.getQuantidade() + venda.getItemEstoque().getQuantidade();
 				venda.getItemEstoque().setQuantidade(quantidadeEstoque);
 				vendaController.devolveProduto();
-				limpaProdutoTela();
 
 				// indiceLinhaTableModel
 			} catch (NullPointerException e) {
-				throw new Exception("Selecione na sacola o ítem que deseja cancelar.");
+				if (!myTableModel.getLinhas().isEmpty())
+					throw new Exception("Selecione na sacola o ítem que deseja cancelar.");
+				else
+					e.printStackTrace();
+			} finally {
+				limpaProdutoTela();
+
 			}
 
 			break;
@@ -412,7 +419,7 @@ public class ControleVendaGui extends AbstractDialog {
 		}
 		itemVenda.setQuantidade(quantidade);
 		// vendaController.setItemVenda(itemVenda);
-		vendaController.devolveProduto();
+		// vendaController.devolveProduto();
 		populaFormulario();
 		removeProdutoSacola(indiceLinhaTableModel);
 		table.clearSelection();

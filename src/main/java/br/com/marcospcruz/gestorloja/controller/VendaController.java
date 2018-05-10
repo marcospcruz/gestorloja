@@ -38,7 +38,7 @@ public class VendaController implements AbstractController {
 			throw new Exception("Quantidade de ítens no estoque é insuficiente para a venda!");
 		}
 		estoqueController.setItemEstoque(itemEstoque);
-		estoqueController.atualizaItem(itemEstoque.getQuantidade() - quantidadeEstoque);
+		estoqueController.incrementaItem(itemEstoque.getQuantidade() - quantidadeEstoque);
 	}
 
 	@Override
@@ -118,8 +118,15 @@ public class VendaController implements AbstractController {
 
 	}
 
-	public void devolveProduto() {
-		estoqueController.atualizaItem(itemVenda.getQuantidade() + itemVenda.getItemEstoque().getQuantidade());
+	public void devolveProduto() throws Exception {
+		try {
+			estoqueController.buscaItemPorCodigoDeBarras(itemVenda.getItemEstoque().getProduto().getCodigoDeBarras());
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		estoqueController.incrementaItem(itemVenda.getQuantidade() + itemVenda.getItemEstoque().getQuantidade());
+		resetItemVenda();
 	}
 
 }
