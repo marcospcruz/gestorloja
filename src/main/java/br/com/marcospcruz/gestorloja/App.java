@@ -6,8 +6,10 @@ import java.util.List;
 
 import javax.persistence.NoResultException;
 
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
+import br.com.marcospcruz.gestorloja.facade.PlanilhaHandlerFacade;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
 import br.com.marcospcruz.gestorloja.model.Usuario;
@@ -25,10 +27,18 @@ public class App {
 				checkAndCreateAppHome();
 				criaUsuario();
 				if (args.length > 1)
-					System.out.print(args[1]);
+					loadEstoqueSheet(args[1]);
 			}
 		initApp();
 
+	}
+
+	private static void loadEstoqueSheet(String sheetString) {
+		
+		PlanilhaHandlerFacade facade = new PlanilhaHandlerFacade();
+		
+		facade.importaPlanilha(sheetString);
+		
 	}
 
 	/**
