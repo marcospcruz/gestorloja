@@ -30,7 +30,10 @@ import javax.persistence.Table;
 				+ "where upper(p.descricaoProduto) like :descricao"),
 		@NamedQuery(name = "itemEstoque.readAll", query = "select ie from ItemEstoque ie " 
 				+ "JOIN ie.produto p "
-				+ "order by p.descricaoProduto")
+				+ "order by p.descricaoProduto"),
+		@NamedQuery(name="itemEstoque.readProduto",query="select ie from ItemEstoque ie "
+				+ "JOIN ie.produto p "
+				+ "WHERE p.idProduto=:idProduto")
 
 })
 //@formatter:on
@@ -46,7 +49,7 @@ public class ItemEstoque implements Serializable {
 	private Integer idItemEstoque;
 
 	@OneToOne
-	@JoinColumn(name="idProduto")
+	@JoinColumn(name = "idProduto")
 	private Produto produto;
 
 	private Integer quantidade;
@@ -82,10 +85,6 @@ public class ItemEstoque implements Serializable {
 
 	public Integer getQuantidade() {
 		return quantidade;
-	}
-
-	public void setQuantidade(int quantidade) {
-		this.quantidade = quantidade;
 	}
 
 	public Date getDataEntradaEstoque() {

@@ -1,6 +1,5 @@
 package br.com.marcospcruz.gestorloja.controller;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,7 +9,6 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
-import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
 public class ProdutoController implements AbstractController {
@@ -22,6 +20,8 @@ public class ProdutoController implements AbstractController {
 	private Produto produto;
 
 	private Crud<Produto> produtoDao;
+
+	private boolean validaDados = true;
 
 	public ProdutoController() {
 
@@ -58,7 +58,8 @@ public class ProdutoController implements AbstractController {
 		TipoProdutoController tipoProdutoController = null;
 		List<TipoProduto> listaTipos = null;
 		try {
-			tipoProdutoController = (TipoProdutoController) getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+			tipoProdutoController = (TipoProdutoController) getController(
+					ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
 
 			listaTipos = tipoProdutoController.getList();
 		} catch (Exception e) {
@@ -80,8 +81,8 @@ public class ProdutoController implements AbstractController {
 	 * @throws Exception
 	 */
 	public void salva(Object produto) throws Exception {
-
-		valida((Produto) produto);
+		if (validaDados)
+			valida((Produto) produto);
 
 		// busca(((Produto) produto).getDescricaoProduto());
 		if (this.produto != null) {
@@ -94,9 +95,7 @@ public class ProdutoController implements AbstractController {
 		}
 		this.produto.setOperador(getUsuarioLogado());
 
-		produtoDao.update(this.produto);
-
-		this.produto = null;
+		this.produto = produtoDao.update(this.produto);
 
 	}
 
@@ -159,7 +158,7 @@ public class ProdutoController implements AbstractController {
 
 		List<Produto> tmp = produtoDao.busca("produto.readall");
 
-		produtos = new ArrayList<Produto>();
+		produtos = new ArrayList<>();
 
 		for (Produto peca : tmp) {
 
@@ -202,6 +201,13 @@ public class ProdutoController implements AbstractController {
 	public void setList(List list) {
 
 		this.produtos = list;
+	}
+
+	@Override
+	public void salva(Object produto, boolean validaDados) throws Exception {
+		this.validaDados = validaDados;
+		salva(produto);
+
 	}
 
 }

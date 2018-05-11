@@ -87,8 +87,6 @@ public class TipoProdutoController implements AbstractController {
 
 		tipoProdutoDao.update(tipoProduto);
 
-		setItem(null);
-
 	}
 
 	private void validaCriaTipoProduto(boolean subTipo, Object superTipoProduto, String descricao) throws Exception {
@@ -127,7 +125,7 @@ public class TipoProdutoController implements AbstractController {
 
 	}
 
-	private void validaTipoRoupa(String descricao) throws Exception {
+	private void validaTipoProduto(String descricao) throws Exception {
 
 		if (tipoProduto == null) {
 
@@ -232,13 +230,13 @@ public class TipoProdutoController implements AbstractController {
 
 		}
 
-		if (tiposProdutos.size() >= 1)
+		if (!tiposProdutos.isEmpty())
 
 			tipoProduto = (SubTipoProduto) tiposProdutos.get(0);
 
-		else if (tiposProdutos.size() == 0)
+		else if (tiposProdutos.isEmpty())
 
-			throw new TipoProdutoNotFoundException(RESULTADO_NAO_ENCONTRADO);
+			throw new TipoProdutoNotFoundException(parametro + ":" + RESULTADO_NAO_ENCONTRADO);
 
 	}
 
@@ -323,7 +321,31 @@ public class TipoProdutoController implements AbstractController {
 	}
 
 	@Override
-	public void salva(Object object) throws Exception {
+	public void salva(Object descricao) throws Exception {
+		buscaSuperTipoProduto("Genérico");
+		SubTipoProduto superTipoProduto = tipoProduto;
+		tipoProduto = new SubTipoProduto();
+		tipoProduto.setDescricaoTipo(descricao.toString());
+		tipoProduto.setSuperTipoProduto(superTipoProduto);
+
+		tipoProduto.setDataInsercao(new Date());
+
+		salva(tipoProduto.getDescricaoTipo(), true, tipoProduto.getSuperTipoProduto());
+
+	}
+
+	private void buscaSuperTipoProduto(String string) throws Exception {
+		try {
+			busca(string);
+		} catch (Exception e) {
+
+			tipoProduto = tipoProdutoDao.update(new SubTipoProduto(string, getUsuarioLogado()));
+		}
+
+	}
+
+	@Override
+	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
 
 	}

@@ -2,6 +2,7 @@ package br.com.marcospcruz.gestorloja.controller;
 
 import java.util.List;
 
+import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
@@ -14,7 +15,12 @@ public interface AbstractController {
 	 * @return
 	 */
 	default Usuario getUsuarioLogado() {
-		return SingletonManager.getInstance().getUsuarioLogado();
+		Usuario usuario = SingletonManager.getInstance().getUsuarioLogado();
+		if(usuario==null) {
+			usuario=new Usuario();
+			usuario.setIdUsuario(1);
+		}
+		return usuario;
 	}
 
 	/**
@@ -24,7 +30,7 @@ public interface AbstractController {
 	 */
 	default boolean contemAcentuacao(String parametro) {
 
-		String pattern = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+		String pattern = "íé";
 
 		for (char caractere : pattern.toCharArray())
 
@@ -61,5 +67,9 @@ public interface AbstractController {
 	public abstract void salva(String text, boolean b, Object object) throws Exception;
 
 	public abstract void salva(Object object) throws Exception;
+
+	public abstract void salva(Object object, boolean validaDados) throws Exception;
+
+
 
 }

@@ -1,7 +1,9 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.util.Collection;
+import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -30,7 +32,7 @@ public class SubTipoProduto extends TipoProduto {
 	 */
 	private static final long serialVersionUID = -7095619182533502712L;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "idSuperTipoProduto")
 	private SubTipoProduto superTipoProduto;
 
@@ -45,6 +47,13 @@ public class SubTipoProduto extends TipoProduto {
 	 */
 	public SubTipoProduto() {
 
+	}
+
+	public SubTipoProduto(String descricao, Usuario operador) {
+		setDescricaoTipo(descricao);
+		setDataInsercao(new Date());
+		setOperador(operador);
+		
 	}
 
 	public String getSexo() {

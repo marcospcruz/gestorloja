@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +38,12 @@ public class App {
 		
 		PlanilhaHandlerFacade facade = new PlanilhaHandlerFacade();
 		
-		facade.importaPlanilha(sheetString);
+		try {
+			facade.importaPlanilha(sheetString);
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
 		
 	}
 

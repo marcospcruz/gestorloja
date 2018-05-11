@@ -180,7 +180,8 @@ public class EstoqueController implements AbstractController {
 
 	@Override
 	public void busca(Object id) throws Exception {
-		// TODO Auto-generated method stub
+		int idProduto = (int) id;
+		itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto", idProduto);
 
 	}
 
@@ -204,8 +205,8 @@ public class EstoqueController implements AbstractController {
 
 	@Override
 	public Object getItem() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return itemEstoque;
 	}
 
 	@Override
@@ -235,6 +236,12 @@ public class EstoqueController implements AbstractController {
 	@Override
 	public void salva(Object object) throws Exception {
 		itemEstoque = itemEstoqueDao.update((ItemEstoque) object);
+
+	}
+
+	@Override
+	public void salva(Object object, boolean validaDados) throws Exception {
+		// TODO Auto-generated method stub
 
 	}
 

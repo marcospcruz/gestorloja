@@ -129,4 +129,10 @@ public class VendaController implements AbstractController {
 		resetItemVenda();
 	}
 
+	@Override
+	public void salva(Object object, boolean validaDados) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -28,7 +28,12 @@ import org.hibernate.annotations.FetchMode;
 		@NamedQuery(name = "produto.readparametrolike", query = "select p from Produto p "
 				+ "LEFT JOIN fetch p.itemEstoque " 
 				+ "LEFT JOIN fetch p.fabricante "
-				+ "where upper(p.descricaoProduto) like :descricao") })
+				+ "where upper(p.descricaoProduto) like :descricao"),
+		@NamedQuery(name="produto.readProdutoFabricante",query="select p from Produto p "
+				+ "JOIN p.fabricante f "
+				+ "WHERE p.descricaoProduto = :descricao "
+				+ "AND f.nome = :marca")})
+		
 //@formatter:on
 public class Produto implements Serializable {
 
@@ -79,6 +84,7 @@ public class Produto implements Serializable {
 	}
 
 	public Produto() {
+		setDataInsercao(new Date());
 	}
 
 	public Integer getIdProduto() {

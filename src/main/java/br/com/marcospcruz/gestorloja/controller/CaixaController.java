@@ -155,4 +155,10 @@ public class CaixaController implements AbstractController {
 		return ultimoCaixa;
 	}
 
+	@Override
+	public void salva(Object object, boolean validaDados) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
