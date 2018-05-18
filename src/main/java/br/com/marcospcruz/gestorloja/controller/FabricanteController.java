@@ -19,133 +19,79 @@ public class FabricanteController implements AbstractController {
 		fabricanteDao = new CrudDao<>();
 	}
 
-	public List<Fabricante> buscaTodos() {
+	@Override
+	public void busca(Object id) throws Exception {
+		// TODO Auto-generated method stub
 
-		setList(fabricanteDao.busca("fabricante.buscaTodos"));
-
-		return getList();
 	}
 
 	@Override
-	public void setList(List fabricantes) {
-		this.fabricantes = fabricantes;
-
+	public List buscaTodos() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public List<Fabricante> getList() {
+	@Override
+	public List getList() {
 		if (fabricantes == null)
-			buscaTodos();
+			fabricantes = fabricanteDao.busca("fabricante.buscaTodos");
 		return fabricantes;
 	}
 
-	public void busca(String parametro) throws Exception {
-
-		zeraAtributos();
-
-		if (parametro.length() == 0) {
-
-			throw new Exception(BUSCA_INVALIDA);
-
-		}
-
-		// if (contemAcentuacao(parametro)) {
-		//
-		// buscaInWorkAround(parametro);
-		//
-		// } else {
-
-		String valor = "%" + parametro.toUpperCase() + "%";
-
-		fabricantes = fabricanteDao.buscaList("fabricante.readParametroLike", "nome", valor);
-
-		// }
-
-		if (fabricantes.size() >= 1)
-
-			fabricante = fabricantes.get(0);
-
-		else if (fabricantes.size() == 0)
-
-			throw new TipoProdutoNotFoundException(ConstantesEnum.FABRICANTE_NAO_ENCONTRADO.getValue().toString());
+	@Override
+	public void busca(String text) throws Exception {
+		String nomeFabricante = text;
+		fabricante = fabricanteDao.busca("fabricante.readParametroLike", "nome", nomeFabricante);
 
 	}
 
-	private void zeraAtributos() {
-		setItem(null);
-		setList(null);
-	}
-
-	public Fabricante getItem() {
+	@Override
+	public Object getItem() {
 
 		return fabricante;
 	}
 
-	public void busca(Object id) {
-		int idFabricante=Integer.valueOf(id.toString());
-		fabricante = fabricanteDao.busca(Fabricante.class, idFabricante);
-
-	}
-
-	public void excluir() throws Exception {
-		
-		if(!fabricante.getProdutos().isEmpty()) {
-			throw new Exception("Exclusão não permitida! Há produtos cadastrados para este fabricante.");
-		}
-
-		fabricanteDao.delete(fabricante);
-
-		zeraAtributos();
-
-	}
-
-	public void salva(String nome, boolean b, Object object) throws Exception {
-
-		fabricante = new Fabricante();
-		fabricante.setNome(nome);
-
-		validaNovoFabricante();
-
-		fabricanteDao.update(fabricante);
-
-	}
-
-	private void validaNovoFabricante() throws Exception {
-
-		if (fabricante.getNome().length() == 0) {
-			throw new Exception(FABRICANTE_INVALIDO);
-		}
+	@Override
+	public void setList(List list) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void setItem(Object object) {
+		// TODO Auto-generated method stub
 
-		this.fabricante = (Fabricante) object;
+	}
+
+	@Override
+	public void excluir() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void salva(String text, boolean b, Object object) throws Exception {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void salva(Object object) throws Exception {
-
-		// busca(((Fabricante) object).getNome());
-
-		if (fabricante != null) {
-			fabricante.setNome(((Fabricante) object).getNome());
-		} else {
-			fabricante = (Fabricante) object;
-		}
-		fabricante.setOperador(getUsuarioLogado());
-
-		// validaNovoFabricante();
-
-		fabricanteDao.update(fabricante);
+		((Fabricante) object).setOperador(getUsuarioLogado());
+		fabricante = fabricanteDao.update((Fabricante) object);
 
 	}
 
 	@Override
 	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
+	public void busca(String param1, String param2) {
+		// TODO Auto-generated method stub
+
+	}
 
 }

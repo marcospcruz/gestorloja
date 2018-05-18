@@ -27,13 +27,12 @@ import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.controller.relatorio.RelatorioEstoqueGeral;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
-import br.com.marcospcruz.gestorloja.util.MyFormatador;
+import br.com.marcospcruz.gestorloja.util.Util;
 
 public class EstoquePrincipalGui extends AbstractDialog {
 
@@ -199,26 +198,28 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	private Object[] parseRow(ItemEstoque itemEstoque) {
 
-		float valor = itemEstoque.getQuantidade() * itemEstoque.getProduto().getValorUnitario();
+		float valor = itemEstoque.getQuantidade() * itemEstoque.getValorUnitario();
 
 		String simboloMonetarioBr = ConstantesEnum.SIMBOLO_MONETARIO_BR.getValue().toString();
 
-		String valorTotal = simboloMonetarioBr + MyFormatador.formataStringDecimais(valor);
+		String valorTotal = simboloMonetarioBr + Util.formataStringDecimais(valor);
 
-		String valorUnitario = simboloMonetarioBr
-				+ MyFormatador.formataStringDecimais(itemEstoque.getProduto().getValorUnitario());
+		String valorUnitario = simboloMonetarioBr + Util.formataStringDecimais(itemEstoque.getValorUnitario());
 
 		SubTipoProduto tipoProduto = itemEstoque.getProduto().getTipoProduto();
 		Produto produto = itemEstoque.getProduto();
-		String nomeFabricante = produto.getFabricante() == null ? "" : produto.getFabricante().getNome();
-//@formatter:off		
+		String nomeFabricante = itemEstoque.getFabricante() == null ? "" : itemEstoque.getFabricante().getNome();
+
+		String descricaoSuperTipoProduto = tipoProduto.getSuperTipoProduto() == null ? ""
+				: tipoProduto.getSuperTipoProduto().getDescricaoTipo();
+		//@formatter:off		
 		return new Object[] { 
 				itemEstoque.getIdItemEstoque(), 
 				nomeFabricante,
-				tipoProduto.getSuperTipoProduto().getDescricaoTipo(),
+				descricaoSuperTipoProduto,
 				tipoProduto.getDescricaoTipo(),
 				produto.getDescricaoProduto(),
-				produto.getCodigoDeBarras(),
+				itemEstoque.getCodigoDeBarras(),
 				itemEstoque.getQuantidade(), 
 				valorUnitario, 
 				valorTotal 

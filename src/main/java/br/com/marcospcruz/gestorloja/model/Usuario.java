@@ -21,8 +21,7 @@ import javax.persistence.TemporalType;
 @Entity
 //@formatter:off
 @NamedQueries({
-		@NamedQuery(name = "usuario.findLogin", query = 
-				"select u from Usuario u "
+		@NamedQuery(name = "usuario.findLogin", query = "select u from Usuario u "
 				+ "JOIN FETCH u.perfisUsuario "
 //				+ "LEFT JOIN u.operador o "						
 				+ "where u.nomeUsuario=:nomeUsuario "
@@ -30,11 +29,15 @@ import javax.persistence.TemporalType;
 		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u "
 				+ "LEFT JOIN u.operador o "
 //				+ "JOIN FETCH u.perfisUsuario p "
-//				+ "LEFT JOIN FETCH p.interfaces i "				
+//				+ "LEFT JOIN FETCH u.interfaces i "				
 				+ "where u.nomeUsuario=:nomeUsuario") })
 //@formatter:on
 public class Usuario implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4577612498982187892L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idUsuario;

@@ -65,7 +65,7 @@ public class CrudDao<T> implements Crud<T> {
 
 		} finally {
 
-			entityManager.close();
+			closeEntityManager();
 
 		}
 
@@ -84,8 +84,14 @@ public class CrudDao<T> implements Crud<T> {
 
 		entityManager.getTransaction().commit();
 
-		entityManager.close();
+		closeEntityManager();
 
+	}
+
+	private void closeEntityManager() {
+		entityManager.close();
+		
+		entityManagerFactory.close();
 	}
 
 	public T busca(Class clazz, int id) {
@@ -93,7 +99,7 @@ public class CrudDao<T> implements Crud<T> {
 		inicializaEntityManager();
 
 		T entity = (T) entityManager.find(clazz, id);
-
+//		closeEntityManager();
 		return entity;
 
 	}
@@ -107,7 +113,7 @@ public class CrudDao<T> implements Crud<T> {
 		query.setParameter(parametro, valor);
 
 		List<T> entities = query.getResultList();
-
+		closeEntityManager();
 		return entities;
 
 	}
@@ -121,7 +127,7 @@ public class CrudDao<T> implements Crud<T> {
 		query.setParameter(parametro, value);
 
 		T entity = (T) query.getSingleResult();
-
+//		closeEntityManager();
 		return entity;
 
 	}
@@ -133,7 +139,7 @@ public class CrudDao<T> implements Crud<T> {
 		Query query = entityManager.createNamedQuery(namedQuery);
 
 		List<T> objetos = query.getResultList();
-		entityManager.close();
+//		closeEntityManager();
 		return objetos;
 
 	}
@@ -146,12 +152,26 @@ public class CrudDao<T> implements Crud<T> {
 		query.setParameter(param2, paramValue2);
 
 		T entity = (T) query.getSingleResult();
+//		closeEntityManager();
 		return entity;
 	}
 
 	private Query createQuery(String namedQuery) {
 
 		return entityManager.createNamedQuery(namedQuery);
+	}
+
+	@Override
+	public T busca(String namedQuery, String param1, Integer paramValue, String param2, Integer paramValue2) {
+	
+		inicializaEntityManager();
+		Query query = createQuery(namedQuery);
+		query.setParameter(param1, paramValue);
+		query.setParameter(param2, paramValue2);
+
+		T entity = (T) query.getSingleResult();
+//		closeEntityManager();
+		return entity;
 	}
 
 }

@@ -30,7 +30,7 @@ public interface AbstractController {
 	 */
 	default boolean contemAcentuacao(String parametro) {
 
-		String pattern = "םי";
+		String pattern = "םיחת";
 
 		for (char caractere : pattern.toCharArray())
 
@@ -69,6 +69,8 @@ public interface AbstractController {
 	public abstract void salva(Object object) throws Exception;
 
 	public abstract void salva(Object object, boolean validaDados) throws Exception;
+
+	public abstract void busca(String param1, String param2);
 
 
 

@@ -3,10 +3,10 @@ package br.com.marcospcruz.gestorloja.facade;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -27,12 +27,9 @@ public class PlanilhaHandlerFacade {
 	private static final int INICIO_DADOS = 2;
 	private static final int MARCA_PRODUTO = 2;
 	private static final int PRODUTO = 3;
-	private static final int QUANTIDADE = 7;
+	private static final int QUANTIDADE = 10;
 	private static final String GENERICO = "Genérico";
 	private Sheet planilha;
-	private AbstractController tipoProdutoController;
-	private AbstractController fabricanteController;
-	private AbstractController produtoController;
 
 	public PlanilhaHandlerFacade() {
 
@@ -46,94 +43,128 @@ public class PlanilhaHandlerFacade {
 	}
 
 	private void cadastraProdutos() {
-
+		List<ItemEstoque> produtosList = new ArrayList<>();
 		Iterator<Row> linhaIterator = planilha.iterator();
-
+		int contador = 0;
 		while (linhaIterator.hasNext()) {
 
 			Row linhaAtual = linhaIterator.next();
 
 			if (linhaAtual.getRowNum() < INICIO_DADOS)
 				continue;
-
+//			System.out.println(linhaAtual.getRowNum());
 			try {
-				cadastraTipoProduto(linhaAtual.getCell(GRUPO));
-				cadastraMarcaProduto(linhaAtual.getCell(MARCA_PRODUTO));
-				cadastraProduto(linhaAtual.getCell(PRODUTO).toString());
-				cadastraItemEstoque(linhaAtual.getCell(QUANTIDADE).getNumericCellValue());
-			} catch (Exception e) {
+				Fabricante fabricante = new Fabricante();
+				String nomeFabricante = GENERICO;
+				if (linhaAtual.getCell(MARCA_PRODUTO) != null)
+					nomeFabricante = linhaAtual.getCell(MARCA_PRODUTO).toString();
+				fabricante.setNome(nomeFabricante);
+				SubTipoProduto tipoProduto = new SubTipoProduto();
+				String descricaoTipo = GENERICO;
+				if (linhaAtual.getCell(GRUPO) != null)
+					descricaoTipo = linhaAtual.getCell(GRUPO).toString();
+				tipoProduto.setDescricaoTipo(descricaoTipo);
+				Produto produto = new Produto();
+				produto.setDescricaoProduto(linhaAtual.getCell(PRODUTO).toString());
+				produto.setTipoProduto(tipoProduto);
+				ItemEstoque itemEstoque = new ItemEstoque();
+				itemEstoque.setProduto(produto);
+				itemEstoque.setFabricante(fabricante);
+				Double quantidade = linhaAtual.getCell(QUANTIDADE).getNumericCellValue();
+				itemEstoque.setQuantidade(quantidade.intValue());
 
+				produtosList.add(itemEstoque);
+				// Fabricante fabricante =
+				// cadastraMarcaProduto(linhaAtual.getCell(MARCA_PRODUTO));
+				// TipoProduto tipoProduto = cadastraTipoProduto(linhaAtual.getCell(GRUPO));
+				// produto=cadastraProduto(linhaAtual.getCell(PRODUTO).toString());
+				// cadastraItemEstoque(linhaAtual.getCell(QUANTIDADE).getNumericCellValue());
+				contador++;
+			} catch (Exception e) {
 				e.printStackTrace();
+				break;
+
+			} finally {
+
 			}
 
 		}
+		System.out.println(contador + " linhas carregadas na memória.");
+		processaProdutos(produtosList);
+	}
+
+	private void processaProdutos(List<ItemEstoque> produtosList) {
+
+		produtosList.stream().forEach(itemEstoque -> {
+
+			try {
+				Produto produto = itemEstoque.getProduto();
+				SubTipoProduto tipoProduto = (SubTipoProduto) cadastraTipoProduto(
+						itemEstoque.getProduto().getTipoProduto());
+				Fabricante fabricante = cadastraMarcaProduto(itemEstoque.getFabricante());
+				produto.setTipoProduto(tipoProduto);
+				produto = cadastraProduto(produto);
+				itemEstoque.setFabricante(fabricante);
+				itemEstoque.setProduto(produto);
+				cadastraItemEstoque(itemEstoque);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 
 	}
 
-	private void cadastraItemEstoque(double qt) throws Exception {
+	private void cadastraItemEstoque(ItemEstoque itemEstoque) throws Exception {
+
 		AbstractController estoqueController = getController(ControllerAbstractFactory.ESTOQUE);
 
-		ItemEstoque itemEstoque;
 		try {
-			estoqueController.busca(((Produto) produtoController.getItem()).getIdProduto());
+			estoqueController.busca(itemEstoque);
 			itemEstoque = (ItemEstoque) estoqueController.getItem();
 		} catch (Exception e) {
-			itemEstoque = new ItemEstoque();
-			itemEstoque.setDataEntradaEstoque(new Date());
-			itemEstoque.setProduto((Produto) produtoController.getItem());
-
-		}
-		itemEstoque.setQuantidade(new Double(qt).intValue());
-		try {
-			estoqueController.salva(itemEstoque);
-
-		} catch (Exception e) {
 			e.printStackTrace();
+
 		}
+
+		estoqueController.salva(itemEstoque);
 
 	}
 
-	private void cadastraProduto(String descricaoProduto) throws Exception {
-		produtoController = getController(ControllerAbstractFactory.PRODUTO);
-		Produto produto = new Produto();
-		SubTipoProduto tipoProduto=tipoProdutoController.getItem();
-		produto.setDescricaoProduto(descricaoProduto);
-		produto.setTipoProduto(tipoProduto);
+	private Produto cadastraProduto(Produto produto) throws Exception {
+
+		AbstractController produtoController = getController(ControllerAbstractFactory.PRODUTO);
+
 		try {
-			
-			produtoController.busca(produto);
+			produtoController.busca(produto.getDescricaoProduto());
 		} catch (Exception e) {
-			
-			produto.setDescricaoProduto(descricaoProduto);
-			produto.setFabricante((Fabricante) fabricanteController.getItem());
-			produto.setTipoProduto((SubTipoProduto) tipoProdutoController.getItem());
 
 			produtoController.salva(produto, false);
 
 		}
+		return (Produto) produtoController.getItem();
 
 	}
 
-	private void cadastraMarcaProduto(Cell marcaProduto) throws Exception {
-		System.out.println(marcaProduto);
-		fabricanteController = getController(ControllerAbstractFactory.FABRICANTE);
-		try {
-			fabricanteController.busca(marcaProduto.toString());
-		} catch (Exception e) {
+	private Fabricante cadastraMarcaProduto(Fabricante fabricante) throws Exception {
 
-			Fabricante fabricante = new Fabricante();
-			fabricante.setNome(marcaProduto.toString());
+		AbstractController fabricanteController = getController(ControllerAbstractFactory.FABRICANTE);
+		String nome = fabricante.getNome();
+
+		try {
+			fabricanteController.busca(nome);
+		} catch (Exception e) {
 
 			fabricanteController.salva(fabricante);
 		}
-
+		return (Fabricante) fabricanteController.getItem();
 	}
 
-	private void cadastraTipoProduto(Cell cellGrupo) throws Exception {
-		tipoProdutoController = getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
-		String descricao = GENERICO;
-		if (cellGrupo != null)
-			descricao = cellGrupo.toString();
+	private TipoProduto cadastraTipoProduto(SubTipoProduto tipoProduto) throws Exception {
+
+		AbstractController tipoProdutoController = getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+		String descricao = tipoProduto.toString();
+
 		try {
 			tipoProdutoController.busca(descricao);
 		} catch (Exception e) {
@@ -141,6 +172,8 @@ public class PlanilhaHandlerFacade {
 			tipoProdutoController.salva(descricao);
 
 		}
+
+		return (TipoProduto) tipoProdutoController.getItem();
 	}
 
 	private AbstractController getController(String controllerName) throws Exception {

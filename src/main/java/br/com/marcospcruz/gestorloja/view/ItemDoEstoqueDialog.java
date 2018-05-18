@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -18,7 +17,7 @@ import javax.swing.border.TitledBorder;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
-import br.com.marcospcruz.gestorloja.util.MyFormatador;
+import br.com.marcospcruz.gestorloja.util.Util;
 
 public class ItemDoEstoqueDialog extends AbstractDialog {
 
@@ -155,7 +154,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 		String descricaoTipoRoupa = item.getProduto().getTipoProduto().toString() + getEspacos();
 
 		String valorUnitario = ConstantesEnum.SIMBOLO_MONETARIO_BR.getValue().toString()
-				+ MyFormatador.formataStringDecimais(item.getProduto().getValorUnitario()) + getEspacos();
+				+ Util.formataStringDecimais(item.getValorUnitario()) + getEspacos();
 
 		String quantidade = item.getQuantidade().toString();
 
@@ -295,13 +294,27 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 
 			excluiItem();
 
+		}else if(actionCommand.equals(btnSubtrair.getText())) {
+			subtraiItem();
 		}
 
 		
 
 	}
 
+	private void subtraiItem() throws Exception {
+		int quantidade = adicionaQuantidade();
+		controller.decrementaItem(quantidade);
+	}
+
 	private void incrementaItem() throws Exception {
+		int quantidade = adicionaQuantidade();
+
+		controller.incrementaItem(quantidade);
+
+	}
+
+	private int adicionaQuantidade() throws Exception {
 		if (controller.getItemEstoque() == null) {
 
 			throw new Exception(ConstantesEnum.ITEM_DO_ESTOQUE_EXCEPTION_SALVAMENTO.getValue().toString());
@@ -315,9 +328,7 @@ public class ItemDoEstoqueDialog extends AbstractDialog {
 			e.printStackTrace();
 			throw new Exception("Quantidade informada inválida!");
 		}
-
-		controller.incrementaItem(quantidade);
-
+		return quantidade;
 	}
 
 	@Override

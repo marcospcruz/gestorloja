@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja.util;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,5 +34,11 @@ public class Util {
 		
 		return Float.valueOf(valor);
 	}
+	public static String formataStringDecimais(float valor) {
 
+		DecimalFormat formatadorNumero = new DecimalFormat("#.00");
+
+		return formatadorNumero.format((double) valor);
+
+	}
 }

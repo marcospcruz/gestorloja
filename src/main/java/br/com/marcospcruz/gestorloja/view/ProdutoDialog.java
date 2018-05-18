@@ -2,7 +2,6 @@ package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +24,12 @@ import org.hibernate.LazyInitializationException;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.AbstractController;
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
-import br.com.marcospcruz.gestorloja.util.MyFormatador;
 import br.com.marcospcruz.gestorloja.util.NumberDocument;
 
 public class ProdutoDialog extends AbstractDialog {
@@ -46,25 +43,17 @@ public class ProdutoDialog extends AbstractDialog {
 			ConstantesEnum.CODIGO_LABEL.getValue().toString(),
 			ConstantesEnum.TIPO_PRODUTO_LABEL.getValue().toString(),
 			ConstantesEnum.DESCRICAO_LABEL.getValue().toString(),
-			ConstantesEnum.FABRICANTE.getValue().toString(),
 			ConstantesEnum.UNIDADE_MEDIDA_LABEL.getValue().toString(),
-			ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString() };
+			 };
 	//@formatter:on
 	private static final String DESCRICAO_LABEL = (String) COLUNAS_TABLE_MODEL[2] + ":";
 
 	private static final String TIPO_PRODUTO_LABEL = COLUNAS_TABLE_MODEL[1] + ":";
 
-	private static final String VALOR_UNITARIO_LABEL = ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString() + ":";
-
 	private JFormattedTextField txtUnidadeMedida;
-
-	private JFormattedTextField txtValorUnitario;
-
-	private JTextField txtCodigoBarras;
 
 	private JComboBox cmbTiposDeProduto;
 	private JComboBox cmbSubTiposDeProduto;
-	private JComboBox cmbMarca;
 
 	public ProdutoDialog(JDialog owner) throws Exception {
 
@@ -229,17 +218,12 @@ public class ProdutoDialog extends AbstractDialog {
 
 			cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
 
-			cmbMarca.setModel(carregaFabricantes(new Fabricante()));
-
 		}
 
 		txtDescricao.setText("");
 
 		txtUnidadeMedida.setText("");
 
-		txtValorUnitario.setText("");
-
-		txtCodigoBarras.setText("");
 	}
 
 	private ComboBoxModel carregaFabricantes(Fabricante fabricante) {
@@ -257,9 +241,6 @@ public class ProdutoDialog extends AbstractDialog {
 		Object[] arrayFabricantes = new Object[fabricantes.size() + 1];
 
 		arrayFabricantes[0] = "Selecione uma Opção";
-
-		if (fabricantes == null)
-			fabricantes = new ArrayList<>();
 
 		int i = 0;
 		for (Fabricante f : fabricantes) {
@@ -318,13 +299,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		txtUnidadeMedida.setText(produto.getUnidadeMedida());
 
-		txtCodigoBarras.setText(produto.getCodigoDeBarras());
-
 		txtDescricao.setText(produto.getDescricaoProduto());
-
-		String valor = Float.toString(produto.getValorUnitario()).replace('.', ',');
-
-		txtValorUnitario.setText(valor);
 
 		SubTipoProduto subTipoProduto = (SubTipoProduto) produto.getTipoProduto();
 
@@ -335,9 +310,6 @@ public class ProdutoDialog extends AbstractDialog {
 		cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(tipoProduto));
 
 		cmbSubTiposDeProduto.getModel().setSelectedItem(subTipoProduto);
-
-		if (produto.getFabricante() != null)
-			cmbMarca.getModel().setSelectedItem(produto.getFabricante());
 
 		habilitaBotaoExcluir(true);
 
@@ -429,14 +401,6 @@ public class ProdutoDialog extends AbstractDialog {
 
 		jPanel.add(lblMarca);
 
-		cmbMarca = new JComboBox();
-
-		cmbMarca.setModel(carregaFabricantes(new Fabricante()));
-
-		cmbMarca.setBounds(150, y, 150, TXT_HEIGHT);
-
-		jPanel.add(cmbMarca);
-
 		y += 25;
 		// --------------------------------------------------------
 		JLabel lbl1 = new JLabel(DESCRICAO_LABEL);
@@ -477,26 +441,13 @@ public class ProdutoDialog extends AbstractDialog {
 
 		jPanel.add(lblCodigoDeBarras);
 
-		txtCodigoBarras = new JTextField();
-
-		txtCodigoBarras.setBounds(150, y, 150, TXT_HEIGHT);
-
-		jPanel.add(txtCodigoBarras);
+		// txtCodigoBarras = new JTextField();
+		//
+		// txtCodigoBarras.setBounds(150, y, 150, TXT_HEIGHT);
+		//
+		// jPanel.add(txtCodigoBarras);
 		// --------------------------------------
-		y += 30;
-		JLabel lblValorUnitario = new JLabel(VALOR_UNITARIO_LABEL);
-
-		lblValorUnitario.setBounds(10, y, 150, 30);
-
-		jPanel.add(lblValorUnitario);
-
-		txtValorUnitario = new JFormattedTextField();
-
-		txtValorUnitario.setDocument(new NumberDocument(true));
-
-		txtValorUnitario.setBounds(150, y, 150, TXT_HEIGHT);
-
-		jPanel.add(txtValorUnitario);
+		// y += 30;
 
 		return jPanel;
 
@@ -618,17 +569,14 @@ public class ProdutoDialog extends AbstractDialog {
 
 			Produto produto = (Produto) objeto;
 
-			String valorUnitario = "R$ " + MyFormatador.formataStringDecimais(produto.getValorUnitario());
-
-			Fabricante fabricante = produto.getFabricante();
 			//@formatter:off
 			Object[] linha = { 
 					produto.getIdProduto(), 
 					produto.getTipoProduto(), 
 					produto.getDescricaoProduto(),
-					fabricante!=null?fabricante.getNome():"",
+					
 					produto.getUnidadeMedida(),
-					valorUnitario 
+					
 					};
 			//@formatter:on
 			linhas.add(linha);
@@ -690,16 +638,8 @@ public class ProdutoDialog extends AbstractDialog {
 
 			String unidadeMedida = txtUnidadeMedida.getText();
 
-			String valorUnitario = txtValorUnitario.getText();
-
-			String codigoDeBarras = txtCodigoBarras.getText();
-
-			Object fabricante = cmbMarca.getSelectedItem();
-			validaValorUnitario(valorUnitario);
-
-			controller.salva(new Produto((TipoProduto) tipoProduto, (SubTipoProduto) subTipoProduto, descricao,
-					unidadeMedida, codigoDeBarras, (Fabricante) fabricante,
-					Float.valueOf(valorUnitario.replaceAll(",", "."))));
+			controller.salva(
+					new Produto((TipoProduto) tipoProduto, (SubTipoProduto) subTipoProduto, descricao, unidadeMedida));
 
 			mostraMensagemConfirmacaoSalvamento();
 

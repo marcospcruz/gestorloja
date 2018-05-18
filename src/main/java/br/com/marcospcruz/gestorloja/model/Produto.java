@@ -3,9 +3,7 @@ package br.com.marcospcruz.gestorloja.model;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,26 +11,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
-
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 //@formatter:off
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "produto.readall", query = "select p from Produto p " 
-				+ "LEFT JOIN fetch p.itemEstoque "
-				+ "LEFT JOIN fetch p.fabricante "),
+),
 		@NamedQuery(name = "produto.readparametrolike", query = "select p from Produto p "
-				+ "LEFT JOIN fetch p.itemEstoque " 
-				+ "LEFT JOIN fetch p.fabricante "
-				+ "where upper(p.descricaoProduto) like :descricao"),
-		@NamedQuery(name="produto.readProdutoFabricante",query="select p from Produto p "
-				+ "JOIN p.fabricante f "
-				+ "WHERE p.descricaoProduto = :descricao "
-				+ "AND f.nome = :marca")})
+				+ "where upper(p.descricaoProduto) like :descricao")})
 		
 //@formatter:on
 public class Produto implements Serializable {
@@ -50,13 +37,10 @@ public class Produto implements Serializable {
 
 	private String unidadeMedida;
 
-	private float valorUnitario;
-	@Column(unique = true)
-	private String codigoDeBarras;
-
-	@OneToOne(targetEntity = ItemEstoque.class, fetch = FetchType.EAGER, mappedBy = "produto")
-	@Fetch(FetchMode.JOIN)
-	private ItemEstoque itemEstoque;
+	// @OneToMany(targetEntity = ItemEstoque.class, fetch = FetchType.LAZY, mappedBy
+	// = "produto")
+	// @Fetch(FetchMode.JOIN)
+	// private List<ItemEstoque> itensEstoque;
 
 	@ManyToOne
 	@JoinColumn(name = "idTipoProduto")
@@ -64,23 +48,17 @@ public class Produto implements Serializable {
 	private SubTipoProduto tipoProduto;
 
 	@ManyToOne
-	@JoinColumn(name = "idFabricante")
-	private Fabricante fabricante;
-	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
 
 	private Date dataInsercao;
 
-	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida,
-			String codigoDeBarras, Fabricante fabricante, float valorUnitario) {
+	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida) {
 		setTipoProduto(subTipoProduto);
 		getTipoProduto().setSuperTipoProduto((SubTipoProduto) tipoProduto);
 		setDescricaoProduto(descricao);
 		setUnidadeMedida(unidadeMedida);
-		setValorUnitario(valorUnitario);
-		setCodigoDeBarras(codigoDeBarras);
-		setFabricante(fabricante);
+
 	}
 
 	public Produto() {
@@ -111,44 +89,12 @@ public class Produto implements Serializable {
 		this.unidadeMedida = unidadeMedida;
 	}
 
-	public float getValorUnitario() {
-		return valorUnitario;
-	}
-
-	public void setValorUnitario(float valorUnitario) {
-		this.valorUnitario = valorUnitario;
-	}
-
-	public ItemEstoque getItemEstoque() {
-		return itemEstoque;
-	}
-
-	public void setItemEstoque(ItemEstoque itemEstoque) {
-		this.itemEstoque = itemEstoque;
-	}
-
 	public SubTipoProduto getTipoProduto() {
 		return tipoProduto;
 	}
 
 	public void setTipoProduto(SubTipoProduto tipoProduto) {
 		this.tipoProduto = tipoProduto;
-	}
-
-	public Fabricante getFabricante() {
-		return fabricante;
-	}
-
-	public void setFabricante(Fabricante fabricante) {
-		this.fabricante = fabricante;
-	}
-
-	public String getCodigoDeBarras() {
-		return codigoDeBarras;
-	}
-
-	public void setCodigoDeBarras(String codigoDeBarras) {
-		this.codigoDeBarras = codigoDeBarras;
 	}
 
 	public Usuario getOperador() {
@@ -176,15 +122,12 @@ public class Produto implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((codigoDeBarras == null) ? 0 : codigoDeBarras.hashCode());
+		result = prime * result + ((dataInsercao == null) ? 0 : dataInsercao.hashCode());
 		result = prime * result + ((descricaoProduto == null) ? 0 : descricaoProduto.hashCode());
-		result = prime * result + ((fabricante == null) ? 0 : fabricante.hashCode());
 		result = prime * result + ((idProduto == null) ? 0 : idProduto.hashCode());
-		result = prime * result + ((itemEstoque == null) ? 0 : itemEstoque.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((tipoProduto == null) ? 0 : tipoProduto.hashCode());
 		result = prime * result + ((unidadeMedida == null) ? 0 : unidadeMedida.hashCode());
-		result = prime * result + Float.floatToIntBits(valorUnitario);
 		return result;
 	}
 
@@ -197,30 +140,20 @@ public class Produto implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Produto other = (Produto) obj;
-		if (codigoDeBarras == null) {
-			if (other.codigoDeBarras != null)
+		if (dataInsercao == null) {
+			if (other.dataInsercao != null)
 				return false;
-		} else if (!codigoDeBarras.equals(other.codigoDeBarras))
+		} else if (!dataInsercao.equals(other.dataInsercao))
 			return false;
 		if (descricaoProduto == null) {
 			if (other.descricaoProduto != null)
 				return false;
 		} else if (!descricaoProduto.equals(other.descricaoProduto))
 			return false;
-		if (fabricante == null) {
-			if (other.fabricante != null)
-				return false;
-		} else if (!fabricante.equals(other.fabricante))
-			return false;
 		if (idProduto == null) {
 			if (other.idProduto != null)
 				return false;
 		} else if (!idProduto.equals(other.idProduto))
-			return false;
-		if (itemEstoque == null) {
-			if (other.itemEstoque != null)
-				return false;
-		} else if (!itemEstoque.equals(other.itemEstoque))
 			return false;
 		if (operador == null) {
 			if (other.operador != null)
@@ -236,8 +169,6 @@ public class Produto implements Serializable {
 			if (other.unidadeMedida != null)
 				return false;
 		} else if (!unidadeMedida.equals(other.unidadeMedida))
-			return false;
-		if (Float.floatToIntBits(valorUnitario) != Float.floatToIntBits(other.valorUnitario))
 			return false;
 		return true;
 	}

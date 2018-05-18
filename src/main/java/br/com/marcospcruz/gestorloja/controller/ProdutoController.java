@@ -101,7 +101,6 @@ public class ProdutoController implements AbstractController {
 
 	private void merge(Object produto) {
 		this.produto.setDescricaoProduto(((Produto) produto).getDescricaoProduto());
-		this.produto.setFabricante(((Produto) produto).getFabricante());
 		this.produto.setTipoProduto(((Produto) produto).getTipoProduto());
 		this.produto.setUnidadeMedida(((Produto) produto).getUnidadeMedida());
 		this.produto.setValorUnitario(((Produto) produto).getValorUnitario());
@@ -122,9 +121,9 @@ public class ProdutoController implements AbstractController {
 
 	}
 
-	public void busca(Object id) {
-		int idPecaRoupa = Integer.valueOf(id.toString());
-		produto = produtoDao.busca(Produto.class, idPecaRoupa);
+	public void busca(Object object) {
+		Integer id = (Integer) object;
+		produto = produtoDao.busca(Produto.class, id);
 
 	}
 
@@ -208,6 +207,14 @@ public class ProdutoController implements AbstractController {
 		this.validaDados = validaDados;
 		salva(produto);
 
+	}
+
+	@Override
+	public void busca(String param1, String param2) {
+		String descricaoProduto = param1;
+		String nomeFabricante = param2;
+		produto = produtoDao.busca("produto.readProdutoFabricante", "descricao", descricaoProduto, "marca",
+				nomeFabricante);
 	}
 
 }

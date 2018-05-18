@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 //@formatter:off
@@ -20,20 +20,23 @@ import javax.persistence.Table;
 @NamedQueries({
 		@NamedQuery(name = "itemestoque.readCodigo", query = "select ie from ItemEstoque ie "
 			+ "JOIN ie.produto p " 
-			+ "where upper(p.codigoDeBarras) = :codigo"),
+			+ "where upper(ie.codigoDeBarras) = :codigo"),
 		@NamedQuery(name = "itemestoque.readCodigoEstoque", query = "select ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
-				+ "WHERE upper(p.codigoDeBarras) = :codigo "
+				+ "WHERE upper(ie.codigoDeBarras) = :codigo "
 				+ "AND ie.quantidade>0"),
 		@NamedQuery(name = "itemestoque.readDescricaoPecao", query = "select ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
 				+ "where upper(p.descricaoProduto) like :descricao"),
 		@NamedQuery(name = "itemEstoque.readAll", query = "select ie from ItemEstoque ie " 
 				+ "JOIN ie.produto p "
-				+ "order by p.descricaoProduto"),
+				+ "JOIN p.tipoProduto t "
+				+ "order by t.descricaoTipo"),
 		@NamedQuery(name="itemEstoque.readProduto",query="select ie from ItemEstoque ie "
 				+ "JOIN ie.produto p "
-				+ "WHERE p.idProduto=:idProduto")
+				+ "JOIN ie.fabricante f "
+				+ "WHERE p.idProduto=:idProduto "
+				+ "AND f.idFabricante=:idFabricante")
 
 })
 //@formatter:on
@@ -48,24 +51,26 @@ public class ItemEstoque implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer idItemEstoque;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "idProduto")
 	private Produto produto;
-
+	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "idFabricante")
+	// @JoinTable(name = "itemEstoque_fabricante", joinColumns = {
+	// @JoinColumn(name = "idItemEstoque") }, inverseJoinColumns = {
+	// @JoinColumn(name = "idFabricante") })
+	private Fabricante fabricante;
 	private Integer quantidade;
-
-	private Date dataEntradaEstoque;
+	@Column(unique = true)
+	private String codigoDeBarras;
+	private Date dataContagem;
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
 
-	public Usuario getOperador() {
-		return operador;
-	}
+	private float valorUnitario;
 
-	public void setOperador(Usuario operador) {
-		this.operador = operador;
-	}
 
 	public Integer getIdItemEstoque() {
 		return idItemEstoque;
@@ -83,31 +88,66 @@ public class ItemEstoque implements Serializable {
 		this.produto = produto;
 	}
 
+	public Fabricante getFabricante() {
+		return fabricante;
+	}
+
+	public void setFabricante(Fabricante fabricante) {
+		this.fabricante = fabricante;
+	}
+
 	public Integer getQuantidade() {
 		return quantidade;
-	}
-
-	public Date getDataEntradaEstoque() {
-		return dataEntradaEstoque;
-	}
-
-	public void setDataEntradaEstoque(Date dataEntradaEstoque) {
-		this.dataEntradaEstoque = dataEntradaEstoque;
 	}
 
 	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
 	}
 
+	public String getCodigoDeBarras() {
+		return codigoDeBarras;
+	}
+
+	public void setCodigoDeBarras(String codigoDeBarras) {
+		this.codigoDeBarras = codigoDeBarras;
+	}
+
+	public Date getDataContagem() {
+		return dataContagem;
+	}
+
+	public void setDataContagem(Date dataContagem) {
+		this.dataContagem = dataContagem;
+	}
+
+	public Usuario getOperador() {
+		return operador;
+	}
+
+	public void setOperador(Usuario operador) {
+		this.operador = operador;
+	}
+
+	public float getValorUnitario() {
+		return valorUnitario;
+	}
+
+	public void setValorUnitario(float valorUnitario) {
+		this.valorUnitario = valorUnitario;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((dataEntradaEstoque == null) ? 0 : dataEntradaEstoque.hashCode());
+		result = prime * result + ((codigoDeBarras == null) ? 0 : codigoDeBarras.hashCode());
+		result = prime * result + ((dataContagem == null) ? 0 : dataContagem.hashCode());
+		result = prime * result + ((fabricante == null) ? 0 : fabricante.hashCode());
 		result = prime * result + ((idItemEstoque == null) ? 0 : idItemEstoque.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((produto == null) ? 0 : produto.hashCode());
 		result = prime * result + ((quantidade == null) ? 0 : quantidade.hashCode());
+		result = prime * result + Float.floatToIntBits(valorUnitario);
 		return result;
 	}
 
@@ -120,10 +160,20 @@ public class ItemEstoque implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ItemEstoque other = (ItemEstoque) obj;
-		if (dataEntradaEstoque == null) {
-			if (other.dataEntradaEstoque != null)
+		if (codigoDeBarras == null) {
+			if (other.codigoDeBarras != null)
 				return false;
-		} else if (!dataEntradaEstoque.equals(other.dataEntradaEstoque))
+		} else if (!codigoDeBarras.equals(other.codigoDeBarras))
+			return false;
+		if (dataContagem == null) {
+			if (other.dataContagem != null)
+				return false;
+		} else if (!dataContagem.equals(other.dataContagem))
+			return false;
+		if (fabricante == null) {
+			if (other.fabricante != null)
+				return false;
+		} else if (!fabricante.equals(other.fabricante))
 			return false;
 		if (idItemEstoque == null) {
 			if (other.idItemEstoque != null)
@@ -145,13 +195,14 @@ public class ItemEstoque implements Serializable {
 				return false;
 		} else if (!quantidade.equals(other.quantidade))
 			return false;
+		if (Float.floatToIntBits(valorUnitario) != Float.floatToIntBits(other.valorUnitario))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "ItemEstoque [idItemEstoque=" + idItemEstoque + ", produto=" + produto + ", quantidade=" + quantidade
-				+ ", dataContagem=" + dataEntradaEstoque + ", operador=" + operador + "]";
+		return produto.getTipoProduto() + " " + fabricante + " " + produto;
 	}
 
 }

@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -39,8 +38,8 @@ public class Fabricante implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date dataInsercao;
 
-	@OneToMany(mappedBy="fabricante")
-	private List<Produto> produtos;
+//	@OneToMany(mappedBy="fabricante")
+//	private List<Produto> produtos;
 
 	public Fabricante() {
 		dataInsercao = new Date();
@@ -79,12 +78,19 @@ public class Fabricante implements Serializable {
 		this.dataInsercao = dataInsercao;
 	}
 
-	public List<Produto> getProdutos() {
-		return produtos;
-	}
+//	public List<Produto> getProdutos() {
+//		return produtos;
+//	}
+//
+//	public void setProdutos(List<Produto> produtos) {
+//		this.produtos = produtos;
+//	}
 
-	public void setProdutos(List<Produto> produtos) {
-		this.produtos = produtos;
+
+
+	@Override
+	public String toString() {
+		return nome;
 	}
 
 	@Override
@@ -95,7 +101,6 @@ public class Fabricante implements Serializable {
 		result = prime * result + ((idFabricante == null) ? 0 : idFabricante.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
-		result = prime * result + ((produtos == null) ? 0 : produtos.hashCode());
 		return result;
 	}
 
@@ -128,17 +133,7 @@ public class Fabricante implements Serializable {
 				return false;
 		} else if (!operador.equals(other.operador))
 			return false;
-		if (produtos == null) {
-			if (other.produtos != null)
-				return false;
-		} else if (!produtos.equals(other.produtos))
-			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return nome;
 	}
 
 }

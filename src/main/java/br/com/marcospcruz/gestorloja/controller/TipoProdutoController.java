@@ -85,7 +85,7 @@ public class TipoProdutoController implements AbstractController {
 		tipoProduto.setOperador(operador);
 		tipoProduto.setDataInsercao(new Date());
 
-		tipoProdutoDao.update(tipoProduto);
+		tipoProduto=tipoProdutoDao.update(tipoProduto);
 
 	}
 
@@ -236,7 +236,7 @@ public class TipoProdutoController implements AbstractController {
 
 		else if (tiposProdutos.isEmpty())
 
-			throw new TipoProdutoNotFoundException(parametro + ":" + RESULTADO_NAO_ENCONTRADO);
+			throw new TipoProdutoNotFoundException(RESULTADO_NAO_ENCONTRADO);
 
 	}
 

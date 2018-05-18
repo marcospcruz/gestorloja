@@ -2,6 +2,8 @@ package br.com.marcospcruz.gestorloja.systemmanager;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.AbstractController;
+import br.com.marcospcruz.gestorloja.dao.Crud;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 
 public class SingletonManager {
@@ -24,7 +26,7 @@ public class SingletonManager {
 	}
 
 	public Usuario getUsuarioLogado() {
-
+		
 		return usuarioLogado;
 	}
 

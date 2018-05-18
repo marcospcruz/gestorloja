@@ -64,7 +64,7 @@ public class EstoqueController implements AbstractController {
 
 		try {
 
-			itemEstoque.setDataEntradaEstoque(new Date());
+			itemEstoque.setDataContagem(new Date());
 
 			produtoController.busca(produto.getDescricaoProduto());
 
@@ -179,9 +179,11 @@ public class EstoqueController implements AbstractController {
 	}
 
 	@Override
-	public void busca(Object id) throws Exception {
-		int idProduto = (int) id;
-		itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto", idProduto);
+	public void busca(Object object) throws Exception {
+		itemEstoque = (ItemEstoque) object;
+		itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
+				itemEstoque.getProduto().getIdProduto(), "idFabricante", itemEstoque.getFabricante().getIdFabricante());
+
 
 	}
 
@@ -235,7 +237,10 @@ public class EstoqueController implements AbstractController {
 
 	@Override
 	public void salva(Object object) throws Exception {
-		itemEstoque = itemEstoqueDao.update((ItemEstoque) object);
+		itemEstoque=(ItemEstoque) object;
+		itemEstoque.setOperador(getUsuarioLogado());
+		itemEstoque.setDataContagem(new Date());
+		itemEstoque = itemEstoqueDao.update(itemEstoque);
 
 	}
 
@@ -243,6 +248,15 @@ public class EstoqueController implements AbstractController {
 	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void decrementaItem(int quantidade) throws Exception {
+		itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidade);
+
+		salva(itemEstoque);
+
+		anulaAtributos();
+		
 	}
 
 }

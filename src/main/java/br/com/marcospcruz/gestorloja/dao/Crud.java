@@ -2,6 +2,7 @@ package br.com.marcospcruz.gestorloja.dao;
 
 import java.util.List;
 
+import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 
 public interface Crud<T> {
@@ -32,5 +33,7 @@ public interface Crud<T> {
 	public List<T> buscaList(String query, String parametro, String valor);
 
 	public T busca(String namedQuery, String param1, String paramValue1, String param2, String paramValue2);
+
+	public T busca(String namedQuery, String param1, Integer paramValue, String param2, Integer paramValue2);
 
 }

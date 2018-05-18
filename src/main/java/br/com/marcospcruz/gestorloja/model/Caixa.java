@@ -1,6 +1,5 @@
 package br.com.marcospcruz.gestorloja.model;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -18,7 +17,7 @@ import javax.persistence.TemporalType;
 @NamedQueries({
 		@NamedQuery(name = "caixa.findCaixaAberto", query = "select c from Caixa c where c.dataFechamento=null") ,
 		@NamedQuery(name="caixa.findAll",query="select c from Caixa c")})
-public class Caixa implements Serializable {
+public class Caixa extends AbstractModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idCaixa;

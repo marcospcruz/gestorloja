@@ -53,7 +53,7 @@ public class SubTipoProduto extends TipoProduto {
 		setDescricaoTipo(descricao);
 		setDataInsercao(new Date());
 		setOperador(operador);
-		
+
 	}
 
 	public String getSexo() {
@@ -120,11 +120,7 @@ public class SubTipoProduto extends TipoProduto {
 
 	public String toString() {
 
-		String descricaoSuperTipoRoupa = superTipoProduto == null ? "" : superTipoProduto.getDescricaoTipo();
-
-		String sexo = getSexo() == null ? "" : getSexo();
-
-		return descricaoSuperTipoRoupa + " " + super.toString() + " " + sexo;
+		return getDescricaoTipo();
 
 	}
 
