@@ -14,13 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.util.Util;
@@ -33,6 +30,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 	private static final long serialVersionUID = -7955099211492942797L;
 	private static final String ABRIR_CAIXA = "Abrir Caixa";
 	private static final String FECHAR_CAIXA = "Fechar Caixa";
+	private CaixaController controller;
 	//@formatter:off
 	private static final Object[] COLUNAS_JTABLE = new Object[] { 
 			"Abertura", 
@@ -40,7 +38,8 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 			"Saldo Abertura",
 			"Saldo Fechamento", 
 			"Fechamento", 
-			"Operador Fechamento" };
+			"Operador Fechamento",
+			"Status Caixa"};
 	//@formatter:on
 	private JPanel jpanel;
 
@@ -49,7 +48,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		super(owner, tituloJanela, ControllerAbstractFactory.CONTROLE_CAIXA, true);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		getContentPane().add(configuraOperacoesPanel(), BorderLayout.NORTH);
-
+		this.controller = (CaixaController) super.getCaixaController();
 		atualizaJTable();
 
 		setVisible(true);
@@ -69,7 +68,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		}
 
 		carregaTableModel();
-		jTable = inicializaJTable();
+		jTable = inicializaJTable(myTableModel);
 
 		// JScrollPane
 		jScrollPane = new JScrollPane(jTable);
@@ -81,37 +80,36 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		getContentPane().add(jpanel, BorderLayout.CENTER);
 	}
 
-	JTable inicializaJTable() {
-
-		JTable jTable = new JTable(myTableModel);
-
-		jTable.addMouseListener(this);
-
-		DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
-
-		direita.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		jTable.getColumnModel().getColumn(0).setCellRenderer(direita);
-
-		jTable.getColumnModel().getColumn(4).setCellRenderer(direita);
-
-		jTable.getColumnModel().getColumn(5).setCellRenderer(direita);
-
-		// jTable.getColumnModel().getColumn(6).setCellRenderer(direita);
-
-		return jTable;
-
-	}
+	// JTable inicializaJTable() {
+	//
+	// JTable jTable = new JTable(myTableModel);
+	//
+	// jTable.addMouseListener(this);
+	//
+	// DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+	//
+	// direita.setHorizontalAlignment(SwingConstants.RIGHT);
+	//
+	// jTable.getColumnModel().getColumn(0).setCellRenderer(direita);
+	//
+	// jTable.getColumnModel().getColumn(4).setCellRenderer(direita);
+	//
+	// jTable.getColumnModel().getColumn(5).setCellRenderer(direita);
+	//
+	// // jTable.getColumnModel().getColumn(6).setCellRenderer(direita);
+	//
+	// return jTable;
+	//
+	// }
 
 	private JPanel configuraOperacoesPanel()
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		JPanel panel = new JPanel();
 
-		CommandFactory btnFactory = new CommandFactory();
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		panel.add(btnFactory.createButton("Abrir Caixa", this));
-		panel.add(btnFactory.createButton("Fechar Caixa", this));
-		panel.setBorder(new TitledBorder("Operações"));
+		panel.add(inicializaJButton("Abrir Caixa"));
+		panel.add(inicializaJButton("Fechar Caixa"));
+		panel.setBorder(criaTitledBorder("Operações"));
 		return panel;
 	}
 
@@ -121,18 +119,18 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 			switch (arg0.getActionCommand()) {
 			case ABRIR_CAIXA:
 
-				((CaixaController) controller).validateCaixaAberto();
+				controller.validateCaixaAberto();
 				new FormAberturaCaixaDialog(this, controller);
 
 				break;
 			case FECHAR_CAIXA:
-				((CaixaController) controller).validateCaixaFechado();
+				controller.validateCaixaFechado();
 				new FormFechamentoCaixaDialog(this, controller);
 			}
 		} catch (Exception e) {
 
 			e.printStackTrace();
-			showMessage(e.getMessage());
+			showMessage(this, e.getMessage());
 		} finally {
 			controller.setList(null);
 			// atualizaTableModel(null);
@@ -176,7 +174,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		List linhas = new ArrayList();
 		try {
 			linhas.add(object);
-			carregaTableModel(carregaLinhasTableModel(linhas));
+			carregaTableModel(parseListToLinhasTableModel(linhas));
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			carregaTableModel();
@@ -194,13 +192,13 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 
 	@Override
 	protected void carregaTableModel() {
-		List linhas = carregaLinhasTableModel(controller.getList());
+		List linhas = parseListToLinhasTableModel(controller.getList());
 		carregaTableModel(linhas, COLUNAS_JTABLE);
 
 	}
 
 	@Override
-	protected List carregaLinhasTableModel(List lista) {
+	protected List parseListToLinhasTableModel(List lista) {
 
 		List linhas = new ArrayList();
 
@@ -224,7 +222,8 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 				Util.formataMoeda(linha.getSaldoInicial()),
 				Util.formataMoeda(linha.getSaldoFinal()), 
 				linha.getDataFechamento() == null ? "" : Util.formataData(linha.getDataFechamento()),
-				nomeCompletoUsuarioFechamento
+				nomeCompletoUsuarioFechamento,
+				(linha.getDataFechamento()==null)?"Aberto":"Fechado"
 
 		};
 	}
@@ -237,7 +236,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 	}
 
 	@Override
-	protected void salvarItem() throws Exception {
+	protected void adicionaItemEstoque() throws Exception {
 		// TODO Auto-generated method stub
 
 	}
@@ -287,6 +286,12 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 
 	@Override
 	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void atualizaTableModel() {
 		// TODO Auto-generated method stub
 
 	}

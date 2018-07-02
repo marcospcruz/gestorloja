@@ -13,12 +13,12 @@ public class NumberDocument extends PlainDocument {
 
 	private boolean decimal;
 
-	/**
-	 * Construtor que n�o permite separador decimal.
-	 */
-	public NumberDocument() {
-
-	}
+	// /**
+	// * Construtor que n�o permite separador decimal.
+	// */
+	// public NumberDocument() {
+	//
+	// }
 
 	/**
 	 * Construtor que permite separador decimal
@@ -31,8 +31,7 @@ public class NumberDocument extends PlainDocument {
 
 	}
 
-	public void insertString(int offs, String str, AttributeSet a)
-			throws BadLocationException {
+	public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
 
 		if (str == null) {
 			return;
@@ -40,7 +39,8 @@ public class NumberDocument extends PlainDocument {
 		for (int i = 0; i < str.length(); i++) {
 			if (Character.isDigit(str.charAt(i)) == false) {
 
-				if (str.charAt(i) != ',' || str.charAt(i) == ',' && !decimal)
+				boolean naoEpontoVirgula = str.charAt(i) != ',' && str.charAt(i) != '.';
+				if (naoEpontoVirgula || !decimal)
 
 					return;
 

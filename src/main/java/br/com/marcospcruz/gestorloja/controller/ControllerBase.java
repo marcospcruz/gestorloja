@@ -2,11 +2,12 @@ package br.com.marcospcruz.gestorloja.controller;
 
 import java.util.List;
 
+import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
-public interface AbstractController {
+public interface ControllerBase {
 
 	static final String BUSCA_INVALIDA = "Busca Invïálida";
 
@@ -16,8 +17,8 @@ public interface AbstractController {
 	 */
 	default Usuario getUsuarioLogado() {
 		Usuario usuario = SingletonManager.getInstance().getUsuarioLogado();
-		if(usuario==null) {
-			usuario=new Usuario();
+		if (usuario == null) {
+			usuario = new Usuario();
 			usuario.setIdUsuario(1);
 		}
 		return usuario;
@@ -44,8 +45,12 @@ public interface AbstractController {
 
 	}
 
-	default AbstractController getController(String controllerClass) throws Exception {
+	default ControllerBase getController(String controllerClass) throws Exception {
 		return SingletonManager.getInstance().getController(controllerClass);
+	}
+	
+	default void reloadLista() {
+		
 	}
 
 	public abstract void busca(Object id) throws Exception;
@@ -66,12 +71,10 @@ public interface AbstractController {
 
 	public abstract void salva(String text, boolean b, Object object) throws Exception;
 
-	public abstract void salva(Object object) throws Exception;
-
 	public abstract void salva(Object object, boolean validaDados) throws Exception;
 
-	public abstract void busca(String param1, String param2);
+	public abstract void salva() throws Exception;
 
-
+	public void registraHistoricoOperacao(Operacao operacao);
 
 }

@@ -11,7 +11,7 @@ import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
-public abstract class AbstractJFrame extends JFrame implements ActionListener, MouseListener {
+public abstract class AbstractJFrame extends JFrame implements MyWindowAction {
 
 	public AbstractJFrame(String tituloJanela) {
 		super(tituloJanela);

@@ -16,6 +16,7 @@
 			<property name="hibernate.dialect"
 				value="br.com.marcospcruz.gestorloja.util.SQLiteDialect" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="hibernate.connection.charSet" value="UTF-8" />
 		</properties>
 	</persistence-unit>
 </persistence>

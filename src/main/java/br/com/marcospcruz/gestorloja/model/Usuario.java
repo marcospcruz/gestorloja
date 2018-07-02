@@ -69,6 +69,10 @@ public class Usuario implements Serializable {
 		setPrimeiroAcesso(primeiroAcesso);
 	}
 
+	public Usuario(int idUsuario) {
+		setIdUsuario(idUsuario);
+	}
+
 	public Usuario getOperador() {
 		return operador;
 	}

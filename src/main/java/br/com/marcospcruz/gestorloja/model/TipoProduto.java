@@ -20,6 +20,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @MappedSuperclass
+//@Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "idSuperTipo")
 public abstract class TipoProduto implements Serializable {
@@ -46,6 +47,10 @@ public abstract class TipoProduto implements Serializable {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataInsercao;
+
+	public TipoProduto() {
+		setDataInsercao(new Date());
+	}
 
 	public Usuario getOperador() {
 		return operador;
@@ -121,11 +126,11 @@ public abstract class TipoProduto implements Serializable {
 				return false;
 		} else if (!idTipoItem.equals(other.idTipoItem))
 			return false;
-		if (operador == null) {
-			if (other.operador != null)
-				return false;
-		} else if (!operador.equals(other.operador))
-			return false;
+		// if (operador == null) {
+		// if (other.operador != null)
+		// return false;
+		// } else if (!operador.equals(other.operador))
+		// return false;
 		if (subTiposProduto == null) {
 			if (other.subTiposProduto != null)
 				return false;

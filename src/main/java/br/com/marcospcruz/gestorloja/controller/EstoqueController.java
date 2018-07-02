@@ -1,31 +1,42 @@
 package br.com.marcospcruz.gestorloja.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
+import br.com.marcospcruz.gestorloja.model.HistoricoOperacao;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
+import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Produto;
+import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
+import br.com.marcospcruz.gestorloja.util.Util;
 
-public class EstoqueController implements AbstractController {
+public class EstoqueController implements ControllerBase {
 
 	private static final String MESSAGE_QT_INVALIDA_EXCEPTION = "Quantidade informada Invï¿½lida!";
 
 	private ItemEstoque itemEstoque;
 
-	private Crud<ItemEstoque> itemEstoqueDao;
+	// private Crud<ItemEstoque> itemEstoqueDao;
 
 	private List<ItemEstoque> itensEstoque;
 
 	private ProdutoController produtoController;
 
+	private CrudDao<ItemEstoque> itemEstoqueDao;
+
+	private List<ItemEstoque> consultaEstoque;
+
 	public EstoqueController() throws Exception {
 
-		itemEstoqueDao = new CrudDao<ItemEstoque>();
-
+		itemEstoqueDao = new CrudDao<>();
+		carregaItensEstoque();
 		produtoController = (ProdutoController) getController(ControllerAbstractFactory.PRODUTO);
 
 	}
@@ -40,18 +51,24 @@ public class EstoqueController implements AbstractController {
 
 	public List<ItemEstoque> getItensEstoque() {
 
-		if (itensEstoque == null || itensEstoque.size() == 0)
-
-			carregaItensEstoque();
+		// if (itensEstoque == null || itensEstoque.size() == 0)
+		//
+		// carregaItensEstoque();
 
 		return itensEstoque;
 
 	}
 
 	private void carregaItensEstoque() {
-
+		// if (itensEstoque == null || itensEstoque.isEmpty())
 		itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
+		setList(itensEstoque);
 
+	}
+
+	private Crud<ItemEstoque> getDao() {
+
+		return new CrudDao<>();
 	}
 
 	public void setItensEstoque(List<ItemEstoque> itensEstoque) {
@@ -75,7 +92,7 @@ public class EstoqueController implements AbstractController {
 			itemEstoque.setQuantidade(qt);
 
 			itemEstoque.setOperador(getUsuarioLogado());
-			salva(itemEstoque);
+//			salva(itemEstoque);
 
 		} catch (NumberFormatException e) {
 
@@ -115,17 +132,26 @@ public class EstoqueController implements AbstractController {
 	}
 
 	public void buscaItemPorCodigoDeBarras(String codigoProduto) {
+		Crud<ItemEstoque> itemEstoqueDao = getDao();
 		itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo", codigoProduto);
 
 	}
 
-	public void buscaItemEstoque(String descricao) throws Exception {
+	public void buscaItemEstoque(String descricao, String descricaoTipo) throws Exception {
+		if (Util.isPalavraAcentuada(descricao)) {
+			buscaComAcentuacao(descricaoTipo, descricao);
 
-		String valor = "%" + descricao.toUpperCase() + "%";
-
-		itensEstoque = (List<ItemEstoque>) itemEstoqueDao.buscaList("itemestoque.readDescricaoPecao", "descricao",
-				valor);
-
+		} else {
+			Map<String, String> paramsMap = new HashMap<>();
+			paramsMap.put("descricaoProduto", "%" + descricao.toUpperCase() + "%");
+			String namedQuery = "itemestoque.readDescricaoProduto";
+			if (descricaoTipo != null) {
+				paramsMap.put("descricaoTipo", "%" + descricaoTipo.toUpperCase() + "%");
+				namedQuery = "itemestoque.readDescricaoPeca";
+			}
+			Crud<ItemEstoque> itemEstoqueDao = getDao();
+			setList(itemEstoqueDao.buscaList(namedQuery, paramsMap));
+		}
 		if (itensEstoque.size() == 1)
 
 			itemEstoque = itensEstoque.get(0);
@@ -133,7 +159,7 @@ public class EstoqueController implements AbstractController {
 	}
 
 	public void busca(int idItemEstoque) {
-
+		Crud<ItemEstoque> itemEstoqueDao = getDao();
 		itemEstoque = itemEstoqueDao.busca(ItemEstoque.class, idItemEstoque);
 
 	}
@@ -145,7 +171,7 @@ public class EstoqueController implements AbstractController {
 			throw new Exception("Exclusï¿½o invï¿½lida!");
 
 		}
-
+		Crud<ItemEstoque> itemEstoqueDao = getDao();
 		itemEstoqueDao.delete(itemEstoque);
 
 		anulaAtributos();
@@ -162,17 +188,20 @@ public class EstoqueController implements AbstractController {
 
 	public void incrementaItem(int quantidade) throws Exception {
 
+		if (quantidade < 1)
+			throw new Exception("Quantidade inválida!");
+
 		itemEstoque.setQuantidade(itemEstoque.getQuantidade() + quantidade);
 
-		salva(itemEstoque);
+		salva();
 
-		anulaAtributos();
+		// anulaAtributos();
 
 	}
 
 	public void validaBusca() throws Exception {
 
-		if (itemEstoque == null && itensEstoque.size() == 0)
+		if (itemEstoque == null && itensEstoque.isEmpty())
 
 			throw new Exception(ConstantesEnum.ITEM_DO_ESTOQUE_NAO_ENCONTRADO.getValue().toString());
 
@@ -181,28 +210,29 @@ public class EstoqueController implements AbstractController {
 	@Override
 	public void busca(Object object) throws Exception {
 		itemEstoque = (ItemEstoque) object;
+		Crud<ItemEstoque> itemEstoqueDao = getDao();
 		itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
 				itemEstoque.getProduto().getIdProduto(), "idFabricante", itemEstoque.getFabricante().getIdFabricante());
-
 
 	}
 
 	@Override
 	public List buscaTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		carregaItensEstoque();
+		return getList();
 	}
 
 	@Override
 	public List getList() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return consultaEstoque;
 	}
 
 	@Override
 	public void busca(String text) throws Exception {
-		// TODO Auto-generated method stub
-
+		// busca(text, null, null);
+		Crud<ItemEstoque> dao = getDao();
+		itemEstoque = dao.busca("itemestoque.readCodigo", "codigo", text);
 	}
 
 	@Override
@@ -213,14 +243,20 @@ public class EstoqueController implements AbstractController {
 
 	@Override
 	public void setList(List list) {
-		// TODO Auto-generated method stub
+		try {
+
+			List objetos = list.isEmpty() ? itensEstoque : list;
+			consultaEstoque = new ArrayList<>(objetos);
+		} catch (NullPointerException e) {
+
+		}
 
 	}
 
 	@Override
 	public void setItem(Object object) {
-		// TODO Auto-generated method stub
 
+		this.itemEstoque = (ItemEstoque) object;
 	}
 
 	@Override
@@ -236,15 +272,6 @@ public class EstoqueController implements AbstractController {
 	}
 
 	@Override
-	public void salva(Object object) throws Exception {
-		itemEstoque=(ItemEstoque) object;
-		itemEstoque.setOperador(getUsuarioLogado());
-		itemEstoque.setDataContagem(new Date());
-		itemEstoque = itemEstoqueDao.update(itemEstoque);
-
-	}
-
-	@Override
 	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
 
@@ -253,10 +280,87 @@ public class EstoqueController implements AbstractController {
 	public void decrementaItem(int quantidade) throws Exception {
 		itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidade);
 
-		salva(itemEstoque);
+		salva();
 
 		anulaAtributos();
-		
+
+	}
+
+	public void busca(String tipoProduto, String produto, String fabricante) {
+		if (Util.isPalavraAcentuada(tipoProduto)) {
+			buscaComAcentuacao(tipoProduto);
+
+			return;
+		}
+		String namedQuery = "itemestoque.readDescricaoTipo";
+		Map<String, String> paramsMap = new HashMap<>();
+		if (tipoProduto != null) {
+			paramsMap.put("descricaoTipo", "%" + tipoProduto.trim().toUpperCase() + "%");
+		}
+		if (produto != null) {
+			paramsMap.put("descricaoProduto", "%" + produto.trim().toUpperCase() + "%");
+			namedQuery = "itemestoque.readDescricaoPeca";
+		}
+
+		if (fabricante != null) {
+			paramsMap.put("nomeFabricante", "%" + fabricante.trim().toUpperCase() + "%");
+			namedQuery = "itemestoque.readTipoFabricante";
+		}
+
+		itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
+		consultaEstoque = itensEstoque;
+	}
+
+	private void buscaComAcentuacao(String... params) {
+		buscaTodos();
+
+		for (String param : params) {
+			if (param == null)
+				continue;
+			List<ItemEstoque> objetos = new ArrayList<>();
+			for (Object o : itensEstoque) {
+				ItemEstoque itemEstoque = (ItemEstoque) o;
+				Produto produto = itemEstoque.getProduto();
+				SubTipoProduto tipoProduto = itemEstoque.getProduto().getTipoProduto();
+
+				boolean tipoProdutoMatches = tipoProduto.getDescricaoTipo().toUpperCase().contains(param.toUpperCase())
+						? true
+						: tipoProduto.getSuperTipoProduto().getDescricaoTipo().toUpperCase()
+								.contains(param.toUpperCase()) ? true : false;
+
+				boolean produtoMatches = !tipoProdutoMatches
+						&& produto.getDescricaoProduto().toUpperCase().contains(param.toUpperCase());
+
+				if (tipoProdutoMatches || produtoMatches) {
+					objetos.add(itemEstoque);
+				}
+			}
+			setList(objetos);
+		}
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	public void salva() throws Exception {
+
+		itemEstoque.setOperador(getUsuarioLogado());
+		itemEstoque.setDataContagem(new Date());
+
+		itemEstoque = itemEstoqueDao.update(itemEstoque);
+
+	}
+
+	@Override
+	public void registraHistoricoOperacao(Operacao operacao) {
+		Crud<HistoricoOperacao> historicoDao = new CrudDao<>();
+		HistoricoOperacao historicoOperacao = new HistoricoOperacao();
+		historicoOperacao.setDataOperacao(new Date());
+		historicoOperacao.setItemEstoque(itemEstoque);
+		historicoOperacao.setOperador(getUsuarioLogado());
+		historicoOperacao.setOperacao(operacao);
+		historicoDao.update(historicoOperacao);
 	}
 
 }

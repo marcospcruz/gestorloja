@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "itemVenda")
@@ -25,6 +28,9 @@ public class ItemVenda implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
+	private float valorVendido;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date dataVenda;
 
 	public void setItemEstoque(ItemEstoque itemEstoque) {
 		this.itemEstoque = itemEstoque;
@@ -59,14 +65,32 @@ public class ItemVenda implements Serializable {
 		this.operador = operador;
 	}
 
+	public float getValorVendido() {
+		return valorVendido;
+	}
+
+	public void setValorVendido(float valorVendido) {
+		this.valorVendido = valorVendido;
+	}
+
+	public Date getDataVenda() {
+		return dataVenda;
+	}
+
+	public void setDataVenda(Date dataVenda) {
+		this.dataVenda = dataVenda;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((dataVenda == null) ? 0 : dataVenda.hashCode());
 		result = prime * result + idVenda;
 		result = prime * result + ((itemEstoque == null) ? 0 : itemEstoque.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((quantidade == null) ? 0 : quantidade.hashCode());
+		result = prime * result + Float.floatToIntBits(valorVendido);
 		return result;
 	}
 
@@ -79,6 +103,11 @@ public class ItemVenda implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ItemVenda other = (ItemVenda) obj;
+		if (dataVenda == null) {
+			if (other.dataVenda != null)
+				return false;
+		} else if (!dataVenda.equals(other.dataVenda))
+			return false;
 		if (idVenda != other.idVenda)
 			return false;
 		if (itemEstoque == null) {
@@ -96,13 +125,15 @@ public class ItemVenda implements Serializable {
 				return false;
 		} else if (!quantidade.equals(other.quantidade))
 			return false;
+		if (Float.floatToIntBits(valorVendido) != Float.floatToIntBits(other.valorVendido))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Venda [idVenda=" + idVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
-				+ ", operador=" + operador + "]";
+		return "ItemVenda [idVenda=" + idVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
+				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda + "]";
 	}
 
 }

@@ -6,12 +6,17 @@ import java.util.List;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Caixa;
+import br.com.marcospcruz.gestorloja.model.MeioPagamento;
+import br.com.marcospcruz.gestorloja.model.Operacao;
+import br.com.marcospcruz.gestorloja.model.Pagamento;
+import br.com.marcospcruz.gestorloja.model.Usuario;
 
-public class CaixaController implements AbstractController {
+public class CaixaController implements ControllerBase {
 
 	public CaixaController() {
 		super();
-
+		meioPagamentoDao = new CrudDao<>();
+		pagamentoDao = new CrudDao<>();
 	}
 
 	private static final String QUERY_BUSCA_TODOS = "caixa.findAll";
@@ -19,6 +24,9 @@ public class CaixaController implements AbstractController {
 	// private Crud<Caixa> dao = new CrudDao<>();
 	private List<Caixa> caixaList;
 	private Caixa caixa;
+	private Crud<MeioPagamento> meioPagamentoDao;
+	private Crud<Pagamento> pagamentoDao;
+	private Pagamento pagamento;
 
 	@Override
 	public void busca(Object id) {
@@ -99,9 +107,8 @@ public class CaixaController implements AbstractController {
 	}
 
 	@Override
-	public void salva(Object object) throws Exception {
+	public void salva() throws Exception {
 
-		caixa = (Caixa) object;
 		ajustaSaldoFinalZeroCaixa();
 		Crud<Caixa> dao = getDao();
 		caixa = dao.update(caixa);
@@ -130,7 +137,7 @@ public class CaixaController implements AbstractController {
 		caixa.setDataFechamento(new Date());
 		caixa.setUsuarioFechamento(getUsuarioLogado());
 
-		salva(caixa);
+		salva();
 	}
 
 	public void abreCaixa(String saldoAbertura) throws Exception {
@@ -143,7 +150,7 @@ public class CaixaController implements AbstractController {
 		caixa.setSaldoInicial(saldoInicial);
 		caixa.setUsuarioAbertura(getUsuarioLogado());
 
-		salva(caixa);
+		salva();
 
 	}
 
@@ -157,6 +164,41 @@ public class CaixaController implements AbstractController {
 
 	@Override
 	public void salva(Object object, boolean validaDados) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void recebePagamento(Pagamento pagamento) {
+		// meioPagamentoDao.update(pagamento);
+		Date dataVenda = pagamento.getDataVenda();
+		Usuario operador = pagamento.getUsuarioLogado();
+		// for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+		for (int i = 0; i < pagamento.getMeiosPagamento().size(); i++) {
+			MeioPagamento meioPagamento = pagamento.getMeiosPagamento().remove(i);
+			meioPagamento.setDataPagamento(dataVenda);
+			meioPagamento.setUsuarioLogado(operador);
+			meioPagamento = meioPagamentoDao.update(meioPagamento);
+			pagamento.getMeiosPagamento().add(meioPagamento);
+		}
+		setPagamento(pagamentoDao.update(pagamento));
+	}
+
+	public void setPagamento(Pagamento pagamento) {
+		this.pagamento = pagamento;
+
+	}
+
+	public Pagamento getPagamento() {
+		return pagamento;
+	}
+
+	public void atualizaPagamento(Pagamento pagamento) {
+		pagamento = pagamentoDao.update(pagamento);
+
+	}
+
+	@Override
+	public void registraHistoricoOperacao(Operacao operacao) {
 		// TODO Auto-generated method stub
 		
 	}

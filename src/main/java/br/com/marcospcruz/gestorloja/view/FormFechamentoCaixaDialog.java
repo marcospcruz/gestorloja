@@ -1,162 +1,103 @@
 package br.com.marcospcruz.gestorloja.view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.util.Date;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import javax.swing.border.TitledBorder;
 
-import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
-import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
-import br.com.marcospcruz.gestorloja.controller.AbstractController;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
+import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.util.Util;
 
-public class FormFechamentoCaixaDialog extends JDialog implements ActionListener, WindowListener {
+public class FormFechamentoCaixaDialog extends AbstractDialog {
 
 	private static final String SALDO_ABERTURA_CAIXA_TITLE = "Saldo Abertura Caixa";
 	private static final String SALDO_ATUAL_CAIXA_TITLE = "Saldo atual do Caixa";
 	private static final String ESPACOS_BRANCO = "                                              ";
-	private AbstractController caixaController;
+	private CaixaController caixaController;
 	private Usuario operador;
 	private JLabel dataAberturaLbl;
 	private Timer timer;
 	private JLabel dataFechamentoLbl;
 
-	public FormFechamentoCaixaDialog(JDialog owner, AbstractController caixaController) {
-		super(owner, true);
-		this.caixaController = caixaController;
-		setSize(400, 600);
+	public FormFechamentoCaixaDialog(JDialog owner, ControllerBase caixaController) {
+		super(owner, "Fechamento do Caixa", true);
+		this.caixaController = (CaixaController) caixaController;
+		setSize(600, 650);
 
 		operador = caixaController.getUsuarioLogado();
 
-		criaFormPanel();
+		getContentPane().setLayout(new BorderLayout());
+		
+		getContentPane().add(criaFormPanel(),BorderLayout.CENTER);
+		getContentPane().add(criaCommandPanel(),BorderLayout.SOUTH);
+		
 
-		try {
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setVisible(true);
 
-			criaCommandPanel();
-
-			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-			setVisible(true);
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-			showMessage(e.getMessage());
-		}
 	}
 
-	private void criaCommandPanel() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		CommandFactory factory = new CommandFactory();
+	private JPanel criaCommandPanel() {
+
 		JPanel commandPanel = new JPanel();
 		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
 		gbc_panel_1.fill = GridBagConstraints.BOTH;
 		gbc_panel_1.gridx = 1;
 		gbc_panel_1.gridy = 1;
-		getContentPane().add(commandPanel, gbc_panel_1);
 
-		commandPanel.add(factory.createButton("Fechar Caixa", this));
+		commandPanel.add(inicializaJButton("Fechar Caixa"));
+
+		return commandPanel;
+
 	}
 
-	private void criaFormPanel() {
+	private JPanel criaFormPanel() {
 		Caixa caixa = (Caixa) caixaController.getItem();
 		initTimer();
-		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		getContentPane().setLayout(gridBagLayout);
 
-		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder("Abertura Caixa"));
-		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.insets = new Insets(0, 0, 5, 0);
-		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 1;
-		gbc_panel.gridy = 0;
-		getContentPane().add(panel, gbc_panel);
-		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
-		gbl_panel.columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
-		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		panel.setLayout(gbl_panel);
+		JPanel panel = new JPanel(new GridLayout(3, 2));
+		panel.setBorder(criaTitledBorder("Abertura Caixa"));
 
-		dataAberturaLbl = new JLabel(Util.formataData(caixa.getDataAbertura()));
-		dataAberturaLbl.setBorder(new TitledBorder("Data de Abertura"));
-		GridBagConstraints gbc_dataAberturaLbl = new GridBagConstraints();
-		gbc_dataAberturaLbl.fill = GridBagConstraints.HORIZONTAL;
-		gbc_dataAberturaLbl.insets = new Insets(0, 0, 5, 5);
-		gbc_dataAberturaLbl.gridx = 0;
-		gbc_dataAberturaLbl.gridy = 0;
-		panel.add(dataAberturaLbl, gbc_dataAberturaLbl);
+		dataAberturaLbl = criaJLabel(Util.formataData(caixa.getDataAbertura()));
+		dataAberturaLbl.setBorder(criaTitledBorder("Data de Abertura"));
 
-		JLabel lblUsuarioAberturaCaixa = new JLabel(operador.getNomeCompleto());
-		lblUsuarioAberturaCaixa.setBorder(new TitledBorder("Caixa aberto por:"));
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel.gridx = 1;
-		gbc_lblNewLabel.gridy = 0;
-		panel.add(lblUsuarioAberturaCaixa, gbc_lblNewLabel);
+		JLabel lblUsuarioAberturaCaixa = criaJLabel(operador.getNomeCompleto());
+		lblUsuarioAberturaCaixa.setBorder(criaTitledBorder("Usuário Abertura:"));
+		panel.add(dataAberturaLbl);
+		panel.add(lblUsuarioAberturaCaixa);
 
-		JLabel lblSaldoDoCaixa = new JLabel(Util.formataMoeda(caixa.getSaldoInicial()));
-		lblSaldoDoCaixa.setBorder(new TitledBorder(SALDO_ABERTURA_CAIXA_TITLE));
+		JLabel lblSaldoDoCaixa = criaJLabel(Util.formataMoeda(caixa.getSaldoInicial()));
+		lblSaldoDoCaixa.setBorder(criaTitledBorder(SALDO_ABERTURA_CAIXA_TITLE));
+		panel.add(lblSaldoDoCaixa);
 
-		GridBagConstraints gbc_lblSaldoDoCaixa = new GridBagConstraints();
-		gbc_lblSaldoDoCaixa.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSaldoDoCaixa.anchor = GridBagConstraints.WEST;
-		gbc_lblSaldoDoCaixa.gridx = 0;
-		gbc_lblSaldoDoCaixa.gridy = 1;
-		panel.add(lblSaldoDoCaixa, gbc_lblSaldoDoCaixa);
+		JLabel lblSaldoAtualDoCaixa = criaJLabel(Util.formataMoeda(caixa.getSaldoFinal()));
+		lblSaldoAtualDoCaixa.setBorder(criaTitledBorder(SALDO_ATUAL_CAIXA_TITLE));
+		panel.add(lblSaldoAtualDoCaixa);
 
-		JLabel lblSaldoAtualDoCaixa = new JLabel(Util.formataMoeda(caixa.getSaldoFinal()) + ESPACOS_BRANCO);
-		lblSaldoAtualDoCaixa.setBorder(new TitledBorder(SALDO_ATUAL_CAIXA_TITLE));
+		panel.add(lblSaldoAtualDoCaixa);
 
-		GridBagConstraints gbc_lblSaldoAtualDoCaixa = new GridBagConstraints();
-		gbc_lblSaldoAtualDoCaixa.anchor = GridBagConstraints.WEST;
-		gbc_lblSaldoAtualDoCaixa.gridwidth = 2;
-		gbc_lblSaldoAtualDoCaixa.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSaldoAtualDoCaixa.gridx = 1;
-		gbc_lblSaldoAtualDoCaixa.gridy = 1;
-		panel.add(lblSaldoAtualDoCaixa, gbc_lblSaldoAtualDoCaixa);
-		gbc_dataAberturaLbl.fill = GridBagConstraints.HORIZONTAL;
-		gbc_dataAberturaLbl.insets = new Insets(0, 0, 5, 5);
-		gbc_dataAberturaLbl.gridx = 0;
-		gbc_dataAberturaLbl.gridy = 2;
+		dataFechamentoLbl = criaJLabel(Util.formataDataAtual());
+		dataFechamentoLbl.setBorder(criaTitledBorder("Data de Fechamento"));
+		panel.add(dataFechamentoLbl);
 
-		dataFechamentoLbl = new JLabel(Util.formataDataAtual());
-		dataFechamentoLbl.setBorder(new TitledBorder("Data de Fechamento"));
-		GridBagConstraints gbc_dataFechamentoLbl = new GridBagConstraints();
-		gbc_dataFechamentoLbl.anchor = GridBagConstraints.WEST;
-		gbc_dataFechamentoLbl.gridx = 0;
-		gbc_dataFechamentoLbl.gridy = 2;
-		gbc_dataFechamentoLbl.insets = new Insets(0, 0, 5, 5);
-		// gbc_dataFechamentoLbl.gridx = 0;
-		// gbc_dataFechamentoLbl.gridy = 2;
-		panel.add(dataFechamentoLbl, gbc_dataFechamentoLbl);
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
+		JLabel lblUsuarioLogado = criaJLabel(operador.getNomeCompleto());
+		lblUsuarioLogado.setBorder(criaTitledBorder("Usuário Fechamento:"));
+		panel.add(lblUsuarioLogado);
 
-		JLabel lblUsuarioLogado = new JLabel(operador.getNomeCompleto());
-		lblUsuarioLogado.setBorder(new TitledBorder("Fechamento caixa efetuado por:"));
-		GridBagConstraints gbc_lblUsuarioLogado = new GridBagConstraints();
-		gbc_lblUsuarioLogado.insets = new Insets(0, 0, 5, 5);
-		gbc_lblUsuarioLogado.gridx = 1;
-		gbc_lblUsuarioLogado.gridy = 2;
-
-		panel.add(lblUsuarioLogado, gbc_lblUsuarioLogado);
+		// getContentPane().add(panel, BorderLayout.CENTER);
+		return panel;
 	}
 
 	private void initTimer() {
@@ -211,43 +152,73 @@ public class FormFechamentoCaixaDialog extends JDialog implements ActionListener
 	}
 
 	@Override
-	public void windowActivated(WindowEvent arg0) {
+	protected void configuraJPanel() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void windowClosed(WindowEvent arg0) {
-		System.out.println("closed");
+	protected JPanel carregaJPanelBusca() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public void windowClosing(WindowEvent arg0) {
-
-		timer.stop();
-
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent arg0) {
+	protected void selecionaAcao(String actionCommand) throws Exception {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void windowDeiconified(WindowEvent arg0) {
+	protected JPanel carregaJpanelFormulario() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected JPanel carregaJpanelTable(int y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void atualizaTableModel(Object object) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void windowIconified(WindowEvent arg0) {
+	protected void carregaTableModel() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void windowOpened(WindowEvent arg0) {
+	protected List parseListToLinhasTableModel(List lista) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void excluiItem() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void adicionaItemEstoque() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void populaFormulario() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void atualizaTableModel() {
 		// TODO Auto-generated method stub
 
 	}

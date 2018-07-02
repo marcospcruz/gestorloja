@@ -15,7 +15,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -23,14 +22,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.hibernate.LazyInitializationException;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
-import br.com.marcospcruz.gestorloja.controller.AbstractController;
+import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
-import br.com.marcospcruz.gestorloja.util.NumberDocument;
 
 public class ProdutoDialog extends AbstractDialog {
 
@@ -73,7 +71,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		if (arg0.getSource() instanceof JComboBox) {
 
-			cmbSubTiposDeProduto.setModel(selectModelSubTiposDeProduto((JComboBox) arg0.getSource()));
+			cmbSubTiposDeProduto.setModel(super.selectModelSubTiposDeProduto((JComboBox) arg0.getSource()));
 
 		} else {
 
@@ -103,33 +101,14 @@ public class ProdutoDialog extends AbstractDialog {
 
 	}
 
-	/**
-	 * 
-	 * @param combo
-	 * @return
-	 */
-	private ComboBoxModel selectModelSubTiposDeProduto(JComboBox combo) {
-
-		DefaultComboBoxModel model = null;
-
-		if (combo.getSelectedIndex() > 0)
-
-			model = carregaSubTiposProdutoModel(combo.getSelectedItem());
-
-		else
-
-			model = carregaSubTiposProdutoModel(new SubTipoProduto());
-
-		return model;
-
-	}
+	
 
 	@Override
 	protected void selecionaAcao(String actionCommand) throws Exception {
 
 		if (actionCommand.equals(SALVAR_BUTTON_LBL)) {
 
-			salvarItem();
+			adicionaItemEstoque();
 
 		} else if (actionCommand.equals(NOVO_BUTTON_LBL)) {
 
@@ -216,7 +195,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 			cmbTiposDeProduto.setSelectedIndex(0);
 
-			cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
+//			cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
 
 		}
 
@@ -228,7 +207,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 	private ComboBoxModel carregaFabricantes(Fabricante fabricante) {
 
-		AbstractController fabricanteController = null;
+		ControllerBase fabricanteController = null;
 		try {
 			fabricanteController = ControllerAbstractFactory.createController(ControllerAbstractFactory.FABRICANTE);
 		} catch (Exception e) {
@@ -251,46 +230,7 @@ public class ProdutoDialog extends AbstractDialog {
 		return model;
 	}
 
-	/**
-	 * 
-	 * @param selectedItem
-	 * @return
-	 */
-	private DefaultComboBoxModel carregaSubTiposProdutoModel(Object selectedItem) {
-
-		List<SubTipoProduto> tiposProduto = (List<SubTipoProduto>) ((SubTipoProduto) selectedItem).getSubTiposProduto();
-
-		Object[] arrayTipos = null;
-
-		DefaultComboBoxModel model = null;
-
-		if (tiposProduto == null)
-
-			tiposProduto = new ArrayList<SubTipoProduto>();
-
-		try {
-
-			arrayTipos = new Object[tiposProduto == null ? 1 : tiposProduto.size() + 1];
-
-			arrayTipos[0] = ITEM_ZERO_COMBO;
-
-			for (int i = 0; i < tiposProduto.size(); i++)
-
-				arrayTipos[i + 1] = tiposProduto.get(i);
-
-			model = new DefaultComboBoxModel(arrayTipos);
-
-		} catch (LazyInitializationException e) {
-
-			e.printStackTrace();
-
-			throw new LazyInitializationException(e.getMessage());
-
-		}
-
-		return model;
-
-	}
+	
 
 	@Override
 	protected void populaFormulario() {
@@ -307,7 +247,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		cmbTiposDeProduto.getModel().setSelectedItem(tipoProduto);
 
-		cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(tipoProduto));
+//		cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(tipoProduto));
 
 		cmbSubTiposDeProduto.getModel().setSelectedItem(subTipoProduto);
 
@@ -387,7 +327,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		cmbSubTiposDeProduto = new JComboBox();
 
-		cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
+//		cmbSubTiposDeProduto.setModel(carregaSubTiposProdutoModel(new SubTipoProduto()));
 
 		cmbSubTiposDeProduto.setBounds(cmbTiposDeProduto.getWidth() + 210, y + 15, 150, TXT_HEIGHT);
 
@@ -453,7 +393,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 	}
 
-	private DefaultComboBoxModel carregaComboTiposProdutoModel() {
+	protected DefaultComboBoxModel carregaComboTiposProdutoModel() {
 
 		Object[] tmp = ((ProdutoController) controller).getArrayTiposProduto();
 
@@ -484,7 +424,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		carregaTableModel();
 
-		jTable = inicializaJTable();
+		jTable = inicializaJTable(myTableModel);
 
 		jScrollPane = new JScrollPane(jTable);
 
@@ -508,7 +448,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 			// linhas.add(produto);
 
-			carregaTableModel(carregaLinhasTableModel(linhas), COLUNAS_TABLE_MODEL);
+			carregaTableModel(parseListToLinhasTableModel(linhas), COLUNAS_TABLE_MODEL);
 
 		} catch (NullPointerException e) {
 
@@ -522,7 +462,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		jPanelTable.remove(jScrollPane);
 
-		jTable = inicializaJTable();
+		jTable = inicializaJTable(myTableModel);
 
 		jScrollPane = new JScrollPane(jTable);
 
@@ -534,26 +474,13 @@ public class ProdutoDialog extends AbstractDialog {
 
 	}
 
-	@Override
-	public JTable inicializaJTable() {
-
-		JTable jTable = super.inicializaJTable();
-
-		DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
-
-		direita.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		jTable.getColumnModel().getColumn(3).setCellRenderer(direita);
-
-		return jTable;
-
-	}
+	
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void carregaTableModel() {
 
-		List linhas = carregaLinhasTableModel(controller.getList());
+		List linhas = parseListToLinhasTableModel(controller.getList());
 
 		carregaTableModel(linhas, COLUNAS_TABLE_MODEL);
 
@@ -561,7 +488,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	protected List carregaLinhasTableModel(List lista) {
+	protected List parseListToLinhasTableModel(List lista) {
 
 		List linhas = new ArrayList();
 
@@ -615,7 +542,7 @@ public class ProdutoDialog extends AbstractDialog {
 	}
 
 	@Override
-	protected void salvarItem() throws Exception {
+	protected void adicionaItemEstoque() throws Exception {
 
 		if (confirmaSalvamentoItem() == 0) {
 
@@ -638,8 +565,8 @@ public class ProdutoDialog extends AbstractDialog {
 
 			String unidadeMedida = txtUnidadeMedida.getText();
 
-			controller.salva(
-					new Produto((TipoProduto) tipoProduto, (SubTipoProduto) subTipoProduto, descricao, unidadeMedida));
+//			controller.salva(
+//					new Produto((TipoProduto) tipoProduto, (SubTipoProduto) subTipoProduto, descricao, unidadeMedida));
 
 			mostraMensagemConfirmacaoSalvamento();
 
@@ -647,6 +574,12 @@ public class ProdutoDialog extends AbstractDialog {
 
 		}
 
+	}
+
+	@Override
+	public void atualizaTableModel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
 
-import br.com.marcospcruz.gestorloja.controller.AbstractController;
+import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 
 public class ControllerAbstractFactory {
@@ -20,11 +20,11 @@ public class ControllerAbstractFactory {
 	private ControllerAbstractFactory() {
 	}
 
-	public static AbstractController createController(String string) throws Exception {
+	public static ControllerBase createController(String string) throws Exception {
 
 		Class controllerClass = Class.forName(string);
 		
-		return (AbstractController) controllerClass.newInstance();
+		return (ControllerBase) controllerClass.newInstance();
 
 	}
 

@@ -5,10 +5,9 @@ import java.util.List;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
-import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
-import br.com.marcospcruz.gestorloja.util.TipoProdutoNotFoundException;
+import br.com.marcospcruz.gestorloja.model.Operacao;
 
-public class FabricanteController implements AbstractController {
+public class FabricanteController implements ControllerBase {
 	private static final String FABRICANTE_INVALIDO = "Fabricante inválido!";
 	private Crud<Fabricante> fabricanteDao;
 	private List<Fabricante> fabricantes;
@@ -27,14 +26,14 @@ public class FabricanteController implements AbstractController {
 
 	@Override
 	public List buscaTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		if (fabricantes == null || fabricantes.isEmpty())
+			fabricantes = fabricanteDao.busca("fabricante.buscaTodos");
+		return getList();
 	}
 
 	@Override
 	public List getList() {
-		if (fabricantes == null)
-			fabricantes = fabricanteDao.busca("fabricante.buscaTodos");
+
 		return fabricantes;
 	}
 
@@ -53,7 +52,7 @@ public class FabricanteController implements AbstractController {
 
 	@Override
 	public void setList(List list) {
-		// TODO Auto-generated method stub
+		fabricantes = list;
 
 	}
 
@@ -76,22 +75,23 @@ public class FabricanteController implements AbstractController {
 	}
 
 	@Override
-	public void salva(Object object) throws Exception {
-		((Fabricante) object).setOperador(getUsuarioLogado());
-		fabricante = fabricanteDao.update((Fabricante) object);
-
-	}
-
-	@Override
 	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
-	public void busca(String param1, String param2) {
+	public void salva() throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
+
+	@Override
+	public void registraHistoricoOperacao(Operacao operacao) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

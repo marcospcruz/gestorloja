@@ -1,8 +1,10 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
 //@formatter:off
@@ -27,7 +30,7 @@ public class Produto implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 966393974554317965L;
+	private static final long serialVersionUID = 1325592421055276202L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,7 +45,7 @@ public class Produto implements Serializable {
 	// @Fetch(FetchMode.JOIN)
 	// private List<ItemEstoque> itensEstoque;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "idTipoProduto")
 	@OrderBy
 	private SubTipoProduto tipoProduto;
@@ -52,6 +55,12 @@ public class Produto implements Serializable {
 	private Usuario operador;
 
 	private Date dataInsercao;
+
+	private boolean estoqueDedutivel;
+
+	@OneToMany(mappedBy = "produto")
+//	@Fetch(FetchMode.JOIN)
+	private Collection<ItemEstoque> estoqueProduto;
 
 	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida) {
 		setTipoProduto(subTipoProduto);
@@ -113,9 +122,25 @@ public class Produto implements Serializable {
 		this.dataInsercao = dataInsercao;
 	}
 
+	public Collection<ItemEstoque> getEstoqueProduto() {
+		return estoqueProduto;
+	}
+
+	public void setEstoqueProduto(Collection<ItemEstoque> estoqueProduto) {
+		this.estoqueProduto = estoqueProduto;
+	}
+
 	@Override
 	public String toString() {
 		return descricaoProduto;
+	}
+
+	public boolean isEstoqueDedutivel() {
+		return estoqueDedutivel;
+	}
+
+	public void setEstoqueDedutivel(boolean estoqueDedutivel) {
+		this.estoqueDedutivel = estoqueDedutivel;
 	}
 
 	@Override
@@ -124,6 +149,7 @@ public class Produto implements Serializable {
 		int result = 1;
 		result = prime * result + ((dataInsercao == null) ? 0 : dataInsercao.hashCode());
 		result = prime * result + ((descricaoProduto == null) ? 0 : descricaoProduto.hashCode());
+		result = prime * result + (estoqueDedutivel ? 1231 : 1237);
 		result = prime * result + ((idProduto == null) ? 0 : idProduto.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((tipoProduto == null) ? 0 : tipoProduto.hashCode());
@@ -149,6 +175,8 @@ public class Produto implements Serializable {
 			if (other.descricaoProduto != null)
 				return false;
 		} else if (!descricaoProduto.equals(other.descricaoProduto))
+			return false;
+		if (estoqueDedutivel != other.estoqueDedutivel)
 			return false;
 		if (idProduto == null) {
 			if (other.idProduto != null)

@@ -131,7 +131,8 @@ public class Fabricante implements Serializable {
 		if (operador == null) {
 			if (other.operador != null)
 				return false;
-		} else if (!operador.equals(other.operador))
+		} 
+		else if (!operador.equals(other.operador))
 			return false;
 		return true;
 	}

@@ -8,6 +8,7 @@ import javax.persistence.NoResultException;
 
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
+import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.model.Usuario;
@@ -21,7 +22,7 @@ import br.com.marcospcruz.gestorloja.util.TipoProdutoNotFoundException;
  * @author Marcos
  * 
  */
-public class TipoProdutoController implements AbstractController {
+public class TipoProdutoController implements ControllerBase {
 
 	private static final String RESULTADO_NAO_ENCONTRADO = ConstantesEnum.TIPO_PRODUTO_NAO_ENCONTRADO.getValue()
 			.toString();
@@ -53,7 +54,7 @@ public class TipoProdutoController implements AbstractController {
 	 */
 	public TipoProdutoController() {
 
-		tipoProdutoDao = new CrudDao<SubTipoProduto>();
+		tipoProdutoDao = new CrudDao<>();
 
 	}
 
@@ -85,7 +86,7 @@ public class TipoProdutoController implements AbstractController {
 		tipoProduto.setOperador(operador);
 		tipoProduto.setDataInsercao(new Date());
 
-		tipoProduto=tipoProdutoDao.update(tipoProduto);
+		tipoProduto = tipoProdutoDao.update(tipoProduto);
 
 	}
 
@@ -159,9 +160,9 @@ public class TipoProdutoController implements AbstractController {
 
 	public List<TipoProduto> getList() {
 
-		if (tiposProdutos == null || tiposProdutos.size() < 1)
-
-			carregaTiposProdutos();
+		// if (tiposProdutos == null || tiposProdutos.size() < 1)
+		//
+		// carregaTiposProdutos();
 
 		return tiposProdutos;
 
@@ -172,7 +173,12 @@ public class TipoProdutoController implements AbstractController {
 	}
 
 	public void setItem(Object tipoProduto) {
+		if (!(tipoProduto instanceof TipoProduto)) {
+			tipoProduto = new SubTipoProduto(tipoProduto.toString(), getUsuarioLogado());
+		}
 		this.tipoProduto = (SubTipoProduto) tipoProduto;
+		// implementação para AutocompleteComboBox
+		setList((List) ((SubTipoProduto) tipoProduto).getSubTiposProduto());
 	}
 
 	public void carregaTiposProdutos() {
@@ -309,8 +315,11 @@ public class TipoProdutoController implements AbstractController {
 	}
 
 	public List buscaTodos() {
+		// implementação para AutocompleteJComboBox
+		// if (getList() == null || getList().isEmpty())
 
-		return tipoProdutoDao.busca("tipoProduto.readtiposabstratos");
+		setList(tipoProdutoDao.busca("tipoProduto.readtiposabstratos"));
+		return getList();
 
 	}
 
@@ -320,7 +329,7 @@ public class TipoProdutoController implements AbstractController {
 		return tipoProduto;
 	}
 
-	@Override
+
 	public void salva(Object descricao) throws Exception {
 		buscaSuperTipoProduto("Genérico");
 		SubTipoProduto superTipoProduto = tipoProduto;
@@ -348,6 +357,18 @@ public class TipoProdutoController implements AbstractController {
 	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void salva() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registraHistoricoOperacao(Operacao operacao) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	// public void iniciaTipoPecaRoupa() {

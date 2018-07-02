@@ -1,22 +1,32 @@
 package br.com.marcospcruz.gestorloja.view;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.SimpleDateFormat;
+import java.util.Properties;
 
-import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
-import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
-import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
-
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.text.DateFormatter;
+
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
+
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.CaixaController;
+import br.com.marcospcruz.gestorloja.controller.LoginFacade;
+import br.com.marcospcruz.gestorloja.model.Caixa;
+import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
+import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+import br.com.marcospcruz.gestorloja.util.FontMapper;
 
 public class PrincipalGui extends AbstractJFrame implements WindowListener {
 
@@ -25,6 +35,7 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 	 */
 	private static final long serialVersionUID = 2738133745490348435L;
 	private LoginFacade loginFacade;
+	private JDatePickerImpl calendario;
 
 	/**
 	 * @param loginFacade
@@ -32,17 +43,49 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 	 */
 	public PrincipalGui(LoginFacade loginFacade) {
 		super("Gestor Loja");
+		Usuario userLogado = loginFacade.getUsuarioLogado();
+		int row = 1;
+		int col = 1;
+		// setLayout(new GridLayout(row, col));
 		addWindowListener(this);
 		this.loginFacade = loginFacade;
 		carregaBotoesModulos();
+		if (userLogado.getIdUsuario() == 1) {
+			carregaDatePicker();
+		}
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 
 	}
 
+	private void carregaDatePicker() {
+		JPanel panel = new JPanel();
+		panel.setBorder(criaTitledBorder("Manutenção"));
+		getContentPane().add(panel, BorderLayout.CENTER);
+
+		panel.add(criaDatePanel());
+	}
+
+	private Component criaDatePanel() {
+		JPanel datePanel = new JPanel();
+		datePanel.setBorder(criaTitledBorder("Configurar Data da Aplicação"));
+		UtilDateModel model = new UtilDateModel();
+		Properties properties = new Properties();
+		properties.put("text.today", "Hoje");
+		properties.put("text.month", "Mês");
+		properties.put("text.year", "Ano");
+		JDatePanelImpl jDatePanel = new JDatePanelImpl(model, properties);
+
+		calendario = new JDatePickerImpl(jDatePanel, new DateFormatter());
+		datePanel.add(calendario);
+		calendario.setFont(FontMapper.getFont(22));
+		calendario.getJFormattedTextField().addMouseListener(this);
+		return datePanel;
+	}
+
 	private void carregaBotoesModulos() {
 		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder("Módulos"));
+		panel.setBorder(criaTitledBorder("Módulos"));
 		getContentPane().add(panel, BorderLayout.NORTH);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		//@formatter:off
@@ -53,15 +96,10 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 				perfilUsuario.getInterfaces()
 					.stream()
 					.forEach(componente->{
-						CommandFactory factory=new CommandFactory();
+						
 					
-						try {
-							JButton button=factory.createButton(componente.getNomeModulo(),this);
-							panel.add(button);
-						} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-							
-							e.printStackTrace();
-						}
+						JButton button=inicializaJButton(componente.getNomeModulo());
+						panel.add(button);
 					
 					});
 		});
@@ -82,18 +120,24 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 				// this);
 				break;
 			case InterfaceGrafica.PONTO_DE_VENDA:
+				CaixaController caixaController = (CaixaController) SingletonManager.getInstance()
+						.getController(ControllerAbstractFactory.CONTROLE_CAIXA);
+				Caixa caixaAberto = (Caixa) caixaController.getItem();
+				if (caixaAberto == null) {
+					throw new NullPointerException("Não há Caixa aberto para realização de vendas.");
+				}
 				JDialogFactory.createDialog(InterfaceGrafica.CLASS_NAME_PDV, this, InterfaceGrafica.CLASS_NAME_PDV);
 			}
 		} catch (Exception e1) {
 
 			e1.printStackTrace();
-			JOptionPane.showMessageDialog(null, e1.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
+			showErrorMessage(this, e1.getMessage());
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
+		System.out.println(calendario.getJFormattedTextField().getText());
 
 	}
 

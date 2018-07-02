@@ -40,6 +40,8 @@ public class LoginFacade {
 	}
 
 	private void buscaSessaoUsuarioAtiva(Usuario usuario) throws Exception {
+		if (usuario.getIdUsuario() == 1)
+			return;
 		try {
 			SessaoUsuario sessaoUsuario = buscaUsuarioLogado(usuario);
 			throw new Exception(

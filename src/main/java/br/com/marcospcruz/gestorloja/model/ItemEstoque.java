@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,24 +20,56 @@ import javax.persistence.Table;
 @Table(name = "Estoque")
 @NamedQueries({
 		@NamedQuery(name = "itemestoque.readCodigo", query = "select ie from ItemEstoque ie "
-			+ "JOIN ie.produto p " 
+			+ "JOIN ie.fabricante "
+			+ "JOIN ie.produto p "
+			+ "JOIN p.tipoProduto t "
 			+ "where upper(ie.codigoDeBarras) = :codigo"),
 		@NamedQuery(name = "itemestoque.readCodigoEstoque", query = "select ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
 				+ "WHERE upper(ie.codigoDeBarras) = :codigo "
-				+ "AND ie.quantidade>0"),
-		@NamedQuery(name = "itemestoque.readDescricaoPecao", query = "select ie from ItemEstoque ie "
+//				+ "AND ie.quantidade>0"
+				),
+		@NamedQuery(name = "itemestoque.readDescricaoPeca", query = "select ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
-				+ "where upper(p.descricaoProduto) like :descricao"),
+				+"JOIN p.tipoProduto t "
+				+ "where "
+				+ "upper(t.descricaoTipo) like :descricaoTipo "
+				+ "AND upper(p.descricaoProduto) like :descricaoProduto"
+				),
+		@NamedQuery(name = "itemestoque.readDescricaoProduto", query = "select ie from ItemEstoque ie "
+				+ "JOIN ie.produto p " 
+				+ "where "
+				+ "upper(p.descricaoProduto) like :descricaoProduto"),
+		@NamedQuery(name = "itemestoque.readDescricaoTipo", query = "select ie from ItemEstoque ie "
+				+ "JOIN ie.fabricante f "
+				+ "JOIN ie.produto p " 
+				+ "JOIN p.tipoProduto t "
+				+ "JOIN t.superTipoProduto st "
+				+ "where "
+				+ "upper(t.descricaoTipo) like :descricaoTipo "
+				+ "OR UPPER(st.descricaoTipo) like :descricaoTipo "
+				+ "order by f.nome,t.descricaoTipo"
+				),
 		@NamedQuery(name = "itemEstoque.readAll", query = "select ie from ItemEstoque ie " 
+				+ "JOIN ie.fabricante f "
 				+ "JOIN ie.produto p "
 				+ "JOIN p.tipoProduto t "
-				+ "order by t.descricaoTipo"),
+				+ "order by f.nome, t.descricaoTipo"),
 		@NamedQuery(name="itemEstoque.readProduto",query="select ie from ItemEstoque ie "
 				+ "JOIN ie.produto p "
 				+ "JOIN ie.fabricante f "
 				+ "WHERE p.idProduto=:idProduto "
-				+ "AND f.idFabricante=:idFabricante")
+				+ "AND f.idFabricante=:idFabricante"),
+		
+		@NamedQuery(name = "itemestoque.readTipoFabricante", query = "select ie from ItemEstoque ie "
+				+ "JOIN ie.produto p " 
+				+ "JOIN ie.fabricante f "
+				+ "JOIN p.tipoProduto t "
+				+ "where "
+				+ "upper(t.descricaoTipo) like :descricaoTipo "
+				+ "AND upper(p.descricaoProduto) like :descricaoProduto "
+				+ "AND upper(f.nome) like :nomeFabricante")
+		
 
 })
 //@formatter:on
@@ -51,11 +84,11 @@ public class ItemEstoque implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer idItemEstoque;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "idProduto")
 	private Produto produto;
-	
-	@ManyToOne(optional = false)
+
+	@ManyToOne(optional = false, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "idFabricante")
 	// @JoinTable(name = "itemEstoque_fabricante", joinColumns = {
 	// @JoinColumn(name = "idItemEstoque") }, inverseJoinColumns = {
@@ -70,7 +103,6 @@ public class ItemEstoque implements Serializable {
 	private Usuario operador;
 
 	private float valorUnitario;
-
 
 	public Integer getIdItemEstoque() {
 		return idItemEstoque;
@@ -202,7 +234,8 @@ public class ItemEstoque implements Serializable {
 
 	@Override
 	public String toString() {
-		return produto.getTipoProduto() + " " + fabricante + " " + produto;
+		String string = fabricante + " - " + produto.getTipoProduto() + " - " + produto;
+		return string;
 	}
 
 }

@@ -1,148 +1,106 @@
 package br.com.marcospcruz.gestorloja.view;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import javax.swing.border.TitledBorder;
 
-import br.com.marcospcruz.gestorloja.abstractfactory.CommandFactory;
-import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
-import br.com.marcospcruz.gestorloja.controller.AbstractController;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
+import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
-import br.com.marcospcruz.gestorloja.util.NumberDocument;
 import br.com.marcospcruz.gestorloja.util.Util;
 
-public class FormAberturaCaixaDialog extends JDialog implements ActionListener, WindowListener {
+public class FormAberturaCaixaDialog extends AbstractDialog implements WindowListener {
 	private JFormattedTextField saldoTextField;
-	private AbstractController caixaController;
+	private CaixaController caixaController;
 	private Usuario operador;
 	private JLabel dataAberturaLbl;
 	private Timer timer;
 
-	public FormAberturaCaixaDialog(JDialog owner, AbstractController caixaController) {
-		super(owner, true);
-		this.caixaController = caixaController;
-		setSize(400, 600);
+	public FormAberturaCaixaDialog(JDialog owner, ControllerBase caixaController) {
+		super(owner, "Abertura do Caixa", true);
+		this.caixaController = (CaixaController) caixaController;
+		setSize(600, 650);
 
 		operador = caixaController.getUsuarioLogado();
 
-		criaFormPanel();
+		getContentPane().setLayout(new BorderLayout());
 
-		try {
+		getContentPane().add(criaFormPanel(), BorderLayout.CENTER);
+		getContentPane().add(criaCommandPanel(), BorderLayout.SOUTH);
 
-			criaCommandPanel();
+		// criaFormPanel();
 
-			// carregaController();
+		// criaCommandPanel();
 
-			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-			setVisible(true);
+		// carregaController();
 
-		} catch (Exception e) {
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setVisible(true);
 
-			e.printStackTrace();
-			showMessage(e.getMessage());
-		}
 	}
 
-	private void criaCommandPanel() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		CommandFactory factory = new CommandFactory();
+	private JPanel criaCommandPanel() {
+
 		JPanel commandPanel = new JPanel();
 		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
 		gbc_panel_1.fill = GridBagConstraints.BOTH;
 		gbc_panel_1.gridx = 1;
 		gbc_panel_1.gridy = 1;
-		getContentPane().add(commandPanel, gbc_panel_1);
+		// getContentPane().add(commandPanel, gbc_panel_1);
 
-		commandPanel.add(factory.createButton("Abrir Caixa", this));
+		commandPanel.add(inicializaJButton("Abrir Caixa"));
+		return commandPanel;
 	}
 
-	private void criaFormPanel() {
+	private JPanel criaFormPanel() {
 		initTimer();
-		Caixa ultimoCaixa = ((CaixaController) caixaController).getUltimoCaixa();
-		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		getContentPane().setLayout(gridBagLayout);
+		int i = 0;
+		Caixa ultimoCaixa = caixaController.getUltimoCaixa();
+		Component[] componentes = new Component[3];
+		JPanel panel = new JPanel(new GridLayout(2, 2));
+		panel.setBorder(super.criaTitledBorder("Abertura Caixa"));
 
-		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder("Abertura Caixa"));
-		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.insets = new Insets(0, 0, 5, 0);
-		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 1;
-		gbc_panel.gridy = 0;
-		getContentPane().add(panel, gbc_panel);
-		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
-		gbl_panel.columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
-		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		panel.setLayout(gbl_panel);
+		dataAberturaLbl = super.criaJLabel(Util.formataDataAtual());
+		dataAberturaLbl.setBorder(super.criaTitledBorder("Data de Abertura"));
+		componentes[i++] = dataAberturaLbl;
+		JLabel lblUsuarioLogado = super.criaJLabel(operador.getNomeCompleto());
+		lblUsuarioLogado.setBorder(super.criaTitledBorder("Usuário Abertura:"));
+		componentes[i++] = lblUsuarioLogado;
+		JPanel pnlSaldoDoCaixa = new JPanel();
+		pnlSaldoDoCaixa.setBorder(criaTitledBorder("Saldo do Caixa"));
 
-		dataAberturaLbl = new JLabel(Util.formataDataAtual());
-		dataAberturaLbl.setBorder(new TitledBorder("Data de Abertura"));
-		GridBagConstraints gbc_dataAberturaLbl = new GridBagConstraints();
-		gbc_dataAberturaLbl.fill = GridBagConstraints.HORIZONTAL;
-		gbc_dataAberturaLbl.insets = new Insets(0, 0, 5, 5);
-		gbc_dataAberturaLbl.gridx = 0;
-		gbc_dataAberturaLbl.gridy = 0;
-		panel.add(dataAberturaLbl, gbc_dataAberturaLbl);
+		// String saldoFinal = "500";//ultimoCaixa != null ?
+		// ultimoCaixa.getSaldoFinal().toString() : "";
+		saldoTextField = super.inicializaDecimalNumberField();
 
-		JLabel lblUsuarioLogado = new JLabel(operador.getNomeCompleto());
-		lblUsuarioLogado.setBorder(new TitledBorder("Caixa aberto por:"));
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel.gridx = 2;
-		gbc_lblNewLabel.gridy = 0;
-		panel.add(lblUsuarioLogado, gbc_lblNewLabel);
+		saldoTextField.setValue(Util.formataStringDecimais(ultimoCaixa != null ? ultimoCaixa.getSaldoFinal() : 0f));
+		pnlSaldoDoCaixa.add(saldoTextField);
+		componentes[i++] = pnlSaldoDoCaixa;
+		for (Component componente : componentes) {
+			panel.add(componente);
+		}
 
-		JLabel lblSaldoDoCaixa = new JLabel("Saldo do Caixa");
-		GridBagConstraints gbc_lblSaldoDoCaixa = new GridBagConstraints();
-		gbc_lblSaldoDoCaixa.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSaldoDoCaixa.anchor = GridBagConstraints.WEST;
-		gbc_lblSaldoDoCaixa.gridx = 0;
-		gbc_lblSaldoDoCaixa.gridy = 1;
-		panel.add(lblSaldoDoCaixa, gbc_lblSaldoDoCaixa);
-
-//		String saldoFinal = "500";//ultimoCaixa != null ? ultimoCaixa.getSaldoFinal().toString() : "";
-		saldoTextField = new JFormattedTextField();
-		saldoTextField.setDocument(new NumberDocument(true));
-		
-		saldoTextField.setColumns(10);
-		saldoTextField.setValue(ultimoCaixa != null ? ultimoCaixa.getSaldoFinal() : "");
-		GridBagConstraints gbc_lbl_data = new GridBagConstraints();
-		gbc_lbl_data.anchor = GridBagConstraints.WEST;
-		gbc_lbl_data.gridwidth = 2;
-		gbc_lbl_data.insets = new Insets(0, 0, 5, 5);
-		gbc_lbl_data.gridx = 1;
-		gbc_lbl_data.gridy = 1;
-		panel.add(saldoTextField, gbc_lbl_data);
+		return panel;
 
 	}
 
 	private void initTimer() {
 		timer = new Timer(1000, this);
 		timer.start();
-
-	}
-
-	private void carregaController() throws Exception {
-		caixaController = ControllerAbstractFactory.createController(ControllerAbstractFactory.CONTROLE_CAIXA);
 
 	}
 
@@ -171,19 +129,14 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 
 		String message = null;
 		try {
-			((CaixaController) caixaController).abreCaixa(saldoTextField.getValue().toString());
+			caixaController.abreCaixa(saldoTextField.getValue().toString());
 			message = "Caixa aberto com sucesso!";
 
 		} catch (Exception e) {
 			message = e.getMessage();
 		} finally {
-			showMessage(message);
+			showMessage(this, message);
 		}
-
-	}
-
-	private void showMessage(String message) {
-		JOptionPane.showMessageDialog(this, message);
 
 	}
 
@@ -230,6 +183,78 @@ public class FormAberturaCaixaDialog extends JDialog implements ActionListener, 
 
 	@Override
 	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void configuraJPanel() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected JPanel carregaJPanelBusca() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void selecionaAcao(String actionCommand) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected JPanel carregaJpanelFormulario() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected JPanel carregaJpanelTable(int y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void atualizaTableModel(Object object) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void carregaTableModel() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected List parseListToLinhasTableModel(List lista) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void excluiItem() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void adicionaItemEstoque() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void populaFormulario() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void atualizaTableModel() {
 		// TODO Auto-generated method stub
 
 	}

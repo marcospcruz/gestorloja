@@ -32,7 +32,7 @@ public class SubTipoProduto extends TipoProduto {
 	 */
 	private static final long serialVersionUID = -7095619182533502712L;
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "idSuperTipoProduto")
 	private SubTipoProduto superTipoProduto;
 

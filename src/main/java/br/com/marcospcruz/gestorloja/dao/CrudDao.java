@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -63,6 +64,8 @@ public class CrudDao<T> implements Crud<T> {
 
 			e.printStackTrace();
 
+			throw e;
+			
 		} finally {
 
 			closeEntityManager();
@@ -90,7 +93,7 @@ public class CrudDao<T> implements Crud<T> {
 
 	private void closeEntityManager() {
 		entityManager.close();
-		
+
 		entityManagerFactory.close();
 	}
 
@@ -99,7 +102,7 @@ public class CrudDao<T> implements Crud<T> {
 		inicializaEntityManager();
 
 		T entity = (T) entityManager.find(clazz, id);
-//		closeEntityManager();
+		// closeEntityManager();
 		return entity;
 
 	}
@@ -127,7 +130,7 @@ public class CrudDao<T> implements Crud<T> {
 		query.setParameter(parametro, value);
 
 		T entity = (T) query.getSingleResult();
-//		closeEntityManager();
+		// closeEntityManager();
 		return entity;
 
 	}
@@ -139,7 +142,7 @@ public class CrudDao<T> implements Crud<T> {
 		Query query = entityManager.createNamedQuery(namedQuery);
 
 		List<T> objetos = query.getResultList();
-//		closeEntityManager();
+		// closeEntityManager();
 		return objetos;
 
 	}
@@ -152,7 +155,7 @@ public class CrudDao<T> implements Crud<T> {
 		query.setParameter(param2, paramValue2);
 
 		T entity = (T) query.getSingleResult();
-//		closeEntityManager();
+		// closeEntityManager();
 		return entity;
 	}
 
@@ -163,15 +166,42 @@ public class CrudDao<T> implements Crud<T> {
 
 	@Override
 	public T busca(String namedQuery, String param1, Integer paramValue, String param2, Integer paramValue2) {
-	
+
 		inicializaEntityManager();
 		Query query = createQuery(namedQuery);
 		query.setParameter(param1, paramValue);
 		query.setParameter(param2, paramValue2);
 
 		T entity = (T) query.getSingleResult();
-//		closeEntityManager();
+		// closeEntityManager();
 		return entity;
+	}
+
+	@Override
+	public List<T> buscaList(String namedQuery, String... params) {
+		inicializaEntityManager();
+		Query query = createQuery(namedQuery);
+		int i = 0;
+		while (i < params.length) {
+			String variable = params[i++];
+			Object param = params[i++];
+			query.setParameter(variable, param);
+		}
+
+		return (List<T>) query.getResultList();
+
+	}
+
+	@Override
+	public List<T> buscaList(String namedQuery, Map<String, String> paramsMap) {
+		inicializaEntityManager();
+		Query query = createQuery(namedQuery);
+
+		paramsMap.keySet().stream().forEach(key -> {
+			query.setParameter(key, paramsMap.get(key));
+		});
+
+		return (List<T>) query.getResultList();
 	}
 
 }

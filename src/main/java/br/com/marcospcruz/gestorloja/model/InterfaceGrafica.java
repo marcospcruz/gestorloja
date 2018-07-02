@@ -28,7 +28,8 @@ public class InterfaceGrafica implements Serializable {
 	public static final String CONTROLE_DE_CAIXA = "Controle de Caixa";
 	public static final String PONTO_DE_VENDA = "Ponto de Venda";
 	public static final String CLASS_NAME_ESTOQUE = PACKAGE + "EstoquePrincipalGui";
-	public static final String CLASS_NAME_PDV = PACKAGE + "ControleVendaGui";
+//	public static final String CLASS_NAME_PDV = PACKAGE + "ControleVendaGui";
+	public static final String CLASS_NAME_PDV = PACKAGE + "PDV";
 	public static final String CLASS_NAME_CAIXA = PACKAGE + "ControleCaixaGui";
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

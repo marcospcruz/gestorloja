@@ -1,34 +1,58 @@
 package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.text.AbstractDocument.Content;
+import javax.swing.table.TableColumn;
 
-import br.com.marcospcruz.gestorloja.controller.AbstractController;
+import org.hibernate.LazyInitializationException;
+
+import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.ControllerBase;
+import br.com.marcospcruz.gestorloja.controller.EstoqueController;
+import br.com.marcospcruz.gestorloja.controller.ProdutoController;
+import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
+import br.com.marcospcruz.gestorloja.controller.VendaController;
+import br.com.marcospcruz.gestorloja.model.Fabricante;
+import br.com.marcospcruz.gestorloja.model.ItemEstoque;
+import br.com.marcospcruz.gestorloja.model.Produto;
+import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
+import br.com.marcospcruz.gestorloja.model.TipoProduto;
+import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
+import br.com.marcospcruz.gestorloja.util.FontMapper;
 import br.com.marcospcruz.gestorloja.util.NumberDocument;
+import br.com.marcospcruz.gestorloja.view.util.MyTableCellRenderer;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
-public abstract class AbstractDialog extends JDialog implements ActionListener, MouseListener {
+public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	protected static final String NOVO_BUTTON_LBL = "Novo";
 
@@ -61,9 +85,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	protected MyTableModel myTableModel;
 
-	protected AbstractController controller;
-
-	protected DefaultTableCellRenderer direita;
+	// protected DefaultTableCellRenderer direita;
 
 	protected int indiceLinhaTableModel;
 
@@ -77,8 +99,10 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 	private static final String MESSAGE_CONFIRMING_SAVING = ConstantesEnum.CONFIRMACAO_SALVAMENTO.getValue().toString();
 
 	protected static final boolean IS_DECIMAL = true;
-	
+
 	protected boolean atualizaTable;
+	protected boolean disableActionPerformed;
+	protected ControllerBase controller;
 
 	public AbstractDialog(JDialog owner, String tituloJanela, boolean modal) {
 
@@ -92,8 +116,6 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 			throws Exception {
 
 		this(owner, tituloJanela, modal);
-
-		criaController(controllerClassName);
 
 		atualizaTable = true;
 
@@ -111,12 +133,12 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	public AbstractDialog(JFrame owner, String tituloJanela, String className, boolean isModal) throws Exception {
 		this(owner, tituloJanela, isModal);
-		criaController(className);
+
 	}
 
-	private void criaController(String controllerClass) throws Exception {
+	private ControllerBase getController(String controllerClass) throws Exception {
 
-		controller = SingletonManager.getInstance().getController(controllerClass);
+		return SingletonManager.getInstance().getController(controllerClass);
 
 	}
 
@@ -145,7 +167,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 		jPanelTable.remove(jScrollPane);
 
-		jTable = inicializaJTable();
+		jTable = inicializaJTable(myTableModel);
 
 		jScrollPane = new JScrollPane(jTable);
 
@@ -174,7 +196,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	protected abstract void carregaTableModel();
 
-	protected abstract List carregaLinhasTableModel(List lista);
+	protected abstract List parseListToLinhasTableModel(List lista);
 
 	/**
 	 * 
@@ -182,7 +204,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 	 */
 	protected abstract void excluiItem() throws Exception;
 
-	protected abstract void salvarItem() throws Exception;
+	protected abstract void adicionaItemEstoque() throws Exception;
 
 	protected abstract void populaFormulario();
 
@@ -236,15 +258,6 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	protected JButton inicializaJButton(String text) {
-
-		JButton jButton = new JButton(text);
-
-		jButton.addActionListener(this);
-
-		return jButton;
-	}
-
 	protected void carregaTableModel(List linhas, Object[] colunas) {
 
 		myTableModel = new MyTableModel(linhas, colunas);
@@ -253,30 +266,7 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	JTable inicializaJTable() {
-
-		JTable jTable = new JTable(myTableModel);
-
-		jTable.addMouseListener(this);
-
-		direita = new DefaultTableCellRenderer();
-
-		direita.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		return jTable;
-
-	}
-
-	protected JFormattedTextField inicializaNumberField() {
-
-		JFormattedTextField txtField = new JFormattedTextField();
-
-		txtField.setDocument(new NumberDocument());
-
-		txtField.setColumns(10);
-
-		return txtField;
-	}
+	
 
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
@@ -322,7 +312,6 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 	}
 
 	public void mostraMensagemConfirmacaoSalvamento() {
-		
 
 		JOptionPane.showMessageDialog(this, ConstantesEnum.CONFIRMACAO_REGISTRO_ATUALIZADO.getValue().toString(),
 				ConstantesEnum.CONFIRMANDO_ATUALIZACAO_MSG_TITLE.getValue().toString(),
@@ -343,7 +332,6 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 			try {
 				controller.busca(id);
 			} catch (Exception e1) {
-
 				e1.printStackTrace();
 			}
 
@@ -353,18 +341,259 @@ public abstract class AbstractDialog extends JDialog implements ActionListener, 
 
 	}
 
-	public void setControllerNameClass(String controllerClassName) {
-
-	}
-
 	protected void habilitaBotaoExcluir(boolean enabled) {
 		btnDeletar.setEnabled(enabled);
 
 	}
 
-	protected void showMessage(String message) {
-		JOptionPane.showMessageDialog(this, message);
+	@SuppressWarnings("rawtypes")
+	protected DefaultComboBoxModel carregaComboTiposProdutoModel() throws Exception {
 
+		// TipoProdutoController controller = new TipoProdutoController();
+		ControllerBase tipoController = getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+
+		List objetos = tipoController.buscaTodos();
+
+		// List objetos = controller.getList();
+
+		DefaultComboBoxModel<TipoProduto> model = new DefaultComboBoxModel<>();
+		TipoProduto t1 = new SubTipoProduto();
+		t1.setDescricaoTipo(ITEM_ZERO_COMBO);
+		model.addElement(t1);
+
+		for (Object objeto : objetos) {
+
+			model.addElement((TipoProduto) objeto);
+
+		}
+
+		return model;
+	}
+
+	/**
+	 * Mï¿½todo responsï¿½vel em carregar jcombobox Tipos de Produto
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	protected JComboBox<TipoProduto> carregaComboTiposProduto() throws Exception {
+
+		JComboBox<TipoProduto> combo = new JComboBox(carregaComboTiposProdutoModel());
+
+		combo.setSelectedIndex(0);
+
+		return combo;
+	}
+
+	/**
+	 * 
+	 * @param combo
+	 * @return
+	 */
+	protected ComboBoxModel selectModelSubTiposDeProduto(JComboBox combo) {
+
+		// if (combo.getSelectedIndex() > 0)
+
+		return carregaSubTiposProdutoModel(combo.getSelectedItem());
+
+		// else
+
+		// return carregaSubTiposProdutoModel(new SubTipoProduto());
+
+	}
+
+	/**
+	 * 
+	 * @param selectedItem
+	 * @return
+	 */
+	private DefaultComboBoxModel carregaSubTiposProdutoModel(Object selectedItem) {
+
+		DefaultComboBoxModel model = null;
+		//
+		SubTipoProduto tipoProduto = null;
+		try {
+			ControllerBase tipoProdutoController = !(controller instanceof TipoProdutoController)
+					? getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER)
+					: controller;
+			tipoProdutoController.busca(((SubTipoProduto) selectedItem).getIdTipoItem());
+			tipoProduto = (SubTipoProduto) tipoProdutoController.getItem();
+
+		} catch (Exception e) {
+			tipoProduto = new SubTipoProduto();
+			tipoProduto.setDescricaoTipo(selectedItem.toString());
+		}
+		List<SubTipoProduto> tiposProduto = (List<SubTipoProduto>) tipoProduto.getSubTiposProduto();
+
+		Object[] arrayTipos = null;
+
+		if (tiposProduto == null)
+
+			tiposProduto = new ArrayList<>();
+
+		try {
+
+			arrayTipos = new Object[tiposProduto == null ? 1 : tiposProduto.size() + 1];
+
+			arrayTipos[0] = ITEM_ZERO_COMBO;
+
+			for (int i = 0; i < tiposProduto.size(); i++)
+
+				arrayTipos[i + 1] = tiposProduto.get(i);
+
+			model = new DefaultComboBoxModel(arrayTipos);
+
+		} catch (LazyInitializationException e) {
+
+			e.printStackTrace();
+
+			throw new LazyInitializationException(e.getMessage());
+
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		return model;
+
+	}
+
+	public ControllerBase getCategoriaProdutoController() throws Exception {
+
+		return getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+	}
+
+	public abstract void atualizaTableModel();
+
+	public TipoProduto parseCategoriaProduto(JComboBox jComboBox) throws Exception {
+		validaSelecaoComboBox(jComboBox);
+		Object selectedItem = jComboBox.getSelectedItem();
+		TipoProduto categoriaProduto;
+		if (selectedItem instanceof TipoProduto)
+			return (TipoProduto) selectedItem;
+		else {
+			categoriaProduto = new SubTipoProduto();
+			categoriaProduto.setDescricaoTipo(selectedItem.toString());
+		}
+		if (categoriaProduto.getOperador() == null)
+			categoriaProduto.setOperador(getUsuarioLogado());
+		return categoriaProduto;
+	}
+
+	private void validaSelecaoComboBox(JComboBox jComboBox) throws Exception {
+		boolean invalido = ITEM_ZERO_COMBO.equals(jComboBox.getModel().getSelectedItem().toString());
+		if (invalido) {
+			throw new Exception("Seleção de Ítem Inválida.");
+		}
+	}
+
+	public Produto parseProduto(JComboBox jComboBox) throws Exception {
+		validaSelecaoComboBox(jComboBox);
+		Object selectedItem = jComboBox.getSelectedItem();
+		Produto produto;
+		if (selectedItem instanceof Produto)
+			return (Produto) selectedItem;
+		else {
+			produto = new Produto();
+			produto.setDescricaoProduto(selectedItem.toString());
+		}
+		if (produto.getOperador() == null)
+			produto.setOperador(getUsuarioLogado());
+		return produto;
+	}
+
+	public ControllerBase getFabricanteController() throws Exception {
+
+		return getController(ControllerAbstractFactory.FABRICANTE);
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public ComboBoxModel carregaComboFabricantes() throws Exception {
+		ControllerBase fabricanteController = getFabricanteController();
+
+		List objetos = fabricanteController.getList();
+
+		// List objetos = controller.getList();
+
+		DefaultComboBoxModel<Fabricante> model = new DefaultComboBoxModel<>();
+		Fabricante t1 = new Fabricante();
+		t1.setNome(ITEM_ZERO_COMBO);
+		model.addElement(t1);
+
+		for (Object objeto : objetos) {
+
+			model.addElement((Fabricante) objeto);
+
+		}
+
+		return model;
+	}
+
+	public Fabricante parseFabricante(JComboBox jComboBox) throws Exception {
+		validaSelecaoComboBox(jComboBox);
+		Object selectedItem = jComboBox.getSelectedItem();
+		Fabricante fabricante;
+		if (selectedItem instanceof Fabricante)
+			return (Fabricante) selectedItem;
+		else {
+			fabricante = new Fabricante();
+			fabricante.setNome(selectedItem.toString());
+		}
+		if (fabricante.getOperador() == null)
+			fabricante.setOperador(getUsuarioLogado());
+		return fabricante;
+	}
+
+	private Usuario getUsuarioLogado() {
+
+		return SingletonManager.getInstance().getUsuarioLogado();
+	}
+
+	public void disableActionPerformed() {
+		disableActionPerformed = true;
+
+	}
+
+	public void enableActionPerformance() {
+		disableActionPerformed = false;
+
+	}
+
+	public EstoqueController getItemEstoqueController() throws Exception {
+
+		return (EstoqueController) getController(ControllerAbstractFactory.ESTOQUE);
+	}
+
+	public ComboBoxModel<ItemEstoque> selectModelItemEstoque() throws Exception {
+		List<ItemEstoque> estoque = getItemEstoqueController().buscaTodos();
+		DefaultComboBoxModel model = new DefaultComboBoxModel();
+		model.addElement(ITEM_ZERO_COMBO);
+		estoque.stream().forEach(objeto -> {
+			ItemEstoque itemEstoque = objeto;
+			if (itemEstoque.getFabricante() == null)
+				System.out.println();
+			model.addElement(itemEstoque);
+		});
+		return model;
+	}
+
+	public ProdutoController getProdutoController() throws Exception {
+
+		return (ProdutoController) getController(ControllerAbstractFactory.PRODUTO);
+	}
+
+	public VendaController getVendaController() throws Exception {
+
+		return (VendaController) getController(ControllerAbstractFactory.CONTROLE_VENDA);
+	}
+
+
+
+	public ControllerBase getCaixaController() throws Exception {
+
+		return getController(ControllerAbstractFactory.CONTROLE_CAIXA);
 	}
 
 }

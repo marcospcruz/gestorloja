@@ -68,7 +68,7 @@ public enum ConstantesEnum {
 			"Relatórios", // 8
 			"Código", // 9
 			"Categoria", // 10
-			"Tipo Item", // 11
+			"Sub Categoria", // 11
 			"Quantidade", // 12
 			"Valor Unitário", // 13
 			"Valor Total", // 14
@@ -102,10 +102,10 @@ public enum ConstantesEnum {
 			"É necessário selecionar um ítem de Estoque antes.", // 42
 			"Exclusão não permitida! Há ítens deste Produto no estoque.", // 43
 			"Não há Dados no Estoque.", // 44
-			"Fabricante / Marca", //45
+			"Fabricante", //45
 			"Fabricante / Marca não encontrado", //46
 			"Ítem não encontrado no Estoque", //47
-			"Código de Barras" //48
+			"Código Produto" //48
 			};
 
 	public Object getValue() {

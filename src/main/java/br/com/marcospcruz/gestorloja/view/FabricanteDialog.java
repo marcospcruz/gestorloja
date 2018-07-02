@@ -100,7 +100,7 @@ public class FabricanteDialog extends AbstractDialog {
 	 * 
 	 * @return
 	 */
-	private JComboBox carregaComboTiposProduto() {
+	protected JComboBox carregaComboTiposProduto() {
 
 		DefaultComboBoxModel model = carregaComboTiposProdutoModel();
 
@@ -112,7 +112,7 @@ public class FabricanteDialog extends AbstractDialog {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private DefaultComboBoxModel carregaComboTiposProdutoModel() {
+	protected DefaultComboBoxModel carregaComboTiposProdutoModel() {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 
@@ -165,24 +165,24 @@ public class FabricanteDialog extends AbstractDialog {
 	 * 
 	 * @return
 	 */
-	@Override
 	protected JPanel carregaJpanelTable(int y) {
 
 		JPanel jPanel = new JPanel(null);
 
-		jPanel.setBounds(0, y, getWidth() - 17, 320);
+		// jPanel.setBounds(0, y, getWidth() - 17, 320);
 
 		jPanel.setBorder(new TitledBorder(FABRICANTES_TITLE));
 
 		carregaTableModel();
 
-		jTable = inicializaJTable();
+		// jTable = inicializaJTable(myTableModel);
 
-		jScrollPane = new JScrollPane(jTable);
+		// jScrollPane = new JScrollPane(jTable);
 
-		jScrollPane.setBounds(6, 15, jPanel.getWidth() - 15, jPanel.getHeight() - 20);
+		// jScrollPane.setBounds(6, 15, jPanel.getWidth() - 15, jPanel.getHeight() -
+		// 20);
 
-		jPanel.add(jScrollPane);
+		// jPanel.add(jScrollPane);
 
 		return jPanel;
 
@@ -191,13 +191,13 @@ public class FabricanteDialog extends AbstractDialog {
 	/**
 	 * xx
 	 */
-	private void atualizaTableModel() {
+	public void atualizaTableModel() {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 
-		carregaTableModel(carregaLinhasTableModel(controller.getList()), COLUNAS_TABLE_MODEL);
+		carregaTableModel(parseListToLinhasTableModel(controller.getList()), COLUNAS_TABLE_MODEL);
 
-		reloadJFrame();
+		// reloadJFrame();
 
 	}
 
@@ -216,7 +216,7 @@ public class FabricanteDialog extends AbstractDialog {
 
 			linhas.add(subTipo);
 
-			carregaTableModel(carregaLinhasTableModel(linhas), COLUNAS_TABLE_MODEL);
+			carregaTableModel(parseListToLinhasTableModel(linhas), COLUNAS_TABLE_MODEL);
 
 		} catch (NullPointerException e) {
 
@@ -254,7 +254,7 @@ public class FabricanteDialog extends AbstractDialog {
 	@Override
 	protected void carregaTableModel() {
 
-		List linhas = carregaLinhasTableModel(controller.getList());
+		List linhas = parseListToLinhasTableModel(controller.getList());
 
 		carregaTableModel(linhas, COLUNAS_TABLE_MODEL);
 
@@ -342,7 +342,7 @@ public class FabricanteDialog extends AbstractDialog {
 
 			acaoBuscar = false;
 
-			salvarItem();
+			adicionaItemEstoque();
 
 			limpaFormulario();
 
@@ -429,7 +429,7 @@ public class FabricanteDialog extends AbstractDialog {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	protected List carregaLinhasTableModel(List lista) {
+	protected List parseListToLinhasTableModel(List lista) {
 
 		List linhas = new ArrayList();
 
@@ -483,24 +483,9 @@ public class FabricanteDialog extends AbstractDialog {
 	}
 
 	@Override
-	protected void salvarItem() throws Exception {
+	protected void adicionaItemEstoque() throws Exception {
+		// TODO Auto-generated method stub
 
-		if (confirmaSalvamentoItem() == 0) {
-
-			// String sexo = cmbSexo.getSelectedIndex() == 0 ? null : cmbSexo
-			// .getSelectedItem().toString();
-
-			// controller.salva(txtDescricao.getText(), chkSubTipo.isSelected(),
-			// tipoProduto, sexo);
-
-			// controller.salva(txtDescricao.getText(), false, null);
-			Fabricante fabricante = new Fabricante();
-			fabricante.setNome(txtDescricao.getText());
-			controller.salva(fabricante);
-
-			mostraMensagemConfirmacaoSalvamento();
-
-		}
 	}
 
 }
