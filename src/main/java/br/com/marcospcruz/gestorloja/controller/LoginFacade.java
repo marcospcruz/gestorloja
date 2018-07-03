@@ -53,8 +53,8 @@ public class LoginFacade {
 
 	}
 
-	private SessaoUsuario buscaUsuarioLogado(Usuario usuario) {
 		SessaoUsuario sessaoUsuario;
+		private SessaoUsuario buscaUsuarioLogado(Usuario usuario) {
 		try {
 			sessaoUsuario = sessaoUsuarioDao.busca("sessaousuario.findSessaoAtiva", "idUsuario",
 					usuario.getIdUsuario());

@@ -247,8 +247,9 @@ public class EstoqueController implements ControllerBase {
 
 			List objetos = list.isEmpty() ? itensEstoque : list;
 			consultaEstoque = new ArrayList<>(objetos);
+			itensEstoque=objetos;
 		} catch (NullPointerException e) {
-
+			e.printStackTrace();
 		}
 
 	}

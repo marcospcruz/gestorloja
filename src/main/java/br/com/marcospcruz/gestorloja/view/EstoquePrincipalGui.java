@@ -601,15 +601,18 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	}
 
 	private void buscaItemEstoque(EstoqueController estoqueController) throws Exception {
-		String descricaoSubCategoria;
+
+		String descricaoSubCategoria = null;
+		String descricao = txtBuscaDescricaoProduto.getText();
 		try {
 			descricaoSubCategoria = ITEM_ZERO_COMBO.equals(cmbSubCategoriaProduto.getSelectedItem().toString()) ? null
 					: cmbSubCategoriaProduto.getSelectedItem().toString();
 
 		} catch (ClassCastException e) {
-			throw new Exception("Seleção de Categoria Inválida.");
+			if (descricao.isEmpty())
+				throw new Exception("Seleção de Categoria Inválida.");
 		}
-		String descricao = txtBuscaDescricaoProduto.getText();
+
 		estoqueController.anulaAtributos();
 
 		if (descricao.length() == 0) {

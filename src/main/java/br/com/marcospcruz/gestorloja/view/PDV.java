@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
@@ -31,6 +33,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -65,7 +68,7 @@ public class PDV extends AbstractDialog {
 	private static final int PRODUTO_HORIZONTAL_DEFAULT_GAP = 750;
 	// private Java2sAutoComboBox autoCompleteComboBox;
 	private VendaController vendaController;
-	AutocompleteJComboBox<ItemEstoque> autoCompleteComboBox;
+	AutocompleteJComboBox<ItemEstoque> produtoPesquisaDropDown;
 	private JFormattedTextField txtQuantidade;
 	private List<MyJCheckBox> meiosPagamentosSelecionadosList;
 	// private AutoCompleteComboBox<String> autoCompleteComboBox;
@@ -91,6 +94,12 @@ public class PDV extends AbstractDialog {
 	private MyJCheckBox debitoCheckBox;
 	private MyJCheckBox creditoCheckBox;
 	private Map<String, List<Component>> pagamentoComponentsMap;
+	private JRadioButton descricaoRadio;
+	private JRadioButton codigoBarrasRadioButton;
+	private Component btnFinalizar;
+	private Component btnPesquisar;
+	private JButton btnAdicionarVenda;
+	private JButton btnRemoverVenda;
 
 	public PDV(String tituloJanela, JFrame owner) throws Exception {
 		super(owner, tituloJanela, ControllerAbstractFactory.CONTROLE_VENDA, true);
@@ -238,10 +247,11 @@ public class PDV extends AbstractDialog {
 
 	private JPanel criaBtnPanel() {
 		JPanel panel3 = new JPanel(new GridBagLayout());
-//		panel3.setBorder(BorderFactory.createEtchedBorder());
+		// panel3.setBorder(BorderFactory.createEtchedBorder());
 		// panel3.setBackground(Color.CYAN);
 
-		JButton btnFinalizar = inicializaJButton("Finalizar Venda");
+		btnFinalizar = inicializaJButton("Finalizar Venda");
+		btnFinalizar.setEnabled(false);
 		panel3.add(btnFinalizar);
 		return panel3;
 	}
@@ -251,7 +261,7 @@ public class PDV extends AbstractDialog {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(criaSubTotalDescontoPanel(), BorderLayout.NORTH);
 		panel.add(criaFormaPagamentoPanel(), BorderLayout.CENTER);
-		JPanel jp=new JPanel(new GridLayout(2, 1));
+		JPanel jp = new JPanel(new GridLayout(2, 1));
 		panel.add(jp, BorderLayout.SOUTH);
 		jp.add(criaFormaPgtoTrocoPanel("Troco"));
 		jp.add(criaBtnPanel());
@@ -352,17 +362,10 @@ public class PDV extends AbstractDialog {
 	}
 
 	private JPanel criaFormaPgtoCartDebitoPanel(String string) {
-
-		JPanel cartaoDebitoPnl = new JPanel(new BorderLayout());
-		cartaoDebitoPnl.setBorder(BorderFactory.createEtchedBorder());
 		debitoCheckBox = criaJCheckBox(string);
 		txtValorPagtoDebito = inicializaDecimalNumberField();
 		txtValorPagtoDebito.addKeyListener(calculaPagtoListener());
-		JPanel valoresPanel = new JPanel(new BorderLayout(10, 10));
-		valoresPanel.add(super.criaJLabel(VALOR), BorderLayout.WEST);
-		valoresPanel.add(createDefaultTxtPanel(txtValorPagtoDebito), BorderLayout.CENTER);
-		cartaoDebitoPnl.add(debitoCheckBox, BorderLayout.NORTH);
-		cartaoDebitoPnl.add(valoresPanel, BorderLayout.SOUTH);
+		JPanel cartaoDebitoPnl = criaDefaultFormaPagto(string, debitoCheckBox, txtValorPagtoDebito, null, VALOR, null);
 
 		pagamentoComponentsMap.put(debitoCheckBox.getText(), Arrays.asList(txtValorPagtoDebito));
 		return cartaoDebitoPnl;
@@ -463,6 +466,7 @@ public class PDV extends AbstractDialog {
 
 				});
 				calculaTroco();
+				btnFinalizar.setEnabled(!meiosPagamentosSelecionadosList.isEmpty());
 			}
 		};
 	}
@@ -524,55 +528,48 @@ public class PDV extends AbstractDialog {
 	}
 
 	private JPanel createPesquisaProdutoPanel() throws Exception {
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-
-		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
-		ParallelGroup horizontalGroup = layout.createParallelGroup();
-		layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(horizontalGroup));
-		SequentialGroup verticalGroup = layout.createSequentialGroup();
-		layout.setVerticalGroup(verticalGroup);
-
-		panel.setLayout(layout);
-
-		JLabel lblDescricaoBusca = createJLabel("Pesquisa Produto:");
-		lblDescricaoBusca.setFont(FontMapper.getFont(22));
+		JPanel panel = new JPanel(new BorderLayout(25, 100));
+		JPanel centerPanel = new JPanel(new GridLayout(1, 2));
+		JPanel radioButtonPnl = new JPanel();
+		panel.setBorder(criaTitledBorder("Pesquisa Produto:"));
 		vendaController.buscaTodos();
-		autoCompleteComboBox = new AutocompleteJComboBox<>(this, super.getItemEstoqueController(), null, false);
-		autoCompleteComboBox.setFont(FontMapper.getFont(20));
-		autoCompleteComboBox.setModel(super.selectModelItemEstoque());
-		JButton btnAdicionar = inicializaJButton("Adicionar");
-
-		//@formatter:off
-				horizontalGroup
-						.addGroup(layout.createParallelGroup(Alignment.LEADING)
-								.addGroup(layout.createSequentialGroup().addContainerGap()
-										.addComponent(lblDescricaoBusca)
-										.addComponent(autoCompleteComboBox)
-										.addComponent(btnAdicionar)
-										)
-								
-								);
-				verticalGroup
-						.addGroup(layout.createParallelGroup(Alignment.LEADING)
-								.addGroup(layout.createSequentialGroup()
-										.addGroup(layout.createParallelGroup(Alignment.LEADING)
-												.addGroup(layout.createSequentialGroup().addGap(16)
-														.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-																.addComponent(lblDescricaoBusca)
-																.addComponent(autoCompleteComboBox)
-																.addComponent(btnAdicionar)
-																)
-														)
-												)
-										)
-								);
-				//@formatter:on
+		produtoPesquisaDropDown = new AutocompleteJComboBox<>(this, super.getItemEstoqueController(), null, false);
+		produtoPesquisaDropDown.setFont(FontMapper.getFont(20));
+		produtoPesquisaDropDown.setModel(super.selectModelItemEstoque());
+		ButtonGroup btnGroup = new ButtonGroup();
+		descricaoRadio = createJRadioButton("Descrição");
+		codigoBarrasRadioButton = createJRadioButton("Código de Barras", true);
+		btnGroup.add(descricaoRadio);
+		btnGroup.add(codigoBarrasRadioButton);
+		panel.add(centerPanel, BorderLayout.CENTER);
+		btnPesquisar = inicializaJButton("Pesquisar");
+		centerPanel.add(produtoPesquisaDropDown);
+		centerPanel.add(radioButtonPnl);
+		radioButtonPnl.add(descricaoRadio);
+		radioButtonPnl.add(codigoBarrasRadioButton);
+		habilitaBtnPesquisar();
+		panel.add(btnPesquisar, BorderLayout.EAST);
 
 		return panel;
 	}
 
+	private JRadioButton createJRadioButton(String string, boolean isSelected) {
+		JRadioButton jb = new JRadioButton(string);
+		jb.addActionListener(this);
+		jb.setFont(FontMapper.getFont(22));
+		jb.setSelected(isSelected);
+		return jb;
+	}
+
+	private JRadioButton createJRadioButton(String string) {
+
+		return createJRadioButton(string, false);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	private JPanel createProdutoPanel() {
 		int i = 0;
 
@@ -587,12 +584,12 @@ public class PDV extends AbstractDialog {
 
 		// panel.setLayout(layout);
 		String blankValue = "";
-		lblSaldoEstoque = createJLabel(blankValue);
-		lblNomeFabricante = createJLabel(blankValue);
-		lblDescricaoCategoria = createJLabel(blankValue);
-		lblDescricaoProduto = createJLabel(blankValue);
-		lblValorUnitario = createJLabel(blankValue);
-		lblValorTotal = createJLabel(blankValue);
+		lblSaldoEstoque = criaJLabel(blankValue);
+		lblNomeFabricante = criaJLabel(blankValue, 25);
+		lblDescricaoCategoria = criaJLabel(blankValue);
+		lblDescricaoProduto = criaJLabel(blankValue, 25);
+		lblValorUnitario = criaJLabel(blankValue, 25);
+		lblValorTotal = criaJLabel(blankValue, 25);
 		txtQuantidade = inicializaNumberField();
 		txtQuantidade.setColumns(10);
 		txtQuantidade.setText("1");
@@ -614,21 +611,24 @@ public class PDV extends AbstractDialog {
 		});
 		txtQuantidade.addKeyListener(createQtKeyListener());
 
-		Component lblFabricante = createJLabel("Fabricante:");
-		Component lblCategoria = createJLabel("Categoria:");
-		Component lblProduto = createJLabel("Produto:");
-		Component lblVlUnitario = createJLabel("Valor (R$):");
-		Component lblQuantidade = createJLabel("Quantidade:");
-		Component lblVlTotal = createJLabel("Total (R$):");
-		JLabel lblSaldoProdutoEstoque = createJLabel("Estoque:");
-		JButton btnAdicionarVenda = inicializaJButton("Adicionar Venda");
+		Component lblFabricante = criaJLabel("Fabricante:");
+		Component lblCategoria = criaJLabel("Categoria:");
+		Component lblProduto = criaJLabel("Produto:");
+		Component lblVlUnitario = criaJLabel("Valor (R$):");
+		Component lblQuantidade = criaJLabel("Quantidade:");
+		Component lblVlTotal = criaJLabel("Total (R$):");
+		JLabel lblSaldoProdutoEstoque = criaJLabel("Estoque:");
+		btnAdicionarVenda = inicializaJButton("Adicionar");
 
-		JButton btnRemoverVenda = inicializaJButton("Remover Venda");
-		Component[] componentes = new Component[10];
+		btnRemoverVenda = inicializaJButton("Remover");
+		btnAdicionarVenda.setEnabled(false);
+		btnRemoverVenda.setEnabled(false);
+		Component[] componentes = new Component[9];
 		// componentes[0]=lblFabricante;
 		componentes[i++] = lblNomeFabricante;
+		lblNomeFabricante.setAlignmentX(SwingConstants.CENTER);
 		// componentes[2]=lblCategoria;
-		componentes[i++] = lblDescricaoCategoria;
+		// componentes[i++] = lblDescricaoCategoria;
 		// componentes[4]=lblProduto;
 		componentes[i++] = lblDescricaoProduto;
 		// componentes[i++] = lblVlUnitario;
@@ -641,12 +641,23 @@ public class PDV extends AbstractDialog {
 		componentes[i++] = lblValorTotal;
 		componentes[i++] = btnAdicionarVenda;
 		componentes[i] = btnRemoverVenda;
-		JPanel panel = new JPanel(new GridLayout(1, componentes.length, 20, 0));
-		panel.setBorder(createTitledBorder("Produto"));
+		// new GridLayout(1, componentes.length, 10, 0)
+		JPanel produtoPnl = new JPanel(new GridLayout(1, 2));
+		JPanel pnl1 = new JPanel(new GridLayout(1, 2));
+		JPanel pnl2 = new JPanel(new GridLayout(1, 6, 10, 0));
+
+		produtoPnl.setBorder(createTitledBorder("Produto"));
+		i = 0;
 		for (Component c : componentes) {
-			panel.add(c);
+			if (i < 2)
+				pnl1.add(c);
+			else
+				pnl2.add(c);
+			i++;
 		}
-		return panel;
+		produtoPnl.add(pnl1);
+		produtoPnl.add(pnl2);
+		return produtoPnl;
 	}
 
 	private KeyListener createQtKeyListener() {
@@ -715,46 +726,59 @@ public class PDV extends AbstractDialog {
 	// return label;
 	// }
 
-	private JLabel createJLabel(String string) {
-		JLabel label = new JLabel(string);
-		label.setAlignmentX(SwingConstants.RIGHT);
-		label.setFont(FontMapper.getFont(22));
-		return label;
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		habilitaBtnPesquisar();
 		String actionCommand = arg0.getActionCommand();
 		// if(actionCommand.contains("combo")) {
 		// autoCompleteComboBox.reloadModel();
 		// }
 		boolean populaFormulario = false;
 		boolean carregaTableModel = false;
-		try {
-			if (actionCommand.equals("Adicionar")) {
 
-				ItemEstoque produto;
+		ItemEstoque produto;
+		try {
+			if (actionCommand.equals("comboBoxChanged")) {
+				if (codigoBarrasRadioButton.isSelected()) {
+					String codigoDeBarras = ((JTextComponent) produtoPesquisaDropDown.getEditor().getEditorComponent())
+							.getText();
+					produto = pesquisaProdutoCombo(codigoDeBarras);
+					if (!codigoDeBarras.isEmpty() && !codigoDeBarras.equals("Selecione uma Opção.")
+							&& produto == null) {
+						throw new Exception("Código de Barras não encontrado no Estoque.");
+					}
+					if (!codigoDeBarras.isEmpty() && !codigoDeBarras.equals("Selecione uma Opção.")) {
+						populaFormulario = true;
+						vendaController.populaItemEstoque(produto);
+						btnAdicionarVenda.setEnabled(true);
+					}
+				}
+
+			} else if (actionCommand.equals("Pesquisar")) {
+
 				try {
-					produto = autoCompleteComboBox.getSelectedItem();
+
+					produto = produtoPesquisaDropDown.getSelectedItem();
 				} catch (ClassCastException e) {
 					throw new ClassCastException(VendaController.PRODUTO_INVALIDO);
 				}
 				populaFormulario = true;
 				vendaController.populaItemEstoque(produto);
-
+				btnAdicionarVenda.setEnabled(true);
 				// atualizaTableModel(produto);
-			} else if (actionCommand.equals("Adicionar Venda")) {
+			} else if (actionCommand.equals("Adicionar")) {
 				populaFormulario = true;
 				carregaTableModel = true;
 
 				adicionaItemEstoque();
 				calculaTotalVenda();
-			} else if (actionCommand.equals("Remover Venda")) {
+				btnAdicionarVenda.setEnabled(false);
+			} else if (actionCommand.equals("Remover")) {
 				excluiItem();
 				populaFormulario = true;
 				carregaTableModel = true;
 
-			} else if (actionCommand.equals("Finalizar")) {
+			} else if (actionCommand.equals("Finalizar Venda")) {
 				finalizaVenda();
 				populaFormulario = true;
 				carregaTableModel = true;
@@ -778,9 +802,9 @@ public class PDV extends AbstractDialog {
 			if (populaFormulario) {
 				populaFormulario();
 				// vendaController.resetItemVenda();
-				((JTextComponent) autoCompleteComboBox.getEditor().getEditorComponent()).setText("");
+				((JTextComponent) produtoPesquisaDropDown.getEditor().getEditorComponent()).setText("");
 				// autoCompleteComboBox.setSelectedItem(null);
-				autoCompleteComboBox.reloadModel();
+				produtoPesquisaDropDown.reloadModel();
 			}
 			if (carregaTableModel)
 				carregaTableModel();
@@ -788,9 +812,27 @@ public class PDV extends AbstractDialog {
 		}
 	}
 
+	private void habilitaBtnPesquisar() {
+		btnPesquisar.setEnabled(descricaoRadio.isSelected());
+	}
+
+	private ItemEstoque pesquisaProdutoCombo(String codigoDeBarras) {
+		if (!codigoDeBarras.isEmpty())
+			for (int i = 0; i < produtoPesquisaDropDown.getModel().getSize(); i++) {
+				if (produtoPesquisaDropDown.getModel().getElementAt(i) instanceof ItemEstoque) {
+					ItemEstoque produto = produtoPesquisaDropDown.getModel().getElementAt(i);
+					if (produto.getCodigoDeBarras().equals(codigoDeBarras)) {
+						produtoPesquisaDropDown.getModel().setSelectedItem(produto);
+						return produto;
+					}
+				}
+			}
+		return null;
+	}
+
 	private void finalizaVenda() throws Exception {
 		Venda venda = vendaController.getVenda();
-		venda.setPorcentagemDesconto(Integer.valueOf(txtDesconto.getText()));
+		venda.setPorcentagemDesconto(Float.valueOf(txtDesconto.getText()));
 		Pagamento pagamento = venda.getPagamento();
 		float troco = Util.parseStringDecimalToFloat(lblValorTroco.getText().substring(3));
 		if (pagamento == null)
@@ -829,6 +871,9 @@ public class PDV extends AbstractDialog {
 			meioPagamento.setValorPago(valorPago);
 			meioPagamento.setPagamento(pagamento);
 			pagamento.getMeiosPagamento().add(meioPagamento);
+		}
+		if (valorTotalRecebido < venda.getTotalVendido()) {
+			throw new Exception("Pagamento insuficiente para a finalização da Venda!");
 		}
 		pagamento.setValorPagamento(valorTotalRecebido);
 		pagamento.setTrocoPagamento(troco);
@@ -929,7 +974,8 @@ public class PDV extends AbstractDialog {
 	protected void excluiItem() throws Exception {
 		vendaController.devolveProduto();
 		calculaTotalVenda();
-
+		btnRemoverVenda.setEnabled(false);
+		btnAdicionarVenda.setEnabled(false);
 	}
 
 	@Override
@@ -938,7 +984,7 @@ public class PDV extends AbstractDialog {
 
 	}
 
-	private void calculaTotalVenda() {
+	private void calculaTotalVenda() {	
 		if (txtTotalVenda != null) {
 			float valorVenda = vendaController.getVenda() == null ? 0f : vendaController.getVenda().getTotalVendido();
 			String valorVendaString = Util.formataMoeda(valorVenda).substring(3);
@@ -975,7 +1021,7 @@ public class PDV extends AbstractDialog {
 		if (quantidade == 0)
 			txtQuantidade.selectAll();
 		txtQuantidade.setEnabled(itemEstoque != null);
-		autoCompleteComboBox.setSelectedItem(null);
+		produtoPesquisaDropDown.setSelectedItem(null);
 		lblSaldoEstoque
 				.setText((itemVenda != null && itemEstoque != null) ? itemEstoque.getQuantidade().toString() : "0");
 	}
@@ -994,6 +1040,8 @@ public class PDV extends AbstractDialog {
 	public void mouseClicked(MouseEvent e) {
 		try {
 			controller = getVendaController();
+			btnRemoverVenda.setEnabled(true);
+			btnAdicionarVenda.setEnabled(true);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

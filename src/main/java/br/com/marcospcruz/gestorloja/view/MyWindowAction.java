@@ -32,7 +32,6 @@ import br.com.marcospcruz.gestorloja.view.util.MyTableCellRenderer;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
 public interface MyWindowAction extends ActionListener, MouseListener {
-
 	default JButton inicializaJButton(String text) {
 
 		JButton jButton = new JButton(text);
@@ -72,8 +71,7 @@ public interface MyWindowAction extends ActionListener, MouseListener {
 	default Border criaTitledBorder(String string) {
 		TitledBorder border = BorderFactory.createTitledBorder(string);
 		border.setTitleFont(FontMapper.getFont(20));
-		
-		
+
 		return border;
 	}
 
@@ -103,8 +101,10 @@ public interface MyWindowAction extends ActionListener, MouseListener {
 	default JLabel criaJLabel(String string, boolean leftAlignment) {
 
 		int alignment = !leftAlignment ? SwingConstants.RIGHT : SwingConstants.LEFT;
-		JLabel label = new JLabel(string, alignment);
+		JLabel label = new JLabel(string);
+		label.setAlignmentX(alignment);
 		label.setFont(FontMapper.getFont(20));
+//		label.setBorder(BorderFactory.createEtchedBorder());
 		return label;
 	}
 

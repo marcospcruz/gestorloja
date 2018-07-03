@@ -572,8 +572,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		model.addElement(ITEM_ZERO_COMBO);
 		estoque.stream().forEach(objeto -> {
 			ItemEstoque itemEstoque = objeto;
-			if (itemEstoque.getFabricante() == null)
-				System.out.println();
+//			if (itemEstoque.getFabricante() == null)
+//				System.out.println();
 			model.addElement(itemEstoque);
 		});
 		return model;

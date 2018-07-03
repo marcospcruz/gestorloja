@@ -119,7 +119,7 @@ public class FormAberturaCaixaDialog extends AbstractDialog implements WindowLis
 				dispose();
 				return;
 			case "Fechar Caixa":
-				System.out.println();
+				System.out.println("Fechar caixa!");
 			}
 
 		atualizaDataAbertura();

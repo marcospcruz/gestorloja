@@ -142,7 +142,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				JTextComponent textEditor = (JTextComponent) e.getSource();
-				System.out.println(textEditor.getText());
+//				System.out.println(textEditor.getText());
 
 			}
 

@@ -151,8 +151,8 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 							// removeAllItems();
 							// reloadModel(model);
 
-							if (keepCurrentModel)
-								System.out.println(keepCurrentModel + " - " + getSelectedItem());
+							// if (keepCurrentModel)
+							// System.out.println(keepCurrentModel + " - " + getSelectedItem());
 							if (keepCurrentModel) {
 
 								model.setSelectedItem(objetoSelecionado);
