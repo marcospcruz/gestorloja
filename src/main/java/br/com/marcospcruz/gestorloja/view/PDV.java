@@ -690,6 +690,7 @@ public class PDV extends AbstractDialog {
 				} catch (Exception e) {
 					// txtQuantidade.setText("0");
 					// showErrorMessage(super,e.getMessage());
+					showErrorMessage(null, e.getMessage());
 					e.printStackTrace();
 				} finally {
 
@@ -791,6 +792,7 @@ public class PDV extends AbstractDialog {
 						((JTextComponent) c).setText("");
 					}
 				});
+				txtTotalVenda.setText(Util.formataMoeda(0f));
 			}
 
 		} catch (Exception e) {
@@ -984,7 +986,7 @@ public class PDV extends AbstractDialog {
 
 	}
 
-	private void calculaTotalVenda() {	
+	private void calculaTotalVenda() {
 		if (txtTotalVenda != null) {
 			float valorVenda = vendaController.getVenda() == null ? 0f : vendaController.getVenda().getTotalVendido();
 			String valorVendaString = Util.formataMoeda(valorVenda).substring(3);

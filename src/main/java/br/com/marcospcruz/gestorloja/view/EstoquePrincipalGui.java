@@ -221,11 +221,9 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		float valor = itemEstoque.getQuantidade() * itemEstoque.getValorUnitario();
 
-		String simboloMonetarioBr = ConstantesEnum.SIMBOLO_MONETARIO_BR.getValue().toString();
+		String valorTotal = Util.formataMoeda(valor);
 
-		String valorTotal = simboloMonetarioBr + Util.formataStringDecimais(valor);
-
-		String valorUnitario = simboloMonetarioBr + Util.formataStringDecimais(itemEstoque.getValorUnitario());
+		String valorUnitario = Util.formataMoeda(itemEstoque.getValorUnitario());
 
 		SubTipoProduto tipoProduto = itemEstoque.getProduto().getTipoProduto();
 		Produto produto = itemEstoque.getProduto();

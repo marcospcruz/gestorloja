@@ -27,6 +27,7 @@ public class CaixaController implements ControllerBase {
 	private Crud<MeioPagamento> meioPagamentoDao;
 	private Crud<Pagamento> pagamentoDao;
 	private Pagamento pagamento;
+	private Crud<Caixa> dao;
 
 	@Override
 	public void busca(Object id) {
@@ -36,9 +37,9 @@ public class CaixaController implements ControllerBase {
 
 	@Override
 	public List buscaTodos() {
-		Crud<Caixa> dao = getDao();
-		if (caixaList == null || caixaList.isEmpty())
-			caixaList = dao.busca(QUERY_BUSCA_TODOS);
+		dao = getDao();
+		// if (caixaList == null || caixaList.isEmpty())
+		caixaList = dao.busca(QUERY_BUSCA_TODOS);
 
 		return caixaList;
 	}
@@ -110,7 +111,7 @@ public class CaixaController implements ControllerBase {
 	public void salva() throws Exception {
 
 		ajustaSaldoFinalZeroCaixa();
-		Crud<Caixa> dao = getDao();
+		
 		caixa = dao.update(caixa);
 
 	}
@@ -168,7 +169,7 @@ public class CaixaController implements ControllerBase {
 
 	}
 
-	public void recebePagamento(Pagamento pagamento) {
+	public void recebePagamento(Pagamento pagamento) throws Exception {
 		// meioPagamentoDao.update(pagamento);
 		Date dataVenda = pagamento.getDataVenda();
 		Usuario operador = pagamento.getUsuarioLogado();
@@ -178,7 +179,13 @@ public class CaixaController implements ControllerBase {
 			meioPagamento.setDataPagamento(dataVenda);
 			meioPagamento.setUsuarioLogado(operador);
 			meioPagamento = meioPagamentoDao.update(meioPagamento);
+			if(meioPagamento.getTipoMeioPagamento().getIdTipoMeioPagamento()==1) {
+				float saldoFinal = caixa.getSaldoFinal()+meioPagamento.getValorPago();
+				caixa.setSaldoFinal(saldoFinal);
+				salva();
+			}
 			pagamento.getMeiosPagamento().add(meioPagamento);
+		
 		}
 		setPagamento(pagamentoDao.update(pagamento));
 	}
@@ -200,7 +207,7 @@ public class CaixaController implements ControllerBase {
 	@Override
 	public void registraHistoricoOperacao(Operacao operacao) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

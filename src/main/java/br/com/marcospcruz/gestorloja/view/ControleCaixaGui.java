@@ -20,6 +20,7 @@ import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.util.Util;
 
 public class ControleCaixaGui extends AbstractDialog implements WindowListener {
@@ -36,6 +37,12 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 			"Abertura", 
 			"Operador Abertura", 
 			"Saldo Abertura",
+			"Total Vendido",
+			//"Produtos Vendidos",
+			//"Recebimento Dinheiro",
+			//"Recebimento Débito",
+			//"Recebimento Crédito",
+			//"Outros Recebimentos",
 			"Saldo Fechamento", 
 			"Fechamento", 
 			"Operador Fechamento",
@@ -216,16 +223,27 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		Usuario usuarioFechamento = linha.getUsuarioFechamento();
 		String nomeCompletoUsuarioAbertura = usuarioAbertura.getNomeCompleto();
 		String nomeCompletoUsuarioFechamento = usuarioFechamento != null ? usuarioFechamento.getNomeCompleto() : "";
+		String totalVendido=Util.formataMoeda(calculaTotalVendido(linha.getVendas()));
 		return new Object[] { 
 				Util.formataData(linha.getDataAbertura()), 
 				nomeCompletoUsuarioAbertura, 
 				Util.formataMoeda(linha.getSaldoInicial()),
+				totalVendido,
 				Util.formataMoeda(linha.getSaldoFinal()), 
 				linha.getDataFechamento() == null ? "" : Util.formataData(linha.getDataFechamento()),
 				nomeCompletoUsuarioFechamento,
 				(linha.getDataFechamento()==null)?"Aberto":"Fechado"
 
 		};
+	}
+
+	private Float calculaTotalVendido(List<Venda> vendas) {
+
+		float totalVendido = 0;
+		for(Venda venda:vendas){
+			totalVendido+=venda.getTotalVendido();
+		}
+		return totalVendido;
 	}
 
 	// @formatter:on

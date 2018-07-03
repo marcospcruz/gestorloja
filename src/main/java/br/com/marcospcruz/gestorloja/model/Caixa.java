@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,13 +11,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "caixa.findCaixaAberto", query = "select c from Caixa c where c.dataFechamento=null") ,
-		@NamedQuery(name="caixa.findAll",query="select c from Caixa c")})
+		@NamedQuery(name = "caixa.findCaixaAberto", query = "select c from Caixa c " + "LEFT JOIN c.vendas "
+				+ "where c.dataFechamento=null"),
+		@NamedQuery(name = "caixa.findAll", query = "select c from Caixa c " + "LEFT JOIN c.vendas ") })
 public class Caixa extends AbstractModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +36,9 @@ public class Caixa extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "idUsuarioFechamento")
 	private Usuario usuarioFechamento;
+	@OneToMany
+	@JoinColumn(name = "idVenda")
+	private List<Venda> vendas;
 
 	public Caixa() {
 		setDataAbertura(new Date());
@@ -94,6 +100,14 @@ public class Caixa extends AbstractModel {
 		this.usuarioFechamento = usuarioFechamento;
 	}
 
+	public List<Venda> getVendas() {
+		return vendas;
+	}
+
+	public void setVendas(List<Venda> vendas) {
+		this.vendas = vendas;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -105,6 +119,7 @@ public class Caixa extends AbstractModel {
 		result = prime * result + Float.floatToIntBits(saldoInicial);
 		result = prime * result + ((usuarioAbertura == null) ? 0 : usuarioAbertura.hashCode());
 		result = prime * result + ((usuarioFechamento == null) ? 0 : usuarioFechamento.hashCode());
+		result = prime * result + ((vendas == null) ? 0 : vendas.hashCode());
 		return result;
 	}
 
@@ -143,6 +158,11 @@ public class Caixa extends AbstractModel {
 				return false;
 		} else if (!usuarioFechamento.equals(other.usuarioFechamento))
 			return false;
+		if (vendas == null) {
+			if (other.vendas != null)
+				return false;
+		} else if (!vendas.equals(other.vendas))
+			return false;
 		return true;
 	}
 
@@ -150,7 +170,7 @@ public class Caixa extends AbstractModel {
 	public String toString() {
 		return "Caixa [idCaixa=" + idCaixa + ", saldoInicial=" + saldoInicial + ", saldoFinal=" + saldoFinal
 				+ ", dataAbertura=" + dataAbertura + ", dataFechamento=" + dataFechamento + ", usuarioAbertura="
-				+ usuarioAbertura + ", usuarioFechamento=" + usuarioFechamento + "]";
+				+ usuarioAbertura + ", usuarioFechamento=" + usuarioFechamento + ", vendas=" + vendas + "]";
 	}
 
 }

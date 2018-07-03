@@ -361,7 +361,9 @@ public class VendaController implements ControllerBase {
 			estoqueController.registraHistoricoOperacao(OperacaoEstoqueFacade.SAIDA_ESTOQUE);
 			salvaItemVenda(itemVenda);
 		}
+		venda.setCaixa((Caixa) caixaController.getItem());
 		salva();
+		
 		iniciaVenda();
 	}
 
