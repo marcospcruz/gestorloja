@@ -74,10 +74,12 @@ public class VendaController implements ControllerBase {
 	}
 
 	public void subtraiEstoque(ItemVenda venda) throws Exception {
+
 		ItemEstoque itemEstoque =
 				// estoqueController.getItemEstoque() != null ?
 				// estoqueController.getItemEstoque()
-				venda.getItemEstoque();
+				venda.getItemEstoque()
+				;
 		Integer quantidadeVenda = venda.getQuantidade();
 
 		if (itemEstoque.getQuantidade() < 0) {
@@ -359,7 +361,7 @@ public class VendaController implements ControllerBase {
 			novoItemEstoque.setValorUnitario(itemVenda.getValorVendido());
 			estoqueController.setItem(novoItemEstoque);
 			estoqueController.registraHistoricoOperacao(OperacaoEstoqueFacade.SAIDA_ESTOQUE);
-			salvaItemVenda(itemVenda);
+//			salvaItemVenda(itemVenda);
 		}
 		venda.setCaixa((Caixa) caixaController.getItem());
 		salva();
@@ -374,7 +376,7 @@ public class VendaController implements ControllerBase {
 	}
 
 	private void recebePagamento() throws Exception {
-
+		//TODO BUSCAR TIPOMEIOPAGAMENTO NO BANCO
 		Pagamento pagamento = venda.getPagamento();
 		Date dataVenda = venda.getDataVenda();
 		pagamento.setdataVenda(dataVenda);

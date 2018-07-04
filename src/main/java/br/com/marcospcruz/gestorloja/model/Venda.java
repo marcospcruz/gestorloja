@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,10 +42,10 @@ public class Venda implements Serializable {
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.MERGE)
 	@JoinColumn(name = "idCaixa")
 	private Caixa caixa;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
 
@@ -133,7 +134,7 @@ public class Venda implements Serializable {
 		int result = 1;
 		result = prime * result + ((dataVenda == null) ? 0 : dataVenda.hashCode());
 		result = prime * result + idVenda;
-		result = prime * result + ((itensVenda == null) ? 0 : itensVenda.hashCode());
+//		result = prime * result + ((itensVenda == null) ? 0 : itensVenda.hashCode());
 		result = prime * result + ((pagamento == null) ? 0 : pagamento.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + Float.floatToIntBits(porcentagemDesconto);

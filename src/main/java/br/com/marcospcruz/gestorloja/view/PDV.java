@@ -1,7 +1,6 @@
 package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
@@ -24,7 +23,6 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
@@ -45,14 +43,12 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
-import br.com.marcospcruz.gestorloja.abstractfactory.MeioPagamentoFactory;
 import br.com.marcospcruz.gestorloja.controller.VendaController;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.ItemVenda;
 import br.com.marcospcruz.gestorloja.model.MeioPagamento;
-import br.com.marcospcruz.gestorloja.model.MeioPagamentoCartaoCredito;
-import br.com.marcospcruz.gestorloja.model.MeioPagamentoOutros;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
+import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
 import br.com.marcospcruz.gestorloja.util.Util;
@@ -796,11 +792,13 @@ public class PDV extends AbstractDialog {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			showErrorMessage(this, e.getMessage());
 
 			populaFormulario = true;
 
 		} finally {
+
 			if (populaFormulario) {
 				populaFormulario();
 				// vendaController.resetItemVenda();
@@ -842,36 +840,37 @@ public class PDV extends AbstractDialog {
 
 		float valorTotalRecebido = 0;
 		for (MyJCheckBox cb : meiosPagamentosSelecionadosList) {
-			List<Component> pagamentosComponentes = pagamentoComponentsMap.get(cb.getText());
-
+			String meioPagamentoString = cb.getText();
+			List<Component> pagamentosComponentes = pagamentoComponentsMap.get(meioPagamentoString);
+			TipoMeioPagamento tipoMeioPagamento = new TipoMeioPagamento();
+			tipoMeioPagamento.setDescricaoTipoMeioPagamento(meioPagamentoString);
 			int cont = 0;
-			MeioPagamento meioPagamento = MeioPagamentoFactory.createMeioPagamento(cb.getText());
+			MeioPagamento meioPagamento = new MeioPagamento();
+			meioPagamento.setTipoMeioPagamento(tipoMeioPagamento);
 			float valorPago = 0f;
+			String valorPagoString = null;
 			for (Component comp : pagamentosComponentes) {
 
-				String valor = ((JTextComponent) comp).getText();
-				if (cb.getText().equals("Cartão de Crédito")) {
-					if (cont == 0) {
-						int qtParcelas = valor.isEmpty() ? 0 : Integer.parseInt(valor);
-						((MeioPagamentoCartaoCredito) meioPagamento).setQuantidadeParcelas(qtParcelas);
-						cont++;
-						continue;
+				valorPagoString = ((JTextComponent) comp).getText();
+				if (!Util.isEqualsAny(meioPagamentoString, "Dinheiro", "Cartão de Débito") && cont == 0) {
+
+					if (Util.isEqualsAny(meioPagamentoString, "Cartão de Crédito")) {
+						int qtParcelas = valorPagoString.isEmpty() ? 0 : Integer.parseInt(valorPagoString);
+						meioPagamento.setParcelas(qtParcelas);
+					} else if (Util.isEqualsAny(meioPagamentoString, "Outros")) {
+						meioPagamento.setDescricao(valorPagoString);
 					}
 
-				} else if (cb.getText().equals("Outros")) {
-					if (cont == 0) {
-						((MeioPagamentoOutros) meioPagamento).setDescricaoPagamentoOutros(valor);
-						cont++;
-						continue;
-					}
 				}
-				valorPago += Util.parseStringDecimalToFloat(valor);
 
 				cont++;
+				// throw new Exception("x");
 			}
-			valorTotalRecebido += valorPago;
+			valorPago = Util.parseStringDecimalToFloat(valorPagoString);
 			meioPagamento.setValorPago(valorPago);
-			meioPagamento.setPagamento(pagamento);
+			valorTotalRecebido += valorPago;
+
+			// meioPagamento.setPagamento(pagamento);
 			pagamento.getMeiosPagamento().add(meioPagamento);
 		}
 		if (valorTotalRecebido < venda.getTotalVendido()) {

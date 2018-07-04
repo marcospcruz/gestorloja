@@ -3,21 +3,16 @@ package br.com.marcospcruz.gestorloja.model;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
-import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "idTipoMeioPagamento")
-public abstract class MeioPagamento implements Serializable {
+public class MeioPagamento implements Serializable {
 	/**
 	 * 
 	 */
@@ -26,18 +21,21 @@ public abstract class MeioPagamento implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int idMeioPagamento;
 
-	// @ManyToOne(cascade = CascadeType.MERGE)
-	// @JoinColumn(name = "idTipoMeioPagamento")
-	// private TipoMeioPagamento tipoMeioPagamento;
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne
 	@JoinColumn(name = "idPagamento")
-
 	private Pagamento pagamento;
+
 	private float valorPago;
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne
+	@JoinColumn(name = "idTipoMeioPagamento")
 	private TipoMeioPagamento tipoMeioPagamento;
 	private Date dataPagamento;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "idOperador")
 	private Usuario usuarioLogado;
+
+	private int parcelas;
+	private String descricao;
 
 	public TipoMeioPagamento getTipoMeioPagamento() {
 		return tipoMeioPagamento;
@@ -71,10 +69,19 @@ public abstract class MeioPagamento implements Serializable {
 		this.valorPago = valorPago;
 	}
 
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
 	@Override
 	public String toString() {
 		return "MeioPagamento [idMeioPagamento=" + idMeioPagamento + ", pagamento=" + pagamento + ", valorPago="
-				+ valorPago + "]";
+				+ valorPago + ", tipoMeioPagamento=" + tipoMeioPagamento + ", dataPagamento=" + dataPagamento
+				+ ", usuarioLogado=" + usuarioLogado + ", parcelas=" + parcelas + ", descricao=" + descricao + "]";
 	}
 
 	@Override
@@ -124,6 +131,15 @@ public abstract class MeioPagamento implements Serializable {
 
 	public Usuario getUsuarioLogado() {
 		return usuarioLogado;
+	}
+
+	public void setParcelas(int qtParcelas) {
+		this.parcelas = qtParcelas;
+
+	}
+
+	public int getParcelas() {
+		return parcelas;
 	}
 
 }

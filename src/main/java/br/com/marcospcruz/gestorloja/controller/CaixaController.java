@@ -9,7 +9,9 @@ import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
+import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.model.Venda;
 
 public class CaixaController implements ControllerBase {
 
@@ -17,6 +19,7 @@ public class CaixaController implements ControllerBase {
 		super();
 		meioPagamentoDao = new CrudDao<>();
 		pagamentoDao = new CrudDao<>();
+		tipoMeioPagamentoDao = new CrudDao<>();
 	}
 
 	private static final String QUERY_BUSCA_TODOS = "caixa.findAll";
@@ -28,6 +31,7 @@ public class CaixaController implements ControllerBase {
 	private Crud<Pagamento> pagamentoDao;
 	private Pagamento pagamento;
 	private Crud<Caixa> dao;
+	private CrudDao<TipoMeioPagamento> tipoMeioPagamentoDao;
 
 	@Override
 	public void busca(Object id) {
@@ -37,7 +41,9 @@ public class CaixaController implements ControllerBase {
 
 	@Override
 	public List buscaTodos() {
-		dao = getDao();
+		if (dao == null)
+			dao = getDao();
+		caixaList=null;
 		// if (caixaList == null || caixaList.isEmpty())
 		caixaList = dao.busca(QUERY_BUSCA_TODOS);
 
@@ -63,16 +69,16 @@ public class CaixaController implements ControllerBase {
 
 	@Override
 	public Object getItem() {
-		if (caixa == null) {
-			try {
-				busca(BUSCA_CAIXA_ABERTO);
-				caixa = caixaList.get(0);
 
-			} catch (Exception e) {
+		try {
+			busca(BUSCA_CAIXA_ABERTO);
+			caixa = caixaList.get(0);
 
-				e.printStackTrace();
-			}
+		} catch (Exception e) {
+
+			e.printStackTrace();
 		}
+
 		return caixa;
 	}
 
@@ -111,7 +117,7 @@ public class CaixaController implements ControllerBase {
 	public void salva() throws Exception {
 
 		ajustaSaldoFinalZeroCaixa();
-		
+
 		caixa = dao.update(caixa);
 
 	}
@@ -173,21 +179,31 @@ public class CaixaController implements ControllerBase {
 		// meioPagamentoDao.update(pagamento);
 		Date dataVenda = pagamento.getDataVenda();
 		Usuario operador = pagamento.getUsuarioLogado();
-		// for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
-		for (int i = 0; i < pagamento.getMeiosPagamento().size(); i++) {
-			MeioPagamento meioPagamento = pagamento.getMeiosPagamento().remove(i);
+		for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+			// for (int i = 0; i < pagamento.getMeiosPagamento().size(); i++) {
+			// MeioPagamento meioPagamento = pagamento.getMeiosPagamento().remove(i);
 			meioPagamento.setDataPagamento(dataVenda);
 			meioPagamento.setUsuarioLogado(operador);
-			meioPagamento = meioPagamentoDao.update(meioPagamento);
-			if(meioPagamento.getTipoMeioPagamento().getIdTipoMeioPagamento()==1) {
-				float saldoFinal = caixa.getSaldoFinal()+meioPagamento.getValorPago();
+			TipoMeioPagamento tipoMeioPagamento = meioPagamento.getTipoMeioPagamento();
+			meioPagamento.setTipoMeioPagamento(buscaTipoMeioPagamento(tipoMeioPagamento));
+			// meioPagamento = meioPagamentoDao.update(meioPagamento);
+			if (meioPagamento.getTipoMeioPagamento().getIdTipoMeioPagamento() == 1) {
+				float saldoFinal = caixa.getSaldoFinal() + meioPagamento.getValorPago();
 				caixa.setSaldoFinal(saldoFinal);
 				salva();
 			}
-			pagamento.getMeiosPagamento().add(meioPagamento);
-		
+			// pagamento.getMeiosPagamento().add(meioPagamento);
+			meioPagamento.setPagamento(pagamento);
+
 		}
-		setPagamento(pagamentoDao.update(pagamento));
+		// setPagamento(pagamentoDao.update(pagamento));
+		setPagamento(pagamento);
+	}
+
+	private TipoMeioPagamento buscaTipoMeioPagamento(TipoMeioPagamento tipoMeioPagamento) {
+
+		return tipoMeioPagamentoDao.busca("tipoMeioPagamento.buscaPorDescricao", "descricao",
+				tipoMeioPagamento.getDescricaoTipoMeioPagamento());
 	}
 
 	public void setPagamento(Pagamento pagamento) {
@@ -208,6 +224,14 @@ public class CaixaController implements ControllerBase {
 	public void registraHistoricoOperacao(Operacao operacao) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public Float getSubTotalVendas() {
+		float subTotalVendas = 0;
+		for (Venda venda : caixa.getVendas()) {
+			subTotalVendas += venda.getTotalVendido();
+		}
+		return subTotalVendas;
 	}
 
 }

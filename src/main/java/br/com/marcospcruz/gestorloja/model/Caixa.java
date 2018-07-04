@@ -1,9 +1,11 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,9 +19,9 @@ import javax.persistence.TemporalType;
 
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "caixa.findCaixaAberto", query = "select c from Caixa c " + "LEFT JOIN c.vendas "
+		@NamedQuery(name = "caixa.findCaixaAberto", query = "select distinct c from Caixa c " + "LEFT JOIN c.vendas "
 				+ "where c.dataFechamento=null"),
-		@NamedQuery(name = "caixa.findAll", query = "select c from Caixa c " + "LEFT JOIN c.vendas ") })
+		@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c " + "LEFT JOIN c.vendas ") })
 public class Caixa extends AbstractModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,9 +38,8 @@ public class Caixa extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "idUsuarioFechamento")
 	private Usuario usuarioFechamento;
-	@OneToMany
-	@JoinColumn(name = "idVenda")
-	private List<Venda> vendas;
+	@OneToMany(fetch = FetchType.EAGER,mappedBy="caixa")
+	private Set<Venda> vendas;
 
 	public Caixa() {
 		setDataAbertura(new Date());
@@ -100,11 +101,11 @@ public class Caixa extends AbstractModel {
 		this.usuarioFechamento = usuarioFechamento;
 	}
 
-	public List<Venda> getVendas() {
+	public Set<Venda> getVendas() {
 		return vendas;
 	}
 
-	public void setVendas(List<Venda> vendas) {
+	public void setVendas(Set<Venda> vendas) {
 		this.vendas = vendas;
 	}
 

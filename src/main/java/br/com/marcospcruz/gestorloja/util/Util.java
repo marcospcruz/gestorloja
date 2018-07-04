@@ -81,4 +81,12 @@ public class Util {
 		}
 		return false;
 	}
+
+	public static boolean isEqualsAny(String valor, String... valores) {
+		for (String string : valores) {
+			if (string.equals(valor))
+				return true;
+		}
+		return false;
+	}
 }

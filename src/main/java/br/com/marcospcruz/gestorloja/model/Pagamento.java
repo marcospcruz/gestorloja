@@ -23,8 +23,7 @@ public class Pagamento implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int idPagamento;
-	@OneToMany(cascade=CascadeType.MERGE)
-	@JoinColumn(name = "idMeioPagamento")
+	@OneToMany(cascade = CascadeType.ALL,mappedBy="pagamento")
 	private List<MeioPagamento> meiosPagamento;
 	private float valorPagamento;
 	private float trocoPagamento;
@@ -36,8 +35,6 @@ public class Pagamento implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario usuarioLogado;
-
-	
 
 	public int getIdPagamento() {
 		return idPagamento;
@@ -98,7 +95,7 @@ public class Pagamento implements Serializable {
 		result = prime * result + Float.floatToIntBits(trocoPagamento);
 		result = prime * result + ((usuarioLogado == null) ? 0 : usuarioLogado.hashCode());
 		result = prime * result + Float.floatToIntBits(valorPagamento);
-		result = prime * result + ((venda == null) ? 0 : venda.hashCode());
+		// result = prime * result + ((venda == null) ? 0 : venda.hashCode());
 		return result;
 	}
 

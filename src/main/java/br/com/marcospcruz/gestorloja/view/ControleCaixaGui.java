@@ -8,13 +8,11 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
@@ -223,7 +221,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		Usuario usuarioFechamento = linha.getUsuarioFechamento();
 		String nomeCompletoUsuarioAbertura = usuarioAbertura.getNomeCompleto();
 		String nomeCompletoUsuarioFechamento = usuarioFechamento != null ? usuarioFechamento.getNomeCompleto() : "";
-		String totalVendido=Util.formataMoeda(calculaTotalVendido(linha.getVendas()));
+		String totalVendido=Util.formataMoeda(calculaTotalVendido(linha));
 		return new Object[] { 
 				Util.formataData(linha.getDataAbertura()), 
 				nomeCompletoUsuarioAbertura, 
@@ -237,8 +235,8 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		};
 	}
 
-	private Float calculaTotalVendido(List<Venda> vendas) {
-
+	private Float calculaTotalVendido(Caixa linha) {
+		Set<Venda>vendas=linha.getVendas();
 		float totalVendido = 0;
 		for(Venda venda:vendas){
 			totalVendido+=venda.getTotalVendido();

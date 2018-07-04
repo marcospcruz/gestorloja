@@ -67,7 +67,7 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 		Caixa caixa = (Caixa) caixaController.getItem();
 		initTimer();
 
-		JPanel panel = new JPanel(new GridLayout(3, 2));
+		JPanel panel = new JPanel(new GridLayout(4, 2));
 		panel.setBorder(criaTitledBorder("Abertura Caixa"));
 
 		dataAberturaLbl = criaJLabel(Util.formataData(caixa.getDataAbertura()));
@@ -87,7 +87,11 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 		panel.add(lblSaldoAtualDoCaixa);
 
 		panel.add(lblSaldoAtualDoCaixa);
-
+		
+		JLabel lblSubTotalVenda=criaJLabel(Util.formataMoeda(caixaController.getSubTotalVendas()));
+		lblSubTotalVenda.setBorder(criaTitledBorder("Total Vendido"));
+		panel.add(lblSubTotalVenda);
+		
 		dataFechamentoLbl = criaJLabel(Util.formataDataAtual());
 		dataFechamentoLbl.setBorder(criaTitledBorder("Data de Fechamento"));
 		panel.add(dataFechamentoLbl);
@@ -95,7 +99,7 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 		JLabel lblUsuarioLogado = criaJLabel(operador.getNomeCompleto());
 		lblUsuarioLogado.setBorder(criaTitledBorder("Usuário Fechamento:"));
 		panel.add(lblUsuarioLogado);
-
+		
 		// getContentPane().add(panel, BorderLayout.CENTER);
 		return panel;
 	}
