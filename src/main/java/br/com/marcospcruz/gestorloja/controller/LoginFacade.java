@@ -114,7 +114,7 @@ public class LoginFacade {
 	}
 
 	public LoginFacade fechaSessaoUsuario() {
-		sessaoUsuarioBuilder.setDataFim(new Date());
+		sessaoUsuarioBuilder.setDataFim(SingletonManager.getInstance().getData());
 		SessaoUsuario sessao = sessaoUsuarioBuilder.getSessaoUsuario();
 		// temp
 		sessaoUsuarioDao.update(sessao);

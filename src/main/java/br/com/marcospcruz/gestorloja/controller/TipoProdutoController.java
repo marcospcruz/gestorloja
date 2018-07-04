@@ -12,6 +12,7 @@ import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.TipoProdutoNotFoundException;
 
@@ -84,7 +85,7 @@ public class TipoProdutoController implements ControllerBase {
 		Usuario operador = getUsuarioLogado();
 
 		tipoProduto.setOperador(operador);
-		tipoProduto.setDataInsercao(new Date());
+		tipoProduto.setDataInsercao(SingletonManager.getInstance().getData());
 
 		tipoProduto = tipoProdutoDao.update(tipoProduto);
 
@@ -337,7 +338,7 @@ public class TipoProdutoController implements ControllerBase {
 		tipoProduto.setDescricaoTipo(descricao.toString());
 		tipoProduto.setSuperTipoProduto(superTipoProduto);
 
-		tipoProduto.setDataInsercao(new Date());
+		tipoProduto.setDataInsercao(SingletonManager.getInstance().getData());
 
 		salva(tipoProduto.getDescricaoTipo(), true, tipoProduto.getSuperTipoProduto());
 

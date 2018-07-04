@@ -16,6 +16,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 //@formatter:off
 @Entity
 @NamedQueries({
@@ -71,7 +73,7 @@ public class Produto implements Serializable {
 	}
 
 	public Produto() {
-		setDataInsercao(new Date());
+		setDataInsercao(SingletonManager.getInstance().getData());
 	}
 
 	public Integer getIdProduto() {

@@ -50,6 +50,7 @@ import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Venda;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.components.AutocompleteJComboBox;
@@ -524,8 +525,10 @@ public class PDV extends AbstractDialog {
 	}
 
 	private JPanel createPesquisaProdutoPanel() throws Exception {
+		boolean isSuperUser = SingletonManager.getInstance().getUsuarioLogado().getIdUsuario() == 1;
 		JPanel panel = new JPanel(new BorderLayout(25, 100));
-		JPanel centerPanel = new JPanel(new GridLayout(1, 2));
+		int colunas = isSuperUser ? 3 : 2;
+		JPanel centerPanel = new JPanel(new GridLayout(1, colunas));
 		JPanel radioButtonPnl = new JPanel();
 		panel.setBorder(criaTitledBorder("Pesquisa Produto:"));
 		vendaController.buscaTodos();
@@ -540,6 +543,13 @@ public class PDV extends AbstractDialog {
 		panel.add(centerPanel, BorderLayout.CENTER);
 		btnPesquisar = inicializaJButton("Pesquisar");
 		centerPanel.add(produtoPesquisaDropDown);
+		JPanel ocultoPnl = new JPanel();
+		if (isSuperUser) {
+			JButton btnNovoProduto = inicializaJButton("Novo Produto");
+			ocultoPnl.add(btnNovoProduto);
+			centerPanel.add(ocultoPnl);
+		}
+
 		centerPanel.add(radioButtonPnl);
 		radioButtonPnl.add(descricaoRadio);
 		radioButtonPnl.add(codigoBarrasRadioButton);
@@ -727,6 +737,7 @@ public class PDV extends AbstractDialog {
 	public void actionPerformed(ActionEvent arg0) {
 		habilitaBtnPesquisar();
 		String actionCommand = arg0.getActionCommand();
+
 		// if(actionCommand.contains("combo")) {
 		// autoCompleteComboBox.reloadModel();
 		// }
@@ -735,7 +746,10 @@ public class PDV extends AbstractDialog {
 
 		ItemEstoque produto;
 		try {
-			if (actionCommand.equals("comboBoxChanged")) {
+			if (actionCommand.equals("Novo Produto")) {
+				new ItemEstoqueDialog(getItemEstoqueController(), this);
+				populaFormulario=true;
+			} else if (actionCommand.equals("comboBoxChanged")) {
 				if (codigoBarrasRadioButton.isSelected()) {
 					String codigoDeBarras = ((JTextComponent) produtoPesquisaDropDown.getEditor().getEditorComponent())
 							.getText();
@@ -808,6 +822,7 @@ public class PDV extends AbstractDialog {
 			}
 			if (carregaTableModel)
 				carregaTableModel();
+			
 
 		}
 	}

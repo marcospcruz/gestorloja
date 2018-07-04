@@ -60,7 +60,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 //			ConstantesEnum.CODIGO_DE_BARRAS.getValue().toString(),
 			ConstantesEnum.QUANTIDADE_LABEL.getValue().toString(),
 			ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString(),
-			ConstantesEnum.VALOR_TOTAL_LABEL.getValue().toString() };
+			ConstantesEnum.VALOR_TOTAL_LABEL.getValue().toString()};
 //@formatter:on
 	private JPanel jPanelEstoque;
 
@@ -240,9 +240,9 @@ public class EstoquePrincipalGui extends AbstractDialog {
 				tipoProduto.getDescricaoTipo(),
 				produto.getDescricaoProduto(),
 //				itemEstoque.getCodigoDeBarras(),
-				itemEstoque.getQuantidade(), 
+				produto.isEstoqueDedutivel()?itemEstoque.getQuantidade():"Sem Estoque", 
 				valorUnitario, 
-				valorTotal 
+				valorTotal 				
 				};
 //@formatter:on
 

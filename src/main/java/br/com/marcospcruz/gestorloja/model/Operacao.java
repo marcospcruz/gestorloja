@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 @Entity
 @NamedQueries({
 		@NamedQuery(name = "operacao.findOperacao", query = "select o from Operacao o  where descricao=:descricao") })
@@ -35,7 +37,7 @@ public class Operacao implements Serializable {
 	}
 
 	public Operacao() {
-		setDataCriacao(new Date());
+		setDataCriacao(SingletonManager.getInstance().getData());
 	}
 
 	public Operacao(int idOperacao) {

@@ -14,6 +14,7 @@ import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.Util;
 
@@ -81,7 +82,7 @@ public class EstoqueController implements ControllerBase {
 
 		try {
 
-			itemEstoque.setDataContagem(new Date());
+			itemEstoque.setDataContagem(SingletonManager.getInstance().getData());
 
 			produtoController.busca(produto.getDescricaoProduto());
 
@@ -347,7 +348,7 @@ public class EstoqueController implements ControllerBase {
 	public void salva() throws Exception {
 
 		itemEstoque.setOperador(getUsuarioLogado());
-		itemEstoque.setDataContagem(new Date());
+		itemEstoque.setDataContagem(SingletonManager.getInstance().getData());
 
 		itemEstoque = itemEstoqueDao.update(itemEstoque);
 
@@ -357,7 +358,7 @@ public class EstoqueController implements ControllerBase {
 	public void registraHistoricoOperacao(Operacao operacao) {
 		Crud<HistoricoOperacao> historicoDao = new CrudDao<>();
 		HistoricoOperacao historicoOperacao = new HistoricoOperacao();
-		historicoOperacao.setDataOperacao(new Date());
+		historicoOperacao.setDataOperacao(SingletonManager.getInstance().getData());
 		historicoOperacao.setItemEstoque(itemEstoque);
 		historicoOperacao.setOperador(getUsuarioLogado());
 		historicoOperacao.setOperacao(operacao);

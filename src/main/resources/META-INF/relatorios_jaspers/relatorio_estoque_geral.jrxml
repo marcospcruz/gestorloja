@@ -47,7 +47,7 @@
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[SingletonManager.getInstance().getData()]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="-1" y="83" width="555" height="1" uuid="67d4e697-d4f3-464a-a056-5a1f7c3479ef"/>

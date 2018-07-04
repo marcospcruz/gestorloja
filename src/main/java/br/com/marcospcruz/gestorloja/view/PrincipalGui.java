@@ -3,17 +3,15 @@ package br.com.marcospcruz.gestorloja.view;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Properties;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.text.DateFormatter;
 
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
@@ -27,6 +25,8 @@ import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
+import br.com.marcospcruz.gestorloja.util.Util;
+import br.com.marcospcruz.gestorloja.view.util.MyDateFormatter;
 
 public class PrincipalGui extends AbstractJFrame implements WindowListener {
 
@@ -76,10 +76,11 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 		properties.put("text.year", "Ano");
 		JDatePanelImpl jDatePanel = new JDatePanelImpl(model, properties);
 
-		calendario = new JDatePickerImpl(jDatePanel, new DateFormatter());
+		calendario = new JDatePickerImpl(jDatePanel, new MyDateFormatter());
+		calendario.getJFormattedTextField().setFont(FontMapper.getFont(22));
 		datePanel.add(calendario);
 		calendario.setFont(FontMapper.getFont(22));
-		calendario.getJFormattedTextField().addMouseListener(this);
+		calendario.addActionListener(this);
 		return datePanel;
 	}
 
@@ -109,6 +110,9 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
+			LocalDate dataManutencao = Util.parseDate(calendario.getJFormattedTextField().getText());
+			if (dataManutencao != null)
+				SingletonManager.getInstance().setDataManutencaoSistema(dataManutencao);
 			switch (e.getActionCommand()) {
 			case InterfaceGrafica.ESTOQUE:
 				JDialogFactory.createDialog(InterfaceGrafica.ESTOQUE, this, InterfaceGrafica.CLASS_NAME_ESTOQUE);
@@ -133,6 +137,7 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 			e1.printStackTrace();
 			showErrorMessage(this, e1.getMessage());
 		}
+
 	}
 
 	@Override

@@ -19,6 +19,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 @MappedSuperclass
 //@Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -49,7 +51,7 @@ public abstract class TipoProduto implements Serializable {
 	private Date dataInsercao;
 
 	public TipoProduto() {
-		setDataInsercao(new Date());
+		setDataInsercao(SingletonManager.getInstance().getData());
 	}
 
 	public Usuario getOperador() {

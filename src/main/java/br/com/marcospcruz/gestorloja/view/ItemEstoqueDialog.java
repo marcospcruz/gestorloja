@@ -18,6 +18,7 @@ import javax.swing.Box;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
@@ -57,12 +58,13 @@ public class ItemEstoqueDialog extends AbstractDialog {
 	private AutocompleteJComboBox<Fabricante> cmbFabricante;
 	private JTextField txtCodigoDeBarras;
 	private Box[] boxes;
+	private JCheckBox deduzEstoqueChkBox;
 
 	public ItemEstoqueDialog(EstoqueController controller, JDialog owner) throws Exception {
 
 		super(owner, "Item de Estoque", true);
 
-		setSize(900, 550);
+		setSize(900, 650);
 
 		// controller;
 
@@ -88,7 +90,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 	private JPanel configuraJPanelNovoItem() throws Exception {
 
 		JPanel panel = new JPanel(new BorderLayout(20, 0));
-		LayoutManager gridLayout = new GridLayout(8, 1, 0, 20);
+		LayoutManager gridLayout = new GridLayout(9, 1, 0, 20);
 
 		JPanel labelPanel = new JPanel(gridLayout);
 
@@ -172,6 +174,9 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		// criaBox("Produto", cmbProduto);
 		labelPanel.add(super.criaJLabel("Produto"));
 		fieldPanel.add(cmbProduto);
+		labelPanel.add(super.criaJLabel("Com Estoque"));
+		deduzEstoqueChkBox=new JCheckBox();
+		fieldPanel.add(deduzEstoqueChkBox);
 		JPanel txtBarras = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		txtCodigoDeBarras = super.createJTextField();
 		txtCodigoDeBarras.setPreferredSize(new Dimension(200, 4));
@@ -473,6 +478,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		SubTipoProduto subTipoProduto = (SubTipoProduto) parseCategoriaProduto(cmbSubCategoriaProduto);
 		subTipoProduto.setSuperTipoProduto((SubTipoProduto) parseCategoriaProduto(cmbCategoriaProduto));
 		produto.setTipoProduto((SubTipoProduto) subTipoProduto);
+		produto.setEstoqueDedutivel(deduzEstoqueChkBox.isSelected());
 		Integer quantidade = Integer.valueOf(txtQuantidadeInicial.getText());
 		Float valorUnitario = Util.parseStringDecimalToFloat(txtValorUnitario.getText());
 		ItemEstoque itemEstoque = controller.getItem() == null ? new ItemEstoque() : (ItemEstoque) controller.getItem();

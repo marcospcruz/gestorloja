@@ -1,7 +1,6 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.util.Collection;
-import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,6 +14,8 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @Table(name = "TipoProduto")
@@ -51,7 +52,7 @@ public class SubTipoProduto extends TipoProduto {
 
 	public SubTipoProduto(String descricao, Usuario operador) {
 		setDescricaoTipo(descricao);
-		setDataInsercao(new Date());
+		setDataInsercao(SingletonManager.getInstance().getData());
 		setOperador(operador);
 
 	}

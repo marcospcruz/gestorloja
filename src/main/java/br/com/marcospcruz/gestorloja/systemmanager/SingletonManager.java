@@ -1,5 +1,8 @@
 package br.com.marcospcruz.gestorloja.systemmanager;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +15,7 @@ public class SingletonManager {
 	private static SingletonManager instance;
 	private Usuario usuarioLogado;
 	private Map<String, ControllerBase> controllersMap;
+	private LocalDate dataManutencao;
 
 	private SingletonManager() {
 
@@ -38,7 +42,7 @@ public class SingletonManager {
 			controllersMap = new HashMap<>();
 
 		if (!controllersMap.containsKey(controllerClass)) {
-			ControllerBase controller=ControllerAbstractFactory.createController(controllerClass);
+			ControllerBase controller = ControllerAbstractFactory.createController(controllerClass);
 			controller.buscaTodos();
 			controllersMap.put(controllerClass, controller);
 		}
@@ -51,6 +55,27 @@ public class SingletonManager {
 			controller.buscaTodos();
 		});
 
+	}
+
+	public void setDataManutencaoSistema(LocalDate dataManutencao) {
+		this.dataManutencao = dataManutencao;
+
+	}
+
+	public LocalDate getDataManutencao() {
+		return dataManutencao;
+	}
+
+	public void setDataManutencao(LocalDate dataManutencao) {
+		this.dataManutencao = dataManutencao;
+	}
+
+	public Date getData() {
+		if(dataManutencao==null) {
+			return new Date();
+		}
+		Date data=Date.from(dataManutencao.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		return data;
 	}
 
 }

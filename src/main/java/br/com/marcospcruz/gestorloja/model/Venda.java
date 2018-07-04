@@ -19,6 +19,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 @Entity
 @Table(name = "Venda")
 public class Venda implements Serializable {
@@ -52,7 +54,7 @@ public class Venda implements Serializable {
 	private float porcentagemDesconto;
 
 	public Venda() {
-		setDataVenda(new Date());
+		setDataVenda(SingletonManager.getInstance().getData());
 		itensVenda = new HashMap<>();
 	}
 

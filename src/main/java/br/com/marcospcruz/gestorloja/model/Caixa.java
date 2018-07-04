@@ -3,7 +3,6 @@ package br.com.marcospcruz.gestorloja.model;
 import java.util.Date;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -16,6 +15,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @NamedQueries({
@@ -42,7 +43,7 @@ public class Caixa extends AbstractModel {
 	private Set<Venda> vendas;
 
 	public Caixa() {
-		setDataAbertura(new Date());
+		setDataAbertura(SingletonManager.getInstance().getData());
 	}
 
 	public int getIdCaixa() {

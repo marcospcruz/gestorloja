@@ -2,7 +2,6 @@ package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,9 +11,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @NamedQueries({ @NamedQuery(name = "fabricante.buscaTodos", query = "select f from Fabricante f order by f.nome"),
@@ -42,7 +42,7 @@ public class Fabricante implements Serializable {
 //	private List<Produto> produtos;
 
 	public Fabricante() {
-		dataInsercao = new Date();
+		dataInsercao = SingletonManager.getInstance().getData();
 	}
 
 	public Integer getIdFabricante() {

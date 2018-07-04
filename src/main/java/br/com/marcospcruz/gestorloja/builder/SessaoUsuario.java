@@ -15,6 +15,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 //@formatter:off
@@ -44,7 +45,7 @@ public class SessaoUsuario implements Serializable {
 	private Date dataFim;
 
 	public SessaoUsuario() {
-		setDataInicio(new Date());
+		setDataInicio(SingletonManager.getInstance().getData());
 	}
 
 	public int getIdSessaoUsuario() {

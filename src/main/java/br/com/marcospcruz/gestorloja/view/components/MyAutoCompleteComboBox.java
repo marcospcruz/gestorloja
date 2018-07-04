@@ -50,7 +50,7 @@ public class MyAutoCompleteComboBox<T> extends JComboBox<T> {
 			@Override
 			public void run() {
 				setPopupVisible(true);
-//				System.out.println(new Date());
+//				System.out.println(SingletonManager.getInstance().getData());
 			}
 		});
 	}

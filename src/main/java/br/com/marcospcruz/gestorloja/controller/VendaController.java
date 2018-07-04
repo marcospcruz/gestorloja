@@ -22,6 +22,7 @@ import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 public class VendaController implements ControllerBase {
 	public static final String PRODUTO_INVALIDO = "Selecão de Produto inválida.";
@@ -48,7 +49,7 @@ public class VendaController implements ControllerBase {
 		venda = new Venda();
 		venda.setOperador(getUsuarioLogado());
 		venda.setCaixa((Caixa) caixaController.getItem());
-		
+
 		resetItemVenda();
 
 	}
@@ -78,8 +79,9 @@ public class VendaController implements ControllerBase {
 		ItemEstoque itemEstoque =
 				// estoqueController.getItemEstoque() != null ?
 				// estoqueController.getItemEstoque()
-				venda.getItemEstoque()
-				;
+				venda.getItemEstoque();
+		if (!itemEstoque.getProduto().isEstoqueDedutivel())
+			return;
 		Integer quantidadeVenda = venda.getQuantidade();
 
 		if (itemEstoque.getQuantidade() < 0) {
@@ -163,7 +165,6 @@ public class VendaController implements ControllerBase {
 
 	}
 
-	
 	public ItemVenda getItemVenda() {
 
 		return itemVenda;
@@ -185,7 +186,8 @@ public class VendaController implements ControllerBase {
 	public void devolveProduto() throws Exception {
 
 		ItemEstoque itemEstoque = itemVenda.getItemEstoque();
-
+		if (!itemEstoque.getProduto().isEstoqueDedutivel())
+			return;
 		if (itemEstoque == null) {
 			throw new Exception("Selecione um ítem na lista.");
 		}
@@ -311,7 +313,7 @@ public class VendaController implements ControllerBase {
 		itemVenda.getItemEstoque()
 				.setQuantidade(itemVenda.getItemEstoque().getQuantidade() - itemVenda.getQuantidade());
 		itemVenda.setValorVendido(itemEstoque.getValorUnitario());
-	
+
 	}
 
 	public void deduzEstoqueProduto(int quantidadeItem) throws Exception {
@@ -345,7 +347,7 @@ public class VendaController implements ControllerBase {
 	}
 
 	public void finalizaVenda() throws Exception {
-		venda.setDataVenda(new Date());
+		venda.setDataVenda(SingletonManager.getInstance().getData());
 		venda.setOperador(getUsuarioLogado());
 		recebePagamento();
 		for (ItemVenda itemVenda : venda.getItensVenda().values()) {
@@ -361,11 +363,11 @@ public class VendaController implements ControllerBase {
 			novoItemEstoque.setValorUnitario(itemVenda.getValorVendido());
 			estoqueController.setItem(novoItemEstoque);
 			estoqueController.registraHistoricoOperacao(OperacaoEstoqueFacade.SAIDA_ESTOQUE);
-//			salvaItemVenda(itemVenda);
+			// salvaItemVenda(itemVenda);
 		}
 		venda.setCaixa((Caixa) caixaController.getItem());
 		salva();
-		
+
 		iniciaVenda();
 	}
 
@@ -376,7 +378,7 @@ public class VendaController implements ControllerBase {
 	}
 
 	private void recebePagamento() throws Exception {
-		//TODO BUSCAR TIPOMEIOPAGAMENTO NO BANCO
+		// TODO BUSCAR TIPOMEIOPAGAMENTO NO BANCO
 		Pagamento pagamento = venda.getPagamento();
 		Date dataVenda = venda.getDataVenda();
 		pagamento.setdataVenda(dataVenda);
@@ -409,7 +411,7 @@ public class VendaController implements ControllerBase {
 	@Override
 	public void registraHistoricoOperacao(Operacao operacao) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

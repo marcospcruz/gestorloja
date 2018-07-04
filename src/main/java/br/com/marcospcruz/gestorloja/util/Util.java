@@ -3,11 +3,12 @@ package br.com.marcospcruz.gestorloja.util;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import javax.swing.text.JTextComponent;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 public class Util {
 
@@ -17,7 +18,7 @@ public class Util {
 
 	public static String formataDataAtual() {
 
-		return formataData(new Date());
+		return formataData(SingletonManager.getInstance().getData());
 	}
 
 	public static String formataMoeda(Float valorMoeda) {
@@ -88,5 +89,17 @@ public class Util {
 				return true;
 		}
 		return false;
+	}
+
+	public static LocalDate parseDate(String text) {
+		if(text.isEmpty()) {
+			return null;
+		}
+		String[] data = text.split("/");
+		
+		int ano=Integer.parseInt(data[2]);
+		int mes=Integer.parseInt(data[1]);
+		int diaMes=Integer.parseInt(data[0]);
+		return LocalDate.of(ano, mes, diaMes);
 	}
 }

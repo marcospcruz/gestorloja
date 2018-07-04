@@ -55,7 +55,7 @@
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[SingletonManager.getInstance().getData()]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="268" y="57" width="118" height="12" uuid="038416ae-8e91-4cf9-bc5a-90ea8104523e"/>

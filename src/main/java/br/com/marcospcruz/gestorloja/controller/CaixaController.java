@@ -12,6 +12,7 @@ import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 public class CaixaController implements ControllerBase {
 
@@ -141,7 +142,7 @@ public class CaixaController implements ControllerBase {
 	}
 
 	public void fechaCaixa() throws Exception {
-		caixa.setDataFechamento(new Date());
+		caixa.setDataFechamento(SingletonManager.getInstance().getData());
 		caixa.setUsuarioFechamento(getUsuarioLogado());
 
 		salva();
