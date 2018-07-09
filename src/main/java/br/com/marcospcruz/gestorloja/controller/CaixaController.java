@@ -1,7 +1,11 @@
 package br.com.marcospcruz.gestorloja.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -13,6 +17,7 @@ import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+import br.com.marcospcruz.gestorloja.util.Util;
 
 public class CaixaController implements ControllerBase {
 
@@ -234,5 +239,38 @@ public class CaixaController implements ControllerBase {
 		}
 		return subTotalVendas;
 	}
+
+	public List controcalculaSubTotalRecebido() {
+		
+		Set<Venda> vendas = caixa.getVendas();
+		Map<TipoMeioPagamento, Float> subTotalRecebido = mapMeioPagamentosRecebidosCaixa(vendas);
+		List linhas = new ArrayList();
+		for (TipoMeioPagamento tm : subTotalRecebido.keySet()) {
+			Object linha = new Object[] { tm.getDescricaoTipoMeioPagamento(),
+					Util.formataMoeda(subTotalRecebido.get(tm)) };
+			linhas.add(linha);
+		}
+		return linhas;
+	}
+
+	private Map<TipoMeioPagamento, Float> mapMeioPagamentosRecebidosCaixa(Set<Venda> vendas) {
+		Map<TipoMeioPagamento, Float> subTotalRecebido = new HashMap<>();
+		for (Venda venda : vendas) {
+			Pagamento pagamento = venda.getPagamento();
+
+			for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+
+				TipoMeioPagamento tipoMeioPagamento = meioPagamento.getTipoMeioPagamento();
+				float valorRecebido = subTotalRecebido.containsKey(tipoMeioPagamento)
+						? subTotalRecebido.get(tipoMeioPagamento)
+						: 0;
+				valorRecebido += meioPagamento.getValorPago();
+
+				subTotalRecebido.put(tipoMeioPagamento, valorRecebido);
+			}
+		}
+		return subTotalRecebido;
+	}
+
 
 }

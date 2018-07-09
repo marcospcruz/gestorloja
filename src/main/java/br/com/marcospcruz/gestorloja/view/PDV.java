@@ -43,11 +43,13 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.VendaController;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.ItemVenda;
 import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
+import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
@@ -58,8 +60,8 @@ import br.com.marcospcruz.gestorloja.view.components.MyJCheckBox;
 
 public class PDV extends AbstractDialog {
 	private static final String VALOR = "Valor: ";
-	private static final Object[] COLUNAS_JTABLE = { "Código Produto", "Marca / Fabricante", "Produto", "Quantidade",
-			"Valor Produto", "Valor Venda", "Valor Total" };
+	private static final Object[] COLUNAS_JTABLE = { "Código Produto", "Fabricante", "Categoria", "Produto",
+			"Quantidade", "Valor Produto", "Valor Venda", "Valor Total" };
 	private static final String UM = "1";
 	private static final int DEFAULT_GAP = 450;
 	private static final int PRODUTO_HORIZONTAL_DEFAULT_GAP = 750;
@@ -532,9 +534,12 @@ public class PDV extends AbstractDialog {
 		JPanel radioButtonPnl = new JPanel();
 		panel.setBorder(criaTitledBorder("Pesquisa Produto:"));
 		vendaController.buscaTodos();
-		produtoPesquisaDropDown = new AutocompleteJComboBox<>(this, super.getItemEstoqueController(), null, false);
+		EstoqueController estoqueController = super.getItemEstoqueController();
+		estoqueController.buscaTodos();
+		produtoPesquisaDropDown = new AutocompleteJComboBox<>(this, estoqueController, null, false);
 		produtoPesquisaDropDown.setFont(FontMapper.getFont(20));
 		produtoPesquisaDropDown.setModel(super.selectModelItemEstoque());
+
 		ButtonGroup btnGroup = new ButtonGroup();
 		descricaoRadio = createJRadioButton("Descrição");
 		codigoBarrasRadioButton = createJRadioButton("Código de Barras", true);
@@ -681,18 +686,22 @@ public class PDV extends AbstractDialog {
 				// calculaValorTotal(Integer.valueOf(txtQuantidade.getText()),
 				// Float.valueOf(lblValorUnitario.getText()));
 				// lblValorUnitario.setText(Util.formataMoeda(valorTotal));
-				if (txtQuantidade.getText().equals("") || txtQuantidade.getText().equals("0")) {
+				String quantidade = txtQuantidade.getText();
+				if (quantidade.equals("") || quantidade.equals("0")) {
 					txtQuantidade.setText("0");
 					txtQuantidade.selectAll();
+					quantidade = "1";
 				}
 
 				vendaController.setItemVendaBackup();
 				try {
-					vendaController.deduzEstoqueProduto(Integer.parseInt(txtQuantidade.getText()));
+					Produto produto = vendaController.getItemVenda().getItemEstoque().getProduto();
 
+					vendaController.deduzEstoqueProduto(Integer.parseInt(quantidade));
+
+					vendaController.getItemVenda().setQuantidade(Integer.parseInt(quantidade));
 					vendaController.calculaValorTotalVenda();
 					populaFormulario();
-
 				} catch (Exception e) {
 					// txtQuantidade.setText("0");
 					// showErrorMessage(super,e.getMessage());
@@ -747,12 +756,18 @@ public class PDV extends AbstractDialog {
 		ItemEstoque produto;
 		try {
 			if (actionCommand.equals("Novo Produto")) {
-				new ItemEstoqueDialog(getItemEstoqueController(), this);
-				populaFormulario=true;
+				getItemEstoqueController().anulaAtributos();
+				EstoqueController itemEstoqueController = getItemEstoqueController();
+				new ItemEstoqueDialog(itemEstoqueController, this);
+				vendaController.getItemVenda().setItemEstoque(itemEstoqueController.getItemEstoque());
+				btnAdicionarVenda.setEnabled(true);
+				populaFormulario = true;
 			} else if (actionCommand.equals("comboBoxChanged")) {
 				if (codigoBarrasRadioButton.isSelected()) {
 					String codigoDeBarras = ((JTextComponent) produtoPesquisaDropDown.getEditor().getEditorComponent())
 							.getText();
+					if (codigoDeBarras.isEmpty() || codigoDeBarras.equals("Selecione uma Opção."))
+						return;
 					produto = pesquisaProdutoCombo(codigoDeBarras);
 					if (!codigoDeBarras.isEmpty() && !codigoDeBarras.equals("Selecione uma Opção.")
 							&& produto == null) {
@@ -778,12 +793,13 @@ public class PDV extends AbstractDialog {
 				btnAdicionarVenda.setEnabled(true);
 				// atualizaTableModel(produto);
 			} else if (actionCommand.equals("Adicionar")) {
-				populaFormulario = true;
+ 				populaFormulario = true;
 				carregaTableModel = true;
 
 				adicionaItemEstoque();
 				calculaTotalVenda();
 				btnAdicionarVenda.setEnabled(false);
+
 			} else if (actionCommand.equals("Remover")) {
 				excluiItem();
 				populaFormulario = true;
@@ -822,7 +838,6 @@ public class PDV extends AbstractDialog {
 			}
 			if (carregaTableModel)
 				carregaTableModel();
-			
 
 		}
 	}
@@ -847,7 +862,7 @@ public class PDV extends AbstractDialog {
 
 	private void finalizaVenda() throws Exception {
 		Venda venda = vendaController.getVenda();
-		venda.setPorcentagemDesconto(Float.valueOf(txtDesconto.getText()));
+		venda.setPorcentagemDesconto(Util.stringDecimaisToFloat(txtDesconto.getText()));
 		Pagamento pagamento = venda.getPagamento();
 		float troco = Util.parseStringDecimalToFloat(lblValorTroco.getText().substring(3));
 		if (pagamento == null)
@@ -923,7 +938,7 @@ public class PDV extends AbstractDialog {
 	}
 
 	@Override
-	protected JPanel carregaJpanelTable(int y) {
+	protected JPanel carregaJpanelTable() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -975,6 +990,7 @@ public class PDV extends AbstractDialog {
 			linhas.add(new Object[] { 
 					itemEstoque.getCodigoDeBarras(),
 					itemEstoque.getFabricante().getNome(),
+					itemEstoque.getTipoProduto().getDescricaoTipo(),
 					itemEstoque.getProduto().getDescricaoProduto(), 
 					itemVenda.getQuantidade(),
 					Util.formataMoeda(valorProduto),
@@ -996,7 +1012,7 @@ public class PDV extends AbstractDialog {
 
 	@Override
 	protected void adicionaItemEstoque() throws Exception {
-		vendaController.adicionaVendaLista();
+		vendaController.adicionaProdutoLista();
 
 	}
 
@@ -1025,7 +1041,7 @@ public class PDV extends AbstractDialog {
 		float valorUnitario = itemEstoque != null ? itemEstoque.getValorUnitario() : 0f;
 		float valorTotal = calculaValorTotal(quantidade, valorUnitario);
 		lblDescricaoCategoria
-				.setText(itemEstoque == null ? "" : itemEstoque.getProduto().getTipoProduto().getDescricaoTipo());
+				.setText(itemEstoque == null ? "" : itemEstoque.getTipoProduto().getDescricaoTipo());
 		lblDescricaoProduto.setText(itemEstoque == null ? "" : itemEstoque.getProduto().getDescricaoProduto());
 		lblValorUnitario.setText(valorUnitario > 0 ? Util.formataMoeda(valorUnitario) : "");
 		lblValorTotal.setText(Util.formataMoeda(valorTotal));

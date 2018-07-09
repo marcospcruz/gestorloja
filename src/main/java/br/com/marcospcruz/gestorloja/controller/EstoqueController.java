@@ -1,7 +1,6 @@
 package br.com.marcospcruz.gestorloja.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
+import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.Util;
@@ -62,6 +62,7 @@ public class EstoqueController implements ControllerBase {
 
 	private void carregaItensEstoque() {
 		// if (itensEstoque == null || itensEstoque.isEmpty())
+		itensEstoque = null;
 		itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
 		setList(itensEstoque);
 
@@ -93,7 +94,7 @@ public class EstoqueController implements ControllerBase {
 			itemEstoque.setQuantidade(qt);
 
 			itemEstoque.setOperador(getUsuarioLogado());
-//			salva(itemEstoque);
+			// salva(itemEstoque);
 
 		} catch (NumberFormatException e) {
 
@@ -133,8 +134,12 @@ public class EstoqueController implements ControllerBase {
 	}
 
 	public void buscaItemPorCodigoDeBarras(String codigoProduto) {
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
-		itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo", codigoProduto);
+		try {
+			Crud<ItemEstoque> itemEstoqueDao = getDao();
+			itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo", codigoProduto);
+		} catch (Exception e) {
+			itemEstoque = null;
+		}
 
 	}
 
@@ -191,10 +196,11 @@ public class EstoqueController implements ControllerBase {
 
 		if (quantidade < 1)
 			throw new Exception("Quantidade inválida!");
+		if (itemEstoque.isEstoqueDedutivel()) {
+			itemEstoque.setQuantidade(itemEstoque.getQuantidade() + quantidade);
 
-		itemEstoque.setQuantidade(itemEstoque.getQuantidade() + quantidade);
-
-		salva();
+			salva();
+		}
 
 		// anulaAtributos();
 
@@ -246,9 +252,9 @@ public class EstoqueController implements ControllerBase {
 	public void setList(List list) {
 		try {
 
-			List objetos = list.isEmpty() ? itensEstoque : list;
+			List objetos = list != null && list.isEmpty() ? itensEstoque : list;
 			consultaEstoque = new ArrayList<>(objetos);
-			itensEstoque=objetos;
+			itensEstoque = objetos;
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
@@ -323,8 +329,8 @@ public class EstoqueController implements ControllerBase {
 			for (Object o : itensEstoque) {
 				ItemEstoque itemEstoque = (ItemEstoque) o;
 				Produto produto = itemEstoque.getProduto();
-				SubTipoProduto tipoProduto = itemEstoque.getProduto().getTipoProduto();
 
+				SubTipoProduto tipoProduto = itemEstoque.getTipoProduto();
 				boolean tipoProdutoMatches = tipoProduto.getDescricaoTipo().toUpperCase().contains(param.toUpperCase())
 						? true
 						: tipoProduto.getSuperTipoProduto().getDescricaoTipo().toUpperCase()

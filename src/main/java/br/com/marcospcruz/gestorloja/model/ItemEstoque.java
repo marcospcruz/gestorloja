@@ -19,52 +19,55 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Estoque")
 @NamedQueries({
-		@NamedQuery(name = "itemestoque.readCodigo", query = "select ie from ItemEstoque ie "
+		@NamedQuery(name = "itemestoque.readCodigo", query = "select distinct ie from ItemEstoque ie "
 			+ "JOIN ie.fabricante "
 			+ "JOIN ie.produto p "
-			+ "JOIN p.tipoProduto t "
+			+"JOIN ie.tipoProduto t "
 			+ "where upper(ie.codigoDeBarras) = :codigo"),
-		@NamedQuery(name = "itemestoque.readCodigoEstoque", query = "select ie from ItemEstoque ie "
+		@NamedQuery(name = "itemestoque.readCodigoEstoque", query = "select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
+				+"JOIN ie.tipoProduto t "
 				+ "WHERE upper(ie.codigoDeBarras) = :codigo "
 //				+ "AND ie.quantidade>0"
 				),
-		@NamedQuery(name = "itemestoque.readDescricaoPeca", query = "select ie from ItemEstoque ie "
+		@NamedQuery(name = "itemestoque.readDescricaoPeca", query = "select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
-				+"JOIN p.tipoProduto t "
+				+"JOIN ie.tipoProduto t "
 				+ "where "
 				+ "upper(t.descricaoTipo) like :descricaoTipo "
 				+ "AND upper(p.descricaoProduto) like :descricaoProduto"
 				),
-		@NamedQuery(name = "itemestoque.readDescricaoProduto", query = "select ie from ItemEstoque ie "
-				+ "JOIN ie.produto p " 
+		@NamedQuery(name = "itemestoque.readDescricaoProduto", query = "select distinct ie from ItemEstoque ie "
+				+ "JOIN ie.produto p "
+				+"JOIN ie.tipoProduto t "
 				+ "where "
 				+ "upper(p.descricaoProduto) like :descricaoProduto"),
-		@NamedQuery(name = "itemestoque.readDescricaoTipo", query = "select ie from ItemEstoque ie "
+		@NamedQuery(name = "itemestoque.readDescricaoTipo", query = "select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.fabricante f "
 				+ "JOIN ie.produto p " 
-				+ "JOIN p.tipoProduto t "
+				+ "JOIN ie.tipoProduto t "
 				+ "JOIN t.superTipoProduto st "
 				+ "where "
 				+ "upper(t.descricaoTipo) like :descricaoTipo "
 				+ "OR UPPER(st.descricaoTipo) like :descricaoTipo "
 				+ "order by f.nome,t.descricaoTipo"
 				),
-		@NamedQuery(name = "itemEstoque.readAll", query = "select ie from ItemEstoque ie " 
+		@NamedQuery(name = "itemEstoque.readAll", query = "select distinct ie from ItemEstoque ie " 
 				+ "JOIN ie.fabricante f "
 				+ "JOIN ie.produto p "
-				+ "JOIN p.tipoProduto t "
+				+ "JOIN ie.tipoProduto t "
 				+ "order by f.nome, t.descricaoTipo"),
-		@NamedQuery(name="itemEstoque.readProduto",query="select ie from ItemEstoque ie "
+		@NamedQuery(name="itemEstoque.readProduto",query="select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p "
+				+"JOIN ie.tipoProduto t "
 				+ "JOIN ie.fabricante f "
 				+ "WHERE p.idProduto=:idProduto "
 				+ "AND f.idFabricante=:idFabricante"),
 		
-		@NamedQuery(name = "itemestoque.readTipoFabricante", query = "select ie from ItemEstoque ie "
+		@NamedQuery(name = "itemestoque.readTipoFabricante", query = "select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
 				+ "JOIN ie.fabricante f "
-				+ "JOIN p.tipoProduto t "
+				+ "JOIN ie.tipoProduto t "
 				+ "where "
 				+ "upper(t.descricaoTipo) like :descricaoTipo "
 				+ "AND upper(p.descricaoProduto) like :descricaoProduto "
@@ -88,6 +91,10 @@ public class ItemEstoque implements Serializable {
 	@JoinColumn(name = "idProduto")
 	private Produto produto;
 
+	@ManyToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name = "idTipoItem")
+	private SubTipoProduto tipoProduto;
+
 	@ManyToOne(optional = false, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "idFabricante")
 	// @JoinTable(name = "itemEstoque_fabricante", joinColumns = {
@@ -101,8 +108,14 @@ public class ItemEstoque implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
-
+	private boolean estoqueDedutivel;
 	private float valorUnitario;
+	private float valorCusto;
+
+	public ItemEstoque() {
+		// setDataContagem(SingletonManager.getInstance().getData());
+		// setOperador(SingletonManager.getInstance().getUsuarioLogado());
+	}
 
 	public Integer getIdItemEstoque() {
 		return idItemEstoque;
@@ -114,6 +127,14 @@ public class ItemEstoque implements Serializable {
 
 	public Produto getProduto() {
 		return produto;
+	}
+
+	public boolean isEstoqueDedutivel() {
+		return estoqueDedutivel;
+	}
+
+	public void setEstoqueDedutivel(boolean estoqueDedutivel) {
+		this.estoqueDedutivel = estoqueDedutivel;
 	}
 
 	public void setProduto(Produto produto) {
@@ -133,7 +154,10 @@ public class ItemEstoque implements Serializable {
 	}
 
 	public void setQuantidade(Integer quantidade) {
-		this.quantidade = quantidade;
+
+		// this.quantidade = quantidade;
+		this.quantidade = isEstoqueDedutivel() ? quantidade : 0;
+
 	}
 
 	public String getCodigoDeBarras() {
@@ -160,6 +184,14 @@ public class ItemEstoque implements Serializable {
 		this.operador = operador;
 	}
 
+	public SubTipoProduto getTipoProduto() {
+		return tipoProduto;
+	}
+
+	public void setTipoProduto(SubTipoProduto tipoProduto) {
+		this.tipoProduto = tipoProduto;
+	}
+
 	public float getValorUnitario() {
 		return valorUnitario;
 	}
@@ -168,17 +200,27 @@ public class ItemEstoque implements Serializable {
 		this.valorUnitario = valorUnitario;
 	}
 
+	public float getValorCusto() {
+		return valorCusto;
+	}
+
+	public void setValorCusto(float valorCusto) {
+		this.valorCusto = valorCusto;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((codigoDeBarras == null) ? 0 : codigoDeBarras.hashCode());
 		result = prime * result + ((dataContagem == null) ? 0 : dataContagem.hashCode());
+		result = prime * result + (estoqueDedutivel ? 1231 : 1237);
 		result = prime * result + ((fabricante == null) ? 0 : fabricante.hashCode());
 		result = prime * result + ((idItemEstoque == null) ? 0 : idItemEstoque.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((produto == null) ? 0 : produto.hashCode());
 		result = prime * result + ((quantidade == null) ? 0 : quantidade.hashCode());
+		result = prime * result + ((tipoProduto == null) ? 0 : tipoProduto.hashCode());
 		result = prime * result + Float.floatToIntBits(valorUnitario);
 		return result;
 	}
@@ -201,6 +243,8 @@ public class ItemEstoque implements Serializable {
 			if (other.dataContagem != null)
 				return false;
 		} else if (!dataContagem.equals(other.dataContagem))
+			return false;
+		if (estoqueDedutivel != other.estoqueDedutivel)
 			return false;
 		if (fabricante == null) {
 			if (other.fabricante != null)
@@ -227,6 +271,11 @@ public class ItemEstoque implements Serializable {
 				return false;
 		} else if (!quantidade.equals(other.quantidade))
 			return false;
+		if (tipoProduto == null) {
+			if (other.tipoProduto != null)
+				return false;
+		} else if (!tipoProduto.equals(other.tipoProduto))
+			return false;
 		if (Float.floatToIntBits(valorUnitario) != Float.floatToIntBits(other.valorUnitario))
 			return false;
 		return true;
@@ -234,8 +283,7 @@ public class ItemEstoque implements Serializable {
 
 	@Override
 	public String toString() {
-		String string = fabricante + " - " + produto.getTipoProduto() + " - " + produto;
-		return string;
+		return fabricante.getNome() + " - " + tipoProduto.getDescricaoTipo() + " - " + produto.getDescricaoProduto();
 	}
 
 }

@@ -1,13 +1,18 @@
 package br.com.marcospcruz.gestorloja.view;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +56,7 @@ import br.com.marcospcruz.gestorloja.util.FontMapper;
 import br.com.marcospcruz.gestorloja.util.NumberDocument;
 import br.com.marcospcruz.gestorloja.view.util.MyTableCellRenderer;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
+import net.sf.jasperreports.olap.mapping.MappingParser;
 
 public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
@@ -91,7 +97,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	// private LoginFacade loginFacade;
 
-	protected static final Border BUSCAR_TITLED_BORDER = new TitledBorder("Busca");
+	// protected static final Border BUSCAR_TITLED_BORDER = new
+	// TitledBorder("Busca");
 
 	private static final String TITLE_CONFIRMING_SAVING = ConstantesEnum.CONFIRMACAO_SALVAMENTO_TITLE.getValue()
 			.toString();
@@ -118,6 +125,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		this(owner, tituloJanela, modal);
 
 		atualizaTable = true;
+
+		controller = getController(controllerClassName);
 
 		configuraJPanel();
 
@@ -179,18 +188,59 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	}
 
+	protected JPanel carregaJPanelBusca() {
+
+		JPanel mainPnl = new JPanel(new BorderLayout(20, 100));
+
+		LayoutManager layout = new BorderLayout(20,100);
+		// new GridLayout(1, 2);
+		// new FlowLayout(FlowLayout.LEFT);
+		//
+//		JPanel jPanel = new JPanel(layout);
+//
+//		mainPnl.setBorder(criaTitledBorder("Pesquisa"));
+//
+//		mainPnl.add(jPanel, BorderLayout.CENTER);
+//
+//		JLabel lbl = criaJLabel("Descrição:");
+//		lbl.setBorder(BorderFactory.createEtchedBorder());
+//		jPanel.add(lbl,BorderLayout.WEST);
+//		//
+//		// lbl.setBounds(10, 15, 400, 30);
+//		//
+////		JPanel op = new JPanel(new BorderLayout());
+//
+//		// jPanel.add(lbl);
+//
+//		//
+//		txtBusca = new JFormattedTextField();
+//		txtBusca.setFont(FontMapper.getFont(22));
+//		//// txtBusca.setBounds(200, 20, 250, TXT_HEIGHT);
+//		//
+//		jPanel.add(txtBusca, BorderLayout.CENTER);
+//		//
+////		jPanel.add(op);
+//		btnBusca = inicializaJButton("Buscar");
+//		//// inicializaJButton("Buscar", 460, 20, 90, txtBusca.getHeight());
+//		//
+//		JPanel jp = new JPanel(new FlowLayout());
+//		// op.add(jp);
+////		jp.add(btnBusca);
+
+		return mainPnl;
+
+	}
+
 	/**
 	 * xxx
 	 */
 	protected abstract void configuraJPanel();
 
-	protected abstract JPanel carregaJPanelBusca();
-
 	protected abstract void selecionaAcao(String actionCommand) throws Exception;
 
 	protected abstract JPanel carregaJpanelFormulario();
 
-	protected abstract JPanel carregaJpanelTable(int y);
+	protected abstract JPanel carregaJpanelTable();
 
 	protected abstract void atualizaTableModel(Object object);
 
@@ -265,8 +315,6 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		myTableModel.fireTableDataChanged();
 
 	}
-
-	
 
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
@@ -350,7 +398,7 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 	protected DefaultComboBoxModel carregaComboTiposProdutoModel() throws Exception {
 
 		// TipoProdutoController controller = new TipoProdutoController();
-		ControllerBase tipoController = getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+		ControllerBase tipoController = getTipoProdutoController();
 
 		List objetos = tipoController.buscaTodos();
 
@@ -402,6 +450,15 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	}
 
+	public ComboBoxModel<Produto> selectModelProdutos(Collection<Produto> produtos) {
+		DefaultComboBoxModel<Produto> model = new DefaultComboBoxModel<>();
+		model.addElement(new Produto("Selecione uma Opção."));
+		for (Produto p : produtos) {
+			model.addElement(p);
+		}
+		return model;
+	}
+
 	/**
 	 * 
 	 * @param selectedItem
@@ -414,7 +471,7 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		SubTipoProduto tipoProduto = null;
 		try {
 			ControllerBase tipoProdutoController = !(controller instanceof TipoProdutoController)
-					? getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER)
+					? getTipoProdutoController()
 					: controller;
 			tipoProdutoController.busca(((SubTipoProduto) selectedItem).getIdTipoItem());
 			tipoProduto = (SubTipoProduto) tipoProdutoController.getItem();
@@ -456,9 +513,13 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	}
 
+	protected TipoProdutoController getTipoProdutoController() throws Exception {
+		return (TipoProdutoController) getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+	}
+
 	public ControllerBase getCategoriaProdutoController() throws Exception {
 
-		return getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+		return getTipoProdutoController();
 	}
 
 	public abstract void atualizaTableModel();
@@ -572,8 +633,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		model.addElement(ITEM_ZERO_COMBO);
 		estoque.stream().forEach(objeto -> {
 			ItemEstoque itemEstoque = objeto;
-//			if (itemEstoque.getFabricante() == null)
-//				System.out.println();
+			// if (itemEstoque.getFabricante() == null)
+			// System.out.println();
 			model.addElement(itemEstoque);
 		});
 		return model;
@@ -588,8 +649,6 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 		return (VendaController) getController(ControllerAbstractFactory.CONTROLE_VENDA);
 	}
-
-
 
 	public ControllerBase getCaixaController() throws Exception {
 

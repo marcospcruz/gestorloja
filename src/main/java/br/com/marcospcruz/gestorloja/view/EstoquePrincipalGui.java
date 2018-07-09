@@ -127,7 +127,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		carregaComponentesPanelCadastro();
 
-		// add(jPanelCadastros, BorderLayout.NORTH);
+		add(jPanelCadastros, BorderLayout.NORTH);
 
 		carregaComponentesPanelEstoque();
 
@@ -209,7 +209,11 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		for (Object itemEstoque : itensEstoque) {
 
-			linhas.add(parseRow((ItemEstoque) itemEstoque));
+			ItemEstoque item = (ItemEstoque) itemEstoque;
+
+			Produto produto = item.getProduto();
+
+			linhas.add(parseRow(item));
 
 		}
 
@@ -219,13 +223,19 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	private Object[] parseRow(ItemEstoque itemEstoque) {
 
-		float valor = itemEstoque.getQuantidade() * itemEstoque.getValorUnitario();
+		float valor;
+		try {
+			valor = itemEstoque.getQuantidade() * itemEstoque.getValorUnitario();
+		} catch (NullPointerException e) {
+			valor = 0;
+		}
 
 		String valorTotal = Util.formataMoeda(valor);
 
 		String valorUnitario = Util.formataMoeda(itemEstoque.getValorUnitario());
 
-		SubTipoProduto tipoProduto = itemEstoque.getProduto().getTipoProduto();
+		SubTipoProduto tipoProduto = itemEstoque.getTipoProduto();
+
 		Produto produto = itemEstoque.getProduto();
 		String nomeFabricante = itemEstoque.getFabricante() == null ? "" : itemEstoque.getFabricante().getNome();
 
@@ -240,7 +250,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 				tipoProduto.getDescricaoTipo(),
 				produto.getDescricaoProduto(),
 //				itemEstoque.getCodigoDeBarras(),
-				produto.isEstoqueDedutivel()?itemEstoque.getQuantidade():"Sem Estoque", 
+				itemEstoque.isEstoqueDedutivel()?itemEstoque.getQuantidade():"Sem Estoque", 
 				valorUnitario, 
 				valorTotal 				
 				};
@@ -385,7 +395,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		Rectangle retangulo = new Rectangle(10, 100, 130, 50);
 
-		jPanelCadastros.add(inicializaJButton(ConstantesEnum.FABRICANTE.getValue().toString(), retangulo));
+//		jPanelCadastros.add(inicializaJButton(ConstantesEnum.FABRICANTE.getValue().toString(), retangulo));
 
 		JButton btnTipoProduto = inicializaJButton(ConstantesEnum.LBL_BTN_TIPO_PRODUTO.getValue().toString(),
 				retangulo);
@@ -395,7 +405,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		JButton btnProduto = inicializaJButton(ConstantesEnum.PRODUTO_LABEL.getValue().toString(),
 				btnTipoProduto.getWidth() + 20, 100, 130, 50);
 
-		jPanelCadastros.add(btnProduto);
+//		jPanelCadastros.add(btnProduto);
 
 		jPanelCadastros.setSize(btnProduto.getWidth(), btnProduto.getHeight());
 
@@ -541,7 +551,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		if (actionCommand.equals(ConstantesEnum.LBL_BTN_NOVO_ITEM_ESTOQUE.getValue().toString())) {
 
 			new ItemEstoqueDialog(estoqueController, this);
-
+			estoqueController.anulaAtributos();
 		} else if (actionCommand.equals(ConstantesEnum.LBL_BTN_RELATORIO.getValue().toString())) {
 
 			RelatorioEstoqueGeral printer = new RelatorioEstoqueGeral();
@@ -560,7 +570,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		} else if (actionCommand.equals(ConstantesEnum.PRODUTO_LABEL.getValue().toString())) {
 
-			new ProdutoDialog(this);
+			// new ProdutoDialog(this);
 
 			// atualizaView();
 
@@ -778,8 +788,8 @@ public class EstoquePrincipalGui extends AbstractDialog {
 			e.printStackTrace();
 		}
 		ItemEstoque itemEstoque = (ItemEstoque) estoqueController.getItem();
-		cmbCategoriaProduto.getModel().setSelectedItem(itemEstoque.getProduto().getTipoProduto().getSuperTipoProduto());
-		cmbSubCategoriaProduto.setSelectedItem(itemEstoque.getProduto().getTipoProduto());
+		cmbCategoriaProduto.getModel().setSelectedItem(itemEstoque.getTipoProduto().getSuperTipoProduto());
+		cmbSubCategoriaProduto.setSelectedItem(itemEstoque.getTipoProduto());
 
 	}
 

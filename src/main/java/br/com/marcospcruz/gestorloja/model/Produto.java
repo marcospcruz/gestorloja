@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,17 +14,21 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 //@formatter:off
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "produto.readall", query = "select p from Produto p " 
+		@NamedQuery(name = "produto.readall", query = "select distinct p from Produto p " 
 ),
-		@NamedQuery(name = "produto.readparametrolike", query = "select p from Produto p "
-				+ "where upper(p.descricaoProduto) like :descricao")})
+		@NamedQuery(name = "produto.readparametrolike", query = "select distinct p from Produto p "
+//				+ "JOIN fetch p.tiposProduto t "
+				+ "where upper(p.descricaoProduto) like :descricao")
+//		@NamedQuery(name = "produto.readbytipo", query = "select distinct p from Produto p "
+//				+ "JOIN fetch p.tiposProduto t "
+//				+ "where t.idTipoItem=:id")
+		})
 		
 //@formatter:on
 public class Produto implements Serializable {
@@ -37,7 +41,7 @@ public class Produto implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer idProduto;
-
+	@Column(unique = true)
 	private String descricaoProduto;
 
 	private String unidadeMedida;
@@ -47,26 +51,19 @@ public class Produto implements Serializable {
 	// @Fetch(FetchMode.JOIN)
 	// private List<ItemEstoque> itensEstoque;
 
-	@ManyToOne(cascade = CascadeType.MERGE)
-	@JoinColumn(name = "idTipoProduto")
-	@OrderBy
-	private SubTipoProduto tipoProduto;
-
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
 
 	private Date dataInsercao;
 
-	private boolean estoqueDedutivel;
-
 	@OneToMany(mappedBy = "produto")
-//	@Fetch(FetchMode.JOIN)
+	// @Fetch(FetchMode.JOIN)
 	private Collection<ItemEstoque> estoqueProduto;
 
 	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida) {
-		setTipoProduto(subTipoProduto);
-		getTipoProduto().setSuperTipoProduto((SubTipoProduto) tipoProduto);
+		// setTipoProduto(subTipoProduto);
+		// getTipoProduto().setSuperTipoProduto((SubTipoProduto) tipoProduto);
 		setDescricaoProduto(descricao);
 		setUnidadeMedida(unidadeMedida);
 
@@ -74,6 +71,10 @@ public class Produto implements Serializable {
 
 	public Produto() {
 		setDataInsercao(SingletonManager.getInstance().getData());
+	}
+
+	public Produto(String string) {
+		this.descricaoProduto = string;
 	}
 
 	public Integer getIdProduto() {
@@ -100,13 +101,13 @@ public class Produto implements Serializable {
 		this.unidadeMedida = unidadeMedida;
 	}
 
-	public SubTipoProduto getTipoProduto() {
-		return tipoProduto;
-	}
-
-	public void setTipoProduto(SubTipoProduto tipoProduto) {
-		this.tipoProduto = tipoProduto;
-	}
+	// public SubTipoProduto getTipoProduto() {
+	// return tipoProduto;
+	// }
+	//
+	// public void setTipoProduto(SubTipoProduto tipoProduto) {
+	// this.tipoProduto = tipoProduto;
+	// }
 
 	public Usuario getOperador() {
 		return operador;
@@ -137,24 +138,15 @@ public class Produto implements Serializable {
 		return descricaoProduto;
 	}
 
-	public boolean isEstoqueDedutivel() {
-		return estoqueDedutivel;
-	}
-
-	public void setEstoqueDedutivel(boolean estoqueDedutivel) {
-		this.estoqueDedutivel = estoqueDedutivel;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((dataInsercao == null) ? 0 : dataInsercao.hashCode());
 		result = prime * result + ((descricaoProduto == null) ? 0 : descricaoProduto.hashCode());
-		result = prime * result + (estoqueDedutivel ? 1231 : 1237);
+		result = prime * result + ((estoqueProduto == null) ? 0 : estoqueProduto.hashCode());
 		result = prime * result + ((idProduto == null) ? 0 : idProduto.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
-		result = prime * result + ((tipoProduto == null) ? 0 : tipoProduto.hashCode());
 		result = prime * result + ((unidadeMedida == null) ? 0 : unidadeMedida.hashCode());
 		return result;
 	}
@@ -178,7 +170,10 @@ public class Produto implements Serializable {
 				return false;
 		} else if (!descricaoProduto.equals(other.descricaoProduto))
 			return false;
-		if (estoqueDedutivel != other.estoqueDedutivel)
+		if (estoqueProduto == null) {
+			if (other.estoqueProduto != null)
+				return false;
+		} else if (estoqueProduto.equals(other.estoqueProduto))
 			return false;
 		if (idProduto == null) {
 			if (other.idProduto != null)
@@ -188,12 +183,7 @@ public class Produto implements Serializable {
 		if (operador == null) {
 			if (other.operador != null)
 				return false;
-		} else if (!operador.equals(other.operador))
-			return false;
-		if (tipoProduto == null) {
-			if (other.tipoProduto != null)
-				return false;
-		} else if (!tipoProduto.equals(other.tipoProduto))
+		} else if (operador.equals(other.operador))
 			return false;
 		if (unidadeMedida == null) {
 			if (other.unidadeMedida != null)

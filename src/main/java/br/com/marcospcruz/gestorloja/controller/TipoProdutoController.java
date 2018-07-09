@@ -290,9 +290,9 @@ public class TipoProdutoController implements ControllerBase {
 
 		}
 
-		if (tipoProduto.getProdutos() != null && tipoProduto.getProdutos().size() > 0)
-
-			throw new Exception(REMOCAO_TIPO_POPULADO);
+//		if (tipoProduto.getProdutos() != null && tipoProduto.getProdutos().size() > 0)
+//
+//			throw new Exception(REMOCAO_TIPO_POPULADO);
 
 		if (tipoProduto.getSubTiposProduto().size() > 0)
 			throw new Exception(REMOCAO_SUPERTIPO_POPULADO);

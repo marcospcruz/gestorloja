@@ -1,9 +1,15 @@
 package br.com.marcospcruz.gestorloja.view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -14,12 +20,18 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import org.apache.log4j.Layout;
+
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
+import br.com.marcospcruz.gestorloja.util.FontMapper;
 
 public class TipoProdutoDialog extends AbstractDialog {
 
@@ -41,8 +53,6 @@ public class TipoProdutoDialog extends AbstractDialog {
 	private JComboBox cmbTiposProduto;
 	// private JComboBox cmbSexo;
 
-
-
 	/**
 	 * 
 	 * @param owner
@@ -50,9 +60,8 @@ public class TipoProdutoDialog extends AbstractDialog {
 	 */
 	public TipoProdutoDialog(JDialog owner) throws Exception {
 
-		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(),ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true);
-
-	
+		super(owner, ConstantesEnum.CADASTRO_TIPO_PRODUTO_TITLE.getValue().toString(),
+				ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER, true);
 
 	}
 
@@ -61,37 +70,15 @@ public class TipoProdutoDialog extends AbstractDialog {
 	 */
 	protected void configuraJPanel() {
 
-		int y = 0;
-
+		JPanel mainPanel = new JPanel();
+		getContentPane().setLayout(new GridLayout());
+		add(mainPanel);
+		// mainPanel.setLayout(new BorderLayout());
+		mainPanel.setLayout(new GridLayout(3, 1));
 		jPanelBusca = carregaJPanelBusca();
-
-		jPanelBusca.setBounds(0, y, getWidth() - 17, txtBusca.getHeight() + 30);
-
-		add(jPanelBusca);
-
-		y += jPanelBusca.getHeight();
-
-		jPanelFormulario = carregaJpanelFormulario();
-
-		jPanelFormulario.setBounds(0, y, getWidth() - 17, 130);
-
-		add(jPanelFormulario);
-
-		y += jPanelFormulario.getHeight();
-
-		jPanelActions = carregaJpanelActions();
-
-		jPanelActions.setBounds(0, y, getWidth() - 17, btnDeletar.getHeight());
-
-		add(jPanelActions);
-
-		y += jPanelActions.getHeight();
-
-		jPanelTable = carregaJpanelTable(y);
-
-		// jPanelTable.setBounds(0, y, getWidth() - 17, 320);
-
-		add(jPanelTable);
+		mainPanel.add(jPanelBusca, BorderLayout.NORTH);
+		mainPanel.add(carregaJpanelFormulario(), BorderLayout.CENTER);
+		mainPanel.add(carregaJpanelTable(), BorderLayout.SOUTH);
 
 	}
 
@@ -105,9 +92,6 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 	}
 
-
-
-	
 	/**
 	 * 
 	 * @return
@@ -115,23 +99,27 @@ public class TipoProdutoDialog extends AbstractDialog {
 	@Override
 	protected JPanel carregaJpanelFormulario() {
 
-		JPanel jPanel = new JPanel();
+		JPanel formPanel = new JPanel();
 
-		jPanel.setBorder(new TitledBorder(ConstantesEnum.TIPO_PRODUTO_LABEL.getValue().toString()));
+		formPanel.setBorder(criaTitledBorder(ConstantesEnum.TIPO_PRODUTO_LABEL.getValue().toString()));
 
-		jPanel.setLayout(null);
+		formPanel.setLayout(new BorderLayout());
+		// GridLayout centerPnlLayout = new GridLayout(2, 1);
+		LayoutManager centerPnlLayout = new BorderLayout();
+		// LayoutManager leftPnlLayout = new GridLayout(2, 1);
+		LayoutManager leftPnlLayout = new BorderLayout();
+		JPanel leftPanel = new JPanel(leftPnlLayout);
+		formPanel.add(leftPanel, BorderLayout.WEST);
+		JLabel lbl1 = criaJLabel(DESCRICAO_LABEL);
 
-		JLabel lbl1 = new JLabel(DESCRICAO_LABEL);
-
-		lbl1.setBounds(10, 10, 200, 50);
-
-		jPanel.add(lbl1);
-
+		leftPanel.add(lbl1, BorderLayout.NORTH);
+		JPanel centerPanel = new JPanel(centerPnlLayout);
+		formPanel.add(centerPanel, BorderLayout.CENTER);
 		txtDescricao = new JFormattedTextField();
 
-		txtDescricao.setBounds(200, 20, 200, TXT_HEIGHT);
+		txtDescricao.setFont(FontMapper.getFont(22));
 
-		jPanel.add(txtDescricao);
+		centerPanel.add(txtDescricao, BorderLayout.NORTH);
 
 		// JLabel lbl2 = new JLabel("Sexo:");
 		//
@@ -150,28 +138,27 @@ public class TipoProdutoDialog extends AbstractDialog {
 		chkSubTipo = new JCheckBox(ConstantesEnum.SUB_TIPO_DE_LABEL.getValue().toString());
 		// setBounds(10, 90, 150, 30);
 
-		chkSubTipo.setBounds(10, 45, 190, 50);
+		chkSubTipo.setFont(FontMapper.getFont(22));
 
 		chkSubTipo.addActionListener(this);
 
-		jPanel.add(chkSubTipo);
+		leftPanel.add(chkSubTipo, BorderLayout.SOUTH);
 
 		try {
 			cmbTiposProduto = super.carregaComboTiposProduto();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 
-		// setBounds(200, 90, 200, TXT_HEIGHT);
-
-		cmbTiposProduto.setBounds(200, 55, 200, TXT_HEIGHT);
-
 		cmbTiposProduto.setEnabled(chkSubTipo.isSelected());
+		cmbTiposProduto.setFont(FontMapper.getFont(22));
 
-		jPanel.add(cmbTiposProduto);
+		// formPanel.add(cmbTiposProduto);
+		centerPanel.add(cmbTiposProduto, BorderLayout.SOUTH);
+		formPanel.add(carregaJpanelActions(), BorderLayout.SOUTH);
 
-		return jPanel;
+		return formPanel;
 	}
 
 	/**
@@ -179,21 +166,17 @@ public class TipoProdutoDialog extends AbstractDialog {
 	 * @return
 	 */
 	@Override
-	protected JPanel carregaJpanelTable(int y) {
+	protected JPanel carregaJpanelTable() {
 
-		JPanel jPanel = new JPanel(null);
+		JPanel jPanel = new JPanel(new GridLayout());
 
-		jPanel.setBounds(0, y, getWidth() - 17, 320);
-
-		jPanel.setBorder(new TitledBorder(ConstantesEnum.TIPOS_PRODUTOS_LABEL.getValue().toString()));
+		jPanel.setBorder(criaTitledBorder(ConstantesEnum.TIPOS_PRODUTOS_LABEL.getValue().toString()));
 
 		carregaTableModel();
 
 		jTable = inicializaJTable(myTableModel);
 
 		jScrollPane = new JScrollPane(jTable);
-
-		jScrollPane.setBounds(6, 15, jPanel.getWidth() - 15, jPanel.getHeight() - 20);
 
 		jPanel.add(jScrollPane);
 
@@ -450,7 +433,8 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 	/**
 	 * M�todo respons�vel em limpar o Formul�rio de Tipo de Produto.
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	private void limpaFormulario() throws Exception {
 
@@ -485,8 +469,6 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 	}
 
-	
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected List parseListToLinhasTableModel(List lista) {
@@ -516,33 +498,6 @@ public class TipoProdutoDialog extends AbstractDialog {
 		}
 
 		return linhas;
-	}
-
-	@Override
-	protected JPanel carregaJPanelBusca() {
-
-		JPanel jPanel = new JPanel(null);
-
-		jPanel.setBorder(BUSCAR_TITLED_BORDER);
-
-		JLabel lbl = new JLabel(DESCRICAO_TIPO_PRODUTO);
-
-		lbl.setBounds(10, 15, 400, 30);
-
-		jPanel.add(lbl);
-
-		txtBusca = new JFormattedTextField();
-
-		txtBusca.setBounds(200, 20, 250, TXT_HEIGHT);
-
-		jPanel.add(txtBusca);
-
-		btnBusca = inicializaJButton("Buscar", 460, 20, 90, txtBusca.getHeight());
-
-		jPanel.add(btnBusca);
-
-		return jPanel;
-
 	}
 
 	@Override

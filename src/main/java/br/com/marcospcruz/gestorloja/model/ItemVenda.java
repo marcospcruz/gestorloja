@@ -23,6 +23,8 @@ public class ItemVenda implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int idVenda;
+	@ManyToOne
+	@JoinColumn(name = "idItemEstoque")
 	private ItemEstoque itemEstoque;
 	private Integer quantidade;
 	@ManyToOne
@@ -31,6 +33,9 @@ public class ItemVenda implements Serializable {
 	private float valorVendido;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataVenda;
+	@ManyToOne
+	@JoinColumn(name = "idVenda", insertable = false, updatable = false)
+	private Venda venda;
 
 	public void setItemEstoque(ItemEstoque itemEstoque) {
 		this.itemEstoque = itemEstoque;
@@ -81,6 +86,14 @@ public class ItemVenda implements Serializable {
 		this.dataVenda = dataVenda;
 	}
 
+	public Venda getVenda() {
+		return venda;
+	}
+
+	public void setVenda(Venda venda) {
+		this.venda = venda;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -91,6 +104,7 @@ public class ItemVenda implements Serializable {
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((quantidade == null) ? 0 : quantidade.hashCode());
 		result = prime * result + Float.floatToIntBits(valorVendido);
+		result = prime * result + ((venda == null) ? 0 : venda.hashCode());
 		return result;
 	}
 
@@ -127,13 +141,19 @@ public class ItemVenda implements Serializable {
 			return false;
 		if (Float.floatToIntBits(valorVendido) != Float.floatToIntBits(other.valorVendido))
 			return false;
+		if (venda == null) {
+			if (other.venda != null)
+				return false;
+		} else if (!venda.equals(other.venda))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "ItemVenda [idVenda=" + idVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
-				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda + "]";
+				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda + ", venda="
+				+ venda + "]";
 	}
 
 }

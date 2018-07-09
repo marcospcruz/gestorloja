@@ -49,7 +49,8 @@ public enum ConstantesEnum {
 	FABRICANTE(45), 
 	FABRICANTE_NAO_ENCONTRADO(46), 
 	ITEM_DO_ESTOQUE_NAO_ENCONTRADO(47), 
-	CODIGO_DE_BARRAS(48);
+	CODIGO_DE_BARRAS(48), 
+	VALOR_CUSTO_LABEL(49);
 //@formatter:on
 	private int index;
 
@@ -60,7 +61,7 @@ public enum ConstantesEnum {
 	private static final Object VALUES[] = { "R$", // 0
 			"Relatório de Estoque (PDF)", // 1
 			"Produto", // 2
-			"Tipos de Produto", // 3
+			"Categorias de Produto", // 3
 			"Novo Item Estoque", // 4
 			"Limpar", // 5
 			"Consulta Estoque", // 6
@@ -70,7 +71,7 @@ public enum ConstantesEnum {
 			"Categoria", // 10
 			"Sub Categoria", // 11
 			"Quantidade", // 12
-			"Valor Unitário", // 13
+			"Preço Final (R$)", // 13
 			"Valor Total", // 14
 			"Descrição", // 15
 			"Sub-Descrição", // 16
@@ -105,7 +106,8 @@ public enum ConstantesEnum {
 			"Fabricante", //45
 			"Fabricante / Marca não encontrado", //46
 			"Ítem não encontrado no Estoque", //47
-			"Código Produto" //48
+			"Código Produto", //48
+			"Preço de Custo (R$)" //49
 			};
 
 	public Object getValue() {

@@ -9,7 +9,9 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Produto;
+import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
 public class ProdutoController implements ControllerBase {
@@ -31,7 +33,6 @@ public class ProdutoController implements ControllerBase {
 	}
 
 	public List<Produto> getList() {
-
 		return produtos;
 
 	}
@@ -41,7 +42,18 @@ public class ProdutoController implements ControllerBase {
 	}
 
 	public void setItem(Object produto) {
-		this.produto = (Produto) produto;
+		if (produto instanceof String) {
+			this.produto = new Produto(produto.toString());
+			return;
+		}
+		// else if (produto instanceof SubTipoProduto) {
+		// this.produto = new Produto();
+		// TODO
+
+		// this.produto.getTiposProduto().add((SubTipoProduto) produto);
+		// } else
+		if (produto instanceof Produto)
+			this.produto = (Produto) produto;
 	}
 
 	public Object[] getArrayTiposProduto() {
@@ -177,7 +189,7 @@ public class ProdutoController implements ControllerBase {
 	@Override
 	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

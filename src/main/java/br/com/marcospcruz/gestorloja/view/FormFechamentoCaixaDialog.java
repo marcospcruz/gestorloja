@@ -1,23 +1,33 @@
 package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.Timer;
 
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.model.Caixa;
+import br.com.marcospcruz.gestorloja.model.MeioPagamento;
+import br.com.marcospcruz.gestorloja.model.Pagamento;
+import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.util.Util;
 
 public class FormFechamentoCaixaDialog extends AbstractDialog {
@@ -39,14 +49,34 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 		operador = caixaController.getUsuarioLogado();
 
 		getContentPane().setLayout(new BorderLayout());
-		
-		getContentPane().add(criaFormPanel(),BorderLayout.CENTER);
-		getContentPane().add(criaCommandPanel(),BorderLayout.SOUTH);
-		
+
+		getContentPane().add(criaCenterPanel(), BorderLayout.CENTER);
+		getContentPane().add(criaCommandPanel(), BorderLayout.SOUTH);
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
 
+	}
+
+	private Component criaCenterPanel() {
+		JPanel panel = new JPanel(new BorderLayout());
+		JPanel p2 = new JPanel(new GridLayout(1, 1));
+
+		panel.setBorder(criaTitledBorder("Fechamento do Caixa:"));
+		p2.add(criaFormPanel());
+		panel.add(p2, BorderLayout.NORTH);
+		p2.setBorder(criaTitledBorder("Teste:"));
+		panel.add(criaPnlRecebimentos(), BorderLayout.CENTER);
+		return panel;
+	}
+
+	private Component criaPnlRecebimentos() {
+		JPanel pnlRecebimentos = new JPanel(new GridLayout(1, 1));
+		pnlRecebimentos.setBorder(criaTitledBorder("Rebimentos:"));
+		jPanelTable = new JPanel(new GridLayout());
+		pnlRecebimentos.add(jPanelTable);
+		carregaTableModel();
+		return pnlRecebimentos;
 	}
 
 	private JPanel criaCommandPanel() {
@@ -68,10 +98,9 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 		initTimer();
 
 		JPanel panel = new JPanel(new GridLayout(4, 2));
-		panel.setBorder(criaTitledBorder("Abertura Caixa"));
 
 		dataAberturaLbl = criaJLabel(Util.formataData(caixa.getDataAbertura()));
-		dataAberturaLbl.setBorder(criaTitledBorder("Data de Abertura"));
+		dataAberturaLbl.setBorder(criaTitledBorder("Data de Abertura:"));
 
 		JLabel lblUsuarioAberturaCaixa = criaJLabel(operador.getNomeCompleto());
 		lblUsuarioAberturaCaixa.setBorder(criaTitledBorder("Usuário Abertura:"));
@@ -87,19 +116,21 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 		panel.add(lblSaldoAtualDoCaixa);
 
 		panel.add(lblSaldoAtualDoCaixa);
-		
-		JLabel lblSubTotalVenda=criaJLabel(Util.formataMoeda(caixaController.getSubTotalVendas()));
-		lblSubTotalVenda.setBorder(criaTitledBorder("Total Vendido"));
+
+		JLabel lblSubTotalVenda = criaJLabel(Util.formataMoeda(caixaController.getSubTotalVendas()));
+		lblSubTotalVenda.setBorder(criaTitledBorder("Total Vendido:"));
 		panel.add(lblSubTotalVenda);
-		
+
+		// panel.add(pnlRecebimentos);
+
 		dataFechamentoLbl = criaJLabel(Util.formataDataAtual());
-		dataFechamentoLbl.setBorder(criaTitledBorder("Data de Fechamento"));
+		dataFechamentoLbl.setBorder(criaTitledBorder("Data de Fechamento:"));
 		panel.add(dataFechamentoLbl);
 
 		JLabel lblUsuarioLogado = criaJLabel(operador.getNomeCompleto());
 		lblUsuarioLogado.setBorder(criaTitledBorder("Usuário Fechamento:"));
 		panel.add(lblUsuarioLogado);
-		
+
 		// getContentPane().add(panel, BorderLayout.CENTER);
 		return panel;
 	}
@@ -193,10 +224,35 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 
 	@Override
 	protected void carregaTableModel() {
-		// TODO Auto-generated method stub
+		List linhas = caixaController.controcalculaSubTotalRecebido();
+		super.carregaTableModel(linhas, new Object[] { "Meio Pagamento", "Valor Recebido" });
+
+		jTable = inicializaJTable(myTableModel);
+		if (jScrollPane == null)
+			jScrollPane = new JScrollPane(jTable);
+
+		Rectangle retangulo = jScrollPane.getBounds();
+
+		jPanelTable.remove(jScrollPane);
+
+		//
+
+		jTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		jTable.setFillsViewportHeight(true);
+		//
+
+		jScrollPane = new JScrollPane(jTable);
+
+		jScrollPane.setBounds(retangulo);
+
+		jPanelTable.add(jScrollPane);
+
+		jPanelTable.repaint();
 
 	}
 
+	
+		
 	@Override
 	protected List parseListToLinhasTableModel(List lista) {
 		// TODO Auto-generated method stub

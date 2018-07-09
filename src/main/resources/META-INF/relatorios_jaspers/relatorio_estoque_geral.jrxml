@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="teste" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6214feb1-d1e7-43ba-9412-bc71b7e29275">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Sample DB"/>
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="58"/>
 	<property name="ireport.y" value="0"/>
@@ -24,6 +24,7 @@
 	<field name="valorUnitario" class="java.lang.Float"/>
 	<field name="produto" class="br.com.marcospcruz.gestorloja.model.Produto"/>
 	<field name="fabricante" class="br.com.marcospcruz.gestorloja.model.Fabricante"/>
+	<field name="tipoProduto" class="br.com.marcospcruz.gestorloja.model.SubTipoProduto"/>
 	<variable name="valor_total" class="java.lang.Float">
 		<variableExpression><![CDATA[$F{valorUnitario}*$F{quantidade}]]></variableExpression>
 	</variable>
@@ -47,13 +48,13 @@
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[SingletonManager.getInstance().getData()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="-1" y="83" width="555" height="1" uuid="67d4e697-d4f3-464a-a056-5a1f7c3479ef"/>
 			</line>
 			<staticText>
-				<reportElement key="" style="Title" x="80" y="-10" width="359" height="66" uuid="70ef226c-fd74-4a99-8a63-a0bf993c3f1b"/>
+				<reportElement key="" style="Title" x="93" y="30" width="401" height="46" uuid="70ef226c-fd74-4a99-8a63-a0bf993c3f1b"/>
 				<textElement textAlignment="Center">
 					<font fontName="Arial" size="22" isBold="true" isItalic="false" isUnderline="false" pdfFontName="" isPdfEmbedded="true"/>
 				</textElement>
@@ -65,7 +66,7 @@
 		<band height="6" splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="50" splitType="Stretch">
+		<band height="38" splitType="Stretch">
 			<staticText>
 				<reportElement x="20" y="5" width="60" height="32" uuid="d358f082-6250-4692-9301-8d67fab64635"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -119,9 +120,9 @@
 	<detail>
 		<band height="21" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="1" width="90" height="18" uuid="f5ae5712-719e-4faa-992e-482b93012b72"/>
+				<reportElement x="0" y="0" width="90" height="18" uuid="f5ae5712-719e-4faa-992e-482b93012b72"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression><![CDATA[$F{produto}.getTipoProduto().getDescricaoTipo()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{tipoProduto}.getDescricaoTipo()]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="180" y="0" width="170" height="18" uuid="b8bd4c4c-1a64-457e-9b7c-da794e99f38e"/>

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -62,11 +63,22 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 		JPanel panel = new JPanel();
 		panel.setBorder(criaTitledBorder("Manutenção"));
 		getContentPane().add(panel, BorderLayout.CENTER);
-
-		panel.add(criaDatePanel());
+		JButton btnLimpaData = inicializaJButton("Limpar data");
+		btnLimpaData.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SingletonManager.getInstance().setDataManutencao(null);
+				calendario.getJFormattedTextField().setText("");
+			}
+		});
+		JPanel dataPanel=criaDatePanel();
+		dataPanel.add(btnLimpaData);
+		panel.add(dataPanel);
+		
 	}
 
-	private Component criaDatePanel() {
+	private JPanel criaDatePanel() {
 		JPanel datePanel = new JPanel();
 		datePanel.setBorder(criaTitledBorder("Configurar Data da Aplicação"));
 		UtilDateModel model = new UtilDateModel();

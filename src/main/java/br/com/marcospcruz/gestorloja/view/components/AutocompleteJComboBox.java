@@ -180,7 +180,12 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 
 									// model.removeAllElements();
 									owner.disableActionPerformed();
-									removeAllItems();
+									
+									try {
+										removeAllItems();
+									}catch(NullPointerException e) {
+										e.printStackTrace();
+									}
 									reloadModel(model);
 
 								} else
@@ -309,7 +314,11 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 		model.addElement(t1);
 		Collection<T> items = null;
 		if (primaryComboBox != null) {
-			controller.setItem(primaryComboBox.getSelectedItem());
+			try {
+				controller.setItem(primaryComboBox.getSelectedItem());
+			} catch (ClassCastException e) {
+				e.printStackTrace();
+			}
 
 		} else {
 			// controller.setList(null);
@@ -347,12 +356,12 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 
 	@Override
 	public void setSelectedItem(Object arg0) {
-		
+
 		super.setSelectedItem(arg0);
 	}
 
 	public void reloadModel() {
-		DefaultComboBoxModel<T> model=(DefaultComboBoxModel<T>) getModel();
+		DefaultComboBoxModel<T> model = (DefaultComboBoxModel<T>) getModel();
 		model.removeAllElements();
 		reloadModel((DefaultComboBoxModel<T>) getModel());
 		repaint();

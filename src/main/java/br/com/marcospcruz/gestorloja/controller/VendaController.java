@@ -17,7 +17,6 @@ import br.com.marcospcruz.gestorloja.facade.OperacaoEstoqueFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.ItemVenda;
-import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
@@ -80,7 +79,7 @@ public class VendaController implements ControllerBase {
 				// estoqueController.getItemEstoque() != null ?
 				// estoqueController.getItemEstoque()
 				venda.getItemEstoque();
-		if (!itemEstoque.getProduto().isEstoqueDedutivel())
+		if (!itemEstoque.isEstoqueDedutivel())
 			return;
 		Integer quantidadeVenda = venda.getQuantidade();
 
@@ -186,7 +185,7 @@ public class VendaController implements ControllerBase {
 	public void devolveProduto() throws Exception {
 
 		ItemEstoque itemEstoque = itemVenda.getItemEstoque();
-		if (!itemEstoque.getProduto().isEstoqueDedutivel())
+		if (!itemEstoque.isEstoqueDedutivel())
 			return;
 		if (itemEstoque == null) {
 			throw new Exception("Selecione um ítem na lista.");
@@ -222,7 +221,7 @@ public class VendaController implements ControllerBase {
 
 	}
 
-	public void adicionaVendaLista() throws Exception {
+	public void adicionaProdutoLista() throws Exception {
 		fazBackup = true;
 
 		if (itemVenda == null || itemVenda.getItemEstoque() == null) {
@@ -310,14 +309,16 @@ public class VendaController implements ControllerBase {
 		}
 		itemVenda.setItemEstoque(itemEstoque);
 		itemVenda.setQuantidade(1);
-		itemVenda.getItemEstoque()
-				.setQuantidade(itemVenda.getItemEstoque().getQuantidade() - itemVenda.getQuantidade());
+		if (itemVenda.getItemEstoque().isEstoqueDedutivel())
+			itemVenda.getItemEstoque()
+					.setQuantidade(itemVenda.getItemEstoque().getQuantidade() - itemVenda.getQuantidade());
 		itemVenda.setValorVendido(itemEstoque.getValorUnitario());
 
 	}
 
 	public void deduzEstoqueProduto(int quantidadeItem) throws Exception {
-
+		if (!itemVenda.getItemEstoque().isEstoqueDedutivel())
+			return;
 		Integer quantidadeEstoque = itemVenda.getItemEstoque().getQuantidade() + itemVenda.getQuantidade()
 				- quantidadeItem;
 		if (quantidadeEstoque < 0) {
@@ -369,12 +370,13 @@ public class VendaController implements ControllerBase {
 		salva();
 
 		iniciaVenda();
+		estoqueController.anulaAtributos();
 	}
 
 	public void salva() {
 		venda = vendaDao.update(venda);
 		venda.getPagamento().setVenda(venda);
-		caixaController.atualizaPagamento(venda.getPagamento());
+		// caixaController.atualizaPagamento(venda.getPagamento());
 	}
 
 	private void recebePagamento() throws Exception {

@@ -102,4 +102,10 @@ public class Util {
 		int diaMes=Integer.parseInt(data[0]);
 		return LocalDate.of(ano, mes, diaMes);
 	}
+
+	public static float stringDecimaisToFloat(String text) {
+		if(!text.isEmpty())
+			return Float.parseFloat(text);
+		return 0;
+	}
 }

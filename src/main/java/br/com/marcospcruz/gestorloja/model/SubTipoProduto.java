@@ -1,6 +1,6 @@
 package br.com.marcospcruz.gestorloja.model;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -11,9 +11,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
@@ -37,9 +34,9 @@ public class SubTipoProduto extends TipoProduto {
 	@JoinColumn(name = "idSuperTipoProduto")
 	private SubTipoProduto superTipoProduto;
 
-	@OneToMany(mappedBy = "tipoProduto", fetch = FetchType.EAGER)
-	@Fetch(FetchMode.JOIN)
-	private Collection<Produto> produtos;
+	@OneToMany(mappedBy="tipoProduto")
+	// @Fetch(FetchMode.JOIN)
+	private List<ItemEstoque> itensEstoque;
 
 	private String sexo;
 
@@ -73,20 +70,11 @@ public class SubTipoProduto extends TipoProduto {
 		this.superTipoProduto = superTipoProduto;
 	}
 
-	public Collection<Produto> getProdutos() {
-
-		return produtos;
-	}
-
-	public void setProdutos(Collection<Produto> produtos) {
-		this.produtos = produtos;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((produtos == null) ? 0 : produtos.hashCode());
+		result = prime * result + ((itensEstoque == null) ? 0 : itensEstoque.hashCode());
 		result = prime * result + ((sexo == null) ? 0 : sexo.hashCode());
 		result = prime * result + ((superTipoProduto == null) ? 0 : superTipoProduto.hashCode());
 		return result;
@@ -101,10 +89,10 @@ public class SubTipoProduto extends TipoProduto {
 		if (getClass() != obj.getClass())
 			return false;
 		SubTipoProduto other = (SubTipoProduto) obj;
-		if (produtos == null) {
-			if (other.produtos != null)
+		if (itensEstoque == null) {
+			if (other.itensEstoque != null)
 				return false;
-		} else if (!produtos.equals(other.produtos))
+		} else if (!itensEstoque.equals(other.itensEstoque))
 			return false;
 		if (sexo == null) {
 			if (other.sexo != null)

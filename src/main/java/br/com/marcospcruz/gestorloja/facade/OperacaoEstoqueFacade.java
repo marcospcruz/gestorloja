@@ -18,10 +18,11 @@ public class OperacaoEstoqueFacade {
 
 	public void adicionaItemEstoque(ItemEstoque itemEstoque) throws Exception {
 		controller.setItem(itemEstoque);
+//		((EstoqueController)controller).validaProdutoExistente();
 		controller.salva();
 
 		controller.registraHistoricoOperacao(ENTRADA_ESTOQUE);
-		((EstoqueController)controller).anulaAtributos();
+//		((EstoqueController)controller).anulaAtributos();
 		SingletonManager.getInstance().reloadControllers();
 	}
 
