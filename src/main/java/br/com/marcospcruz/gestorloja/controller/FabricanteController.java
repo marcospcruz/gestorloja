@@ -20,7 +20,8 @@ public class FabricanteController implements ControllerBase {
 
 	@Override
 	public void busca(Object id) throws Exception {
-		// TODO Auto-generated method stub
+		fabricanteDao = new CrudDao<>();
+		fabricante = fabricanteDao.busca(Fabricante.class, new Integer(id.toString()));
 
 	}
 
@@ -39,7 +40,7 @@ public class FabricanteController implements ControllerBase {
 
 	@Override
 	public void busca(String text) throws Exception {
-		String nomeFabricante = text;
+		String nomeFabricante = "%"+text.toUpperCase()+"%";
 		fabricante = fabricanteDao.busca("fabricante.readParametroLike", "nome", nomeFabricante);
 
 	}
@@ -58,13 +59,13 @@ public class FabricanteController implements ControllerBase {
 
 	@Override
 	public void setItem(Object object) {
-		// TODO Auto-generated method stub
+		fabricante = (Fabricante) object;
 
 	}
 
 	@Override
 	public void excluir() throws Exception {
-		// TODO Auto-generated method stub
+		fabricanteDao.delete(fabricante);
 
 	}
 
@@ -77,21 +78,32 @@ public class FabricanteController implements ControllerBase {
 	@Override
 	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void salva() throws Exception {
-		// TODO Auto-generated method stub
-		
+		fabricante = fabricanteDao.update(fabricante);
+
 	}
 
 	@Override
 	public void registraHistoricoOperacao(Operacao operacao) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
+	public void validaExistente(String text) throws Exception {
+		Fabricante novo = null;
+		try {
+			novo = fabricanteDao.busca("fabricante.readParametroLike", "nome", "%" + text.toUpperCase() + "%");
+		} catch (Exception e) {
 
+		}
+		if (fabricante.getIdFabricante() == null && novo != null)
+			throw new Exception("Marca / Fabricante já cadastrado.");
+
+	}
 
 }

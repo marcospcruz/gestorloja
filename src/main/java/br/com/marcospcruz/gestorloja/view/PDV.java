@@ -793,7 +793,7 @@ public class PDV extends AbstractDialog {
 				btnAdicionarVenda.setEnabled(true);
 				// atualizaTableModel(produto);
 			} else if (actionCommand.equals("Adicionar")) {
- 				populaFormulario = true;
+				populaFormulario = true;
 				carregaTableModel = true;
 
 				adicionaItemEstoque();
@@ -816,9 +816,11 @@ public class PDV extends AbstractDialog {
 					List<Component> lista = pagamentoComponentsMap.get(jc.getText());
 					for (Component c : lista) {
 						((JTextComponent) c).setText("");
+						((JTextComponent) c).setEnabled(jc.isSelected());
 					}
 				});
 				txtTotalVenda.setText(Util.formataMoeda(0f));
+				lblValorTroco.setText(Util.formataMoeda(0f));
 			}
 
 		} catch (Exception e) {
@@ -877,6 +879,7 @@ public class PDV extends AbstractDialog {
 			int cont = 0;
 			MeioPagamento meioPagamento = new MeioPagamento();
 			meioPagamento.setTipoMeioPagamento(tipoMeioPagamento);
+			meioPagamento.setPagamento(pagamento);
 			float valorPago = 0f;
 			String valorPagoString = null;
 			for (Component comp : pagamentosComponentes) {
@@ -909,6 +912,7 @@ public class PDV extends AbstractDialog {
 		pagamento.setValorPagamento(valorTotalRecebido);
 		pagamento.setTrocoPagamento(troco);
 		venda.setPagamento(pagamento);
+		pagamento.setVenda(venda);
 		vendaController.finalizaVenda();
 
 	}
@@ -1040,8 +1044,7 @@ public class PDV extends AbstractDialog {
 		int quantidade = (itemVenda == null || itemVenda.getQuantidade() == null) ? 0 : itemVenda.getQuantidade();
 		float valorUnitario = itemEstoque != null ? itemEstoque.getValorUnitario() : 0f;
 		float valorTotal = calculaValorTotal(quantidade, valorUnitario);
-		lblDescricaoCategoria
-				.setText(itemEstoque == null ? "" : itemEstoque.getTipoProduto().getDescricaoTipo());
+		lblDescricaoCategoria.setText(itemEstoque == null ? "" : itemEstoque.getTipoProduto().getDescricaoTipo());
 		lblDescricaoProduto.setText(itemEstoque == null ? "" : itemEstoque.getProduto().getDescricaoProduto());
 		lblValorUnitario.setText(valorUnitario > 0 ? Util.formataMoeda(valorUnitario) : "");
 		lblValorTotal.setText(Util.formataMoeda(valorTotal));
@@ -1087,8 +1090,9 @@ public class PDV extends AbstractDialog {
 				+ Util.parseStringDecimalToFloat(txtValorPagtoCredito.getText())
 				+ Util.parseStringDecimalToFloat(txtValorPagtoOutros.getText());
 		float troco = 0;
-		if (valorRecebido > 0) {
-			float subTotalVenda = vendaController.getVenda().getTotalVendido();
+		float subTotalVenda = vendaController.getVenda().getTotalVendido();
+		if (valorRecebido > 0 && subTotalVenda > 0) {
+
 			troco = valorRecebido - subTotalVenda;
 		}
 		lblValorTroco.setText(Util.formataMoeda(troco));

@@ -1,25 +1,31 @@
 package br.com.marcospcruz.gestorloja.view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.border.TitledBorder;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
+import br.com.marcospcruz.gestorloja.util.FontMapper;
 
 public class FabricanteDialog extends AbstractDialog {
 
@@ -32,8 +38,6 @@ public class FabricanteDialog extends AbstractDialog {
 
 	private static final String DESCRICAO_LABEL = COLUNAS_TABLE_MODEL[1] + ":";
 
-	private static final String FABRICANTES_TITLE = "Fabricantes";
-
 	/**
 	 * 
 	 * @param owner
@@ -44,71 +48,6 @@ public class FabricanteDialog extends AbstractDialog {
 		super(owner, "Cadastro de " + ConstantesEnum.FABRICANTE.getValue().toString(),
 				ControllerAbstractFactory.FABRICANTE, true);
 
-	}
-
-	/**
-	 * x
-	 */
-	protected void configuraJPanel() {
-
-		int y = 0;
-
-		jPanelBusca = carregaJPanelBusca();
-
-		jPanelBusca.setBounds(0, y, getWidth() - 17, txtBusca.getHeight() + 30);
-
-		add(jPanelBusca);
-
-		y += jPanelBusca.getHeight();
-
-		jPanelFormulario = carregaJpanelFormulario();
-
-		jPanelFormulario.setBounds(0, y, getWidth() - 17, 130);
-
-		add(jPanelFormulario);
-
-		y += jPanelFormulario.getHeight();
-
-		jPanelActions = carregaJpanelActions();
-
-		jPanelActions.setBounds(0, y, getWidth() - 17, btnDeletar.getHeight());
-
-		add(jPanelActions);
-
-		y += jPanelActions.getHeight();
-
-		jPanelTable = carregaJpanelTable(y);
-
-		// jPanelTable.setBounds(0, y, getWidth() - 17, 320);
-
-		add(jPanelTable);
-
-	}
-
-	protected JPanel carregaJpanelActions() {
-
-		JPanel jPanel = super.carregaJpanelActions();
-
-		btnDeletar.setEnabled(false);
-
-		return jPanel;
-
-	}
-
-	/**
-	 * M�todo respons�vel em carregar jcombobox Tipos de Produto
-	 * 
-	 * @return
-	 */
-	protected JComboBox carregaComboTiposProduto() {
-
-		DefaultComboBoxModel model = carregaComboTiposProdutoModel();
-
-		JComboBox combo = new JComboBox(model);
-
-		combo.setSelectedIndex(0);
-
-		return combo;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -126,7 +65,7 @@ public class FabricanteDialog extends AbstractDialog {
 
 		for (Object objeto : objetos) {
 
-			model.addElement((TipoProduto) objeto);
+			// model.addElement((TipoProduto) objeto);
 
 		}
 
@@ -140,52 +79,45 @@ public class FabricanteDialog extends AbstractDialog {
 	@Override
 	protected JPanel carregaJpanelFormulario() {
 
-		JPanel jPanel = new JPanel();
+		JPanel formPanel = new JPanel(new BorderLayout(50, 50));
 
-		jPanel.setBorder(new TitledBorder(ConstantesEnum.FABRICANTE.getValue().toString()));
+		formPanel.setBorder(criaTitledBorder(ConstantesEnum.FABRICANTE.getValue().toString()));
 
-		jPanel.setLayout(null);
+		// formPanel.setLayout(new BorderLayout());
+		// GridLayout centerPnlLayout = new GridLayout(1, 1);
+		LayoutManager centerPnlLayout = new BorderLayout();
+		// LayoutManager leftPnlLayout = new GridLayout(2, 1);
+		LayoutManager leftPnlLayout = new BorderLayout();
+		JPanel leftPanel = new JPanel(leftPnlLayout);
+		formPanel.add(leftPanel, BorderLayout.WEST);
+		JLabel lbl1 = criaJLabel(DESCRICAO_LABEL);
 
-		JLabel lbl1 = new JLabel(DESCRICAO_LABEL);
-
-		lbl1.setBounds(10, 10, 200, 50);
-
-		jPanel.add(lbl1);
-
+		leftPanel.add(lbl1, BorderLayout.NORTH);
+		JPanel centerPanel = new JPanel(centerPnlLayout);
+		formPanel.add(centerPanel, BorderLayout.CENTER);
 		txtDescricao = new JFormattedTextField();
 
-		txtDescricao.setBounds(200, 20, 200, TXT_HEIGHT);
+		txtDescricao.setFont(FontMapper.getFont(22));
 
-		jPanel.add(txtDescricao);
+		centerPanel.add(txtDescricao, BorderLayout.NORTH);
 
-		return jPanel;
-	}
+		// JLabel lbl2 = new JLabel("Sexo:");
+		//
+		// lbl2.setBounds(10, 45, 200, 50);
+		//
+		// jPanel.add(lbl2);
 
-	/**
-	 * 
-	 * @return
-	 */
-	protected JPanel carregaJpanelTable(int y) {
+		// cmbSexo = carregaComboSexo();
+		//
+		// cmbSexo.setEnabled(false);
+		//
+		// cmbSexo.setBounds(200, 55, 200, TXT_HEIGHT);
+		//
+		// jPanel.add(cmbSexo);
 
-		JPanel jPanel = new JPanel(null);
+		formPanel.add(carregaJpanelActions(), BorderLayout.SOUTH);
 
-		// jPanel.setBounds(0, y, getWidth() - 17, 320);
-
-		jPanel.setBorder(new TitledBorder(FABRICANTES_TITLE));
-
-		carregaTableModel();
-
-		// jTable = inicializaJTable(myTableModel);
-
-		// jScrollPane = new JScrollPane(jTable);
-
-		// jScrollPane.setBounds(6, 15, jPanel.getWidth() - 15, jPanel.getHeight() -
-		// 20);
-
-		// jPanel.add(jScrollPane);
-
-		return jPanel;
-
+		return formPanel;
 	}
 
 	/**
@@ -195,9 +127,15 @@ public class FabricanteDialog extends AbstractDialog {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 
+		if (controller.getItem() == null) {
+
+			controller.buscaTodos();
+			
+		}
+
 		carregaTableModel(parseListToLinhasTableModel(controller.getList()), COLUNAS_TABLE_MODEL);
 
-		// reloadJFrame();
+		reloadJFrame();
 
 	}
 
@@ -299,7 +237,7 @@ public class FabricanteDialog extends AbstractDialog {
 
 				e.printStackTrace();
 
-				JOptionPane.showMessageDialog(null, e.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
+				showErrorMessage(this, e.getMessage());
 
 				atualizaTable = false;
 
@@ -365,6 +303,9 @@ public class FabricanteDialog extends AbstractDialog {
 		// TipoProdutoController controller = new TipoProdutoController();
 
 		controller.busca(txtBusca.getText());
+		
+		controller.setList(new ArrayList());
+		controller.getList().add(controller.getItem());
 
 		limpaFormulario();
 
@@ -406,9 +347,10 @@ public class FabricanteDialog extends AbstractDialog {
 
 		if (!acaoBuscar) {
 
-			controller.setItem(null);
-
-			controller.setList(null);
+			controller.setItem(new Fabricante());
+			
+			controller.buscaTodos();
+//			controller.setList(null);
 		}
 
 		txtDescricao.setEnabled(true);
@@ -445,27 +387,6 @@ public class FabricanteDialog extends AbstractDialog {
 	}
 
 	@Override
-	protected JPanel carregaJPanelBusca() {
-
-		JPanel jPanel = new JPanel(null);
-
-		jPanel.setBorder(BUSCAR_TITLED_BORDER);
-
-		txtBusca = new JFormattedTextField();
-
-		txtBusca.setBounds(200, 20, 250, TXT_HEIGHT);
-
-		jPanel.add(txtBusca);
-
-		btnBusca = inicializaJButton("Buscar", 460, 20, 90, txtBusca.getHeight());
-
-		jPanel.add(btnBusca);
-
-		return jPanel;
-
-	}
-
-	@Override
 	protected void excluiItem() throws Exception {
 
 		atualizaTable = false;
@@ -476,6 +397,10 @@ public class FabricanteDialog extends AbstractDialog {
 
 			controller.excluir();
 
+			controller.setItem(new Fabricante());
+
+			controller.setList(null);
+
 			limpaFormulario();
 
 		}
@@ -484,7 +409,13 @@ public class FabricanteDialog extends AbstractDialog {
 
 	@Override
 	protected void adicionaItemEstoque() throws Exception {
-		// TODO Auto-generated method stub
+
+		if (confirmaSalvamentoItem() == 0) {
+			controller.validaExistente(txtDescricao.getText());
+			((Fabricante) controller.getItem()).setNome(txtDescricao.getText());
+			controller.salva();
+			mostraMensagemConfirmacaoSalvamento();
+		}
 
 	}
 

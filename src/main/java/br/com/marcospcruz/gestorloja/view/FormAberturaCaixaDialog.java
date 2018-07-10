@@ -212,7 +212,7 @@ public class FormAberturaCaixaDialog extends AbstractDialog implements WindowLis
 	}
 
 	@Override
-	protected JPanel carregaJpanelTable(int y) {
+	protected JPanel carregaJpanelTable() {
 		// TODO Auto-generated method stub
 		return null;
 	}

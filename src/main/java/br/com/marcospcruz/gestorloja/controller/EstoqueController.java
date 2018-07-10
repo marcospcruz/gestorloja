@@ -30,13 +30,11 @@ public class EstoqueController implements ControllerBase {
 
 	private ProdutoController produtoController;
 
-	private CrudDao<ItemEstoque> itemEstoqueDao;
-
 	private List<ItemEstoque> consultaEstoque;
 
 	public EstoqueController() throws Exception {
 
-		itemEstoqueDao = new CrudDao<>();
+		// itemEstoqueDao = new CrudDao<>();
 		carregaItensEstoque();
 		produtoController = (ProdutoController) getController(ControllerAbstractFactory.PRODUTO);
 
@@ -62,9 +60,10 @@ public class EstoqueController implements ControllerBase {
 
 	private void carregaItensEstoque() {
 		// if (itensEstoque == null || itensEstoque.isEmpty())
+		CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
 		itensEstoque = null;
 		itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
-		setList(itensEstoque);
+//		setList(itensEstoque);
 
 	}
 
@@ -208,10 +207,11 @@ public class EstoqueController implements ControllerBase {
 
 	public void validaBusca() throws Exception {
 
-		if (itemEstoque == null && itensEstoque.isEmpty())
+		if (itemEstoque == null && itensEstoque.isEmpty()) {
+			buscaTodos();
 
 			throw new Exception(ConstantesEnum.ITEM_DO_ESTOQUE_NAO_ENCONTRADO.getValue().toString());
-
+		}
 	}
 
 	@Override
@@ -226,13 +226,13 @@ public class EstoqueController implements ControllerBase {
 	@Override
 	public List buscaTodos() {
 		carregaItensEstoque();
-		return getList();
+		return itensEstoque;
 	}
 
 	@Override
 	public List getList() {
-
-		return consultaEstoque;
+		// buscaTodos();
+		return itensEstoque;
 	}
 
 	@Override
@@ -252,9 +252,9 @@ public class EstoqueController implements ControllerBase {
 	public void setList(List list) {
 		try {
 
-			List objetos = list != null && list.isEmpty() ? itensEstoque : list;
-			consultaEstoque = new ArrayList<>(objetos);
-			itensEstoque = objetos;
+			// List objetos = list != null && list.isEmpty() ? itensEstoque : list;
+			// consultaEstoque = new ArrayList<>(objetos);
+			itensEstoque = list;
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
@@ -315,6 +315,7 @@ public class EstoqueController implements ControllerBase {
 			namedQuery = "itemestoque.readTipoFabricante";
 		}
 
+		CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
 		itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
 		consultaEstoque = itensEstoque;
 	}
@@ -331,10 +332,15 @@ public class EstoqueController implements ControllerBase {
 				Produto produto = itemEstoque.getProduto();
 
 				SubTipoProduto tipoProduto = itemEstoque.getTipoProduto();
-				boolean tipoProdutoMatches = tipoProduto.getDescricaoTipo().toUpperCase().contains(param.toUpperCase())
-						? true
-						: tipoProduto.getSuperTipoProduto().getDescricaoTipo().toUpperCase()
-								.contains(param.toUpperCase()) ? true : false;
+				boolean tipoProdutoMatches = false;
+				try {
+					tipoProdutoMatches = tipoProduto.getDescricaoTipo().toUpperCase().contains(param.toUpperCase())
+							? true
+							: tipoProduto.getSuperTipoProduto().getDescricaoTipo().toUpperCase()
+									.contains(param.toUpperCase()) ? true : false;
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
 
 				boolean produtoMatches = !tipoProdutoMatches
 						&& produto.getDescricaoProduto().toUpperCase().contains(param.toUpperCase());
@@ -356,6 +362,7 @@ public class EstoqueController implements ControllerBase {
 		itemEstoque.setOperador(getUsuarioLogado());
 		itemEstoque.setDataContagem(SingletonManager.getInstance().getData());
 
+		CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
 		itemEstoque = itemEstoqueDao.update(itemEstoque);
 
 	}
@@ -369,6 +376,12 @@ public class EstoqueController implements ControllerBase {
 		historicoOperacao.setOperador(getUsuarioLogado());
 		historicoOperacao.setOperacao(operacao);
 		historicoDao.update(historicoOperacao);
+	}
+
+	@Override
+	public void validaExistente(String text) throws Exception {
+		// TODO Auto-generated method stub
+
 	}
 
 }

@@ -358,15 +358,15 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		{
 
 			try {
+				if (confirmaSalvamentoItem() == 0) {
+					adicionaItemEstoque();
 
-				adicionaItemEstoque();
+					mensagem = "Estoque atualizado com sucesso!";
 
-				mensagem = "Estoque atualizado com sucesso!";
+					tipoMensagem = JOptionPane.INFORMATION_MESSAGE;
 
-				tipoMensagem = JOptionPane.INFORMATION_MESSAGE;
-
-				exibeMensagemSucesso(this, mensagem);
-
+					exibeMensagemSucesso(this, mensagem);
+				}
 			} catch (Exception e) {
 
 				e.printStackTrace();
@@ -415,7 +415,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 	}
 
 	@Override
-	protected JPanel carregaJpanelTable(int y) {
+	protected JPanel carregaJpanelTable() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -443,58 +443,64 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		EstoqueController controller = null;
 		try {
 			controller = (EstoqueController) super.getItemEstoqueController();
+
+			ItemEstoque itemEstoque = (ItemEstoque) controller.getItem();
+			if (itemEstoque != null) {
+				Fabricante fabricante = itemEstoque.getFabricante();
+				Produto produto = itemEstoque.getProduto();
+				SubTipoProduto categoria = itemEstoque.getTipoProduto();
+				SubTipoProduto superCategoria = categoria.getSuperTipoProduto();
+				cmbFabricante.setSelectedItem(fabricante);
+				cmbProduto.setSelectedItem(produto, true);
+
+				// TODO
+				cmbCategoriaProduto.setSelectedItem(superCategoria);
+				cmbSubCategoriaProduto.setModel(selectModelSubTiposDeProduto(cmbCategoriaProduto));
+
+				cmbSubCategoriaProduto.setSelectedItem(categoria);
+				// TODO
+				cmbSubCategoriaProduto.setSelectedItem(categoria, true);
+				// for (int i = 1; i < model.getSize(); i++) {
+				// SubTipoProduto objeto = model.getElementAt(i);
+				// if (objeto.equals(categoria)) {
+				// model.setSelectedItem(objeto);
+				// }
+				// }
+				// ((JTextComponent) cmbSubCategoriaProduto.getEditor().getEditorComponent())
+				// .setText(categoria.getDescricaoTipo());
+				// try {
+				// getProdutoController().buscaTodos();
+				// List<Produto> produtos = getProdutoController().getList();
+				// cmbProduto.setModel(super.selectModelProdutos(produtos));
+				// } catch (Exception e) {
+				// // TODO Auto-generated catch block
+				// e.printStackTrace();
+				// }
+
+				// for (int i = 0; i < cmbProduto.getModel().getSize(); i++) {
+				// Produto p = cmbProduto.getModel().getElementAt(i);
+				// if (p.getIdProduto() != null &&
+				// p.getIdProduto().equals(produto.getIdProduto())) {
+				// // cmbProduto.getModel().setSelectedItem(p);
+				// cmbProduto.setSelectedItem(p);
+				// }
+				// }
+				txtCodigoDeBarras.setText(itemEstoque.getCodigoDeBarras());
+				txtQuantidadeInicial.setText(itemEstoque.getQuantidade().toString());
+				String valorUnitario = Util.formataMoeda(itemEstoque.getValorUnitario());
+				txtValorUnitario.setText(valorUnitario.substring(3));
+				deduzEstoqueChkBox.setSelected(itemEstoque.isEstoqueDedutivel());
+				String valorCusto = Util.formataMoeda(itemEstoque.getValorCusto());
+				txtValorCusto.setText(valorCusto.substring(3));
+
+				// cmbProduto.setEnabled(produto == null);
+				// cmbFabricante.setEnabled(fabricante == null);
+				// cmbSubCategoriaProduto.setEnabled(categoria == null);
+				// cmbCategoriaProduto.setEnabled(superCategoria == null);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		ItemEstoque itemEstoque = (ItemEstoque) controller.getItem();
-		if (itemEstoque != null) {
-			Fabricante fabricante = itemEstoque.getFabricante();
-			Produto produto = itemEstoque.getProduto();
-			SubTipoProduto categoria = itemEstoque.getTipoProduto();
-			SubTipoProduto superCategoria = categoria.getSuperTipoProduto();
-			cmbFabricante.setSelectedItem(fabricante);
-			cmbProduto.setSelectedItem(produto, true);
-			// TODO
-			cmbCategoriaProduto.setSelectedItem(superCategoria);
-			cmbSubCategoriaProduto.setModel(selectModelSubTiposDeProduto(cmbCategoriaProduto));
-
-			cmbSubCategoriaProduto.setSelectedItem(categoria);
-			// TODO
-			cmbSubCategoriaProduto.setSelectedItem(categoria, true);
-			// for (int i = 1; i < model.getSize(); i++) {
-			// SubTipoProduto objeto = model.getElementAt(i);
-			// if (objeto.equals(categoria)) {
-			// model.setSelectedItem(objeto);
-			// }
-			// }
-			// ((JTextComponent) cmbSubCategoriaProduto.getEditor().getEditorComponent())
-			// .setText(categoria.getDescricaoTipo());
-			// try {
-			// getProdutoController().buscaTodos();
-			// List<Produto> produtos = getProdutoController().getList();
-			// cmbProduto.setModel(super.selectModelProdutos(produtos));
-			// } catch (Exception e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
-
-			// for (int i = 0; i < cmbProduto.getModel().getSize(); i++) {
-			// Produto p = cmbProduto.getModel().getElementAt(i);
-			// if (p.getIdProduto() != null &&
-			// p.getIdProduto().equals(produto.getIdProduto())) {
-			// // cmbProduto.getModel().setSelectedItem(p);
-			// cmbProduto.setSelectedItem(p);
-			// }
-			// }
-			txtCodigoDeBarras.setText(itemEstoque.getCodigoDeBarras());
-			txtQuantidadeInicial.setText(itemEstoque.getQuantidade().toString());
-			String valorUnitario = Util.formataMoeda(itemEstoque.getValorUnitario());
-			txtValorUnitario.setText(valorUnitario.substring(3));
-			deduzEstoqueChkBox.setSelected(itemEstoque.isEstoqueDedutivel());
-			String valorCusto=Util.formataMoeda(itemEstoque.getValorCusto());
-			txtValorCusto.setText(valorCusto.substring(3));
-
 		}
 		// txtValorUnitario.setText(Util.formataStringDecimais(8f));
 
@@ -532,7 +538,9 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		}
 
 		SubTipoProduto subTipoProduto = (SubTipoProduto) parseCategoriaProduto(cmbSubCategoriaProduto);
-		subTipoProduto.setSuperTipoProduto((SubTipoProduto) parseCategoriaProduto(cmbCategoriaProduto));
+		SubTipoProduto superTipoProduto = (SubTipoProduto) parseCategoriaProduto(cmbCategoriaProduto);
+		if (!superTipoProduto.equals(subTipoProduto))
+			subTipoProduto.setSuperTipoProduto(superTipoProduto);
 		// produto.setTipoProduto((SubTipoProduto) subTipoProduto);
 		// List<SubTipoProduto> tipos = produto.getTiposProduto();
 		// if (tipos == null)

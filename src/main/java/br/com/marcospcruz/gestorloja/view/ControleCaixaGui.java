@@ -83,6 +83,8 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		jpanel.add(jScrollPane, BorderLayout.CENTER);
 
 		getContentPane().add(jpanel, BorderLayout.CENTER);
+		
+		repaint();
 	}
 
 	// JTable inicializaJTable() {
@@ -168,7 +170,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 	}
 
 	@Override
-	protected JPanel carregaJpanelTable(int y) {
+	protected JPanel carregaJpanelTable() {
 		// TODO Auto-generated method stub
 		return null;
 	}

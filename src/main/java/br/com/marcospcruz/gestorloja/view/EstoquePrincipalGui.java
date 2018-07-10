@@ -174,8 +174,11 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	protected void carregaTableModel() {
 		try {
 			EstoqueController estoqueController = getController();
-			List<ItemEstoque> itemsEstoque = estoqueController.getList();
+			// estoqueController.setList(null);
 
+			if (estoqueController.getList() == null || estoqueController.getList().isEmpty())
+				estoqueController.buscaTodos();
+			List<ItemEstoque> itemsEstoque = estoqueController.getList();
 			List linhas = parseListToLinhasTableModel(itemsEstoque);
 
 			carregaTableModel(linhas);
@@ -395,18 +398,17 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		Rectangle retangulo = new Rectangle(10, 100, 130, 50);
 
-//		jPanelCadastros.add(inicializaJButton(ConstantesEnum.FABRICANTE.getValue().toString(), retangulo));
+		jPanelCadastros.add(inicializaJButton(ConstantesEnum.FABRICANTE.getValue().toString()));
 
 		JButton btnTipoProduto = inicializaJButton(ConstantesEnum.LBL_BTN_TIPO_PRODUTO.getValue().toString(),
 				retangulo);
 
 		jPanelCadastros.add(btnTipoProduto);
 
-		JButton btnProduto = inicializaJButton(ConstantesEnum.PRODUTO_LABEL.getValue().toString(),
-				btnTipoProduto.getWidth() + 20, 100, 130, 50);
+		JButton btnProduto = inicializaJButton(ConstantesEnum.PRODUTO_LABEL.getValue().toString());
 
-//		jPanelCadastros.add(btnProduto);
-
+		jPanelCadastros.add(btnProduto);
+		//
 		jPanelCadastros.setSize(btnProduto.getWidth(), btnProduto.getHeight());
 
 	}
@@ -454,7 +456,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 			e1.printStackTrace();
 
-			JOptionPane.showMessageDialog(null, e1.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
+			showErrorMessage(this, e1.getMessage());
 			limpaPesquisa();
 
 		} finally {
@@ -549,7 +551,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		EstoqueController estoqueController = getController();
 		if (actionCommand.equals(ConstantesEnum.LBL_BTN_NOVO_ITEM_ESTOQUE.getValue().toString())) {
-
+			estoqueController.setItem(new ItemEstoque());
 			new ItemEstoqueDialog(estoqueController, this);
 			estoqueController.anulaAtributos();
 		} else if (actionCommand.equals(ConstantesEnum.LBL_BTN_RELATORIO.getValue().toString())) {
@@ -570,7 +572,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 		} else if (actionCommand.equals(ConstantesEnum.PRODUTO_LABEL.getValue().toString())) {
 
-			// new ProdutoDialog(this);
+			new ProdutoDialog(this);
 
 			// atualizaView();
 
@@ -648,8 +650,6 @@ public class EstoquePrincipalGui extends AbstractDialog {
 			carregaTableModel(parseListToLinhasTableModel(linhas));
 
 		} catch (NullPointerException e) {
-
-			// showMessage("Não foram encontrados Produtos com esta categoria no estoque.");
 
 			carregaTableModel();
 
@@ -755,7 +755,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	}
 
 	@Override
-	protected JPanel carregaJpanelTable(int y) {
+	protected JPanel carregaJpanelTable() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -783,13 +783,15 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		EstoqueController estoqueController = null;
 		try {
 			estoqueController = getItemEstoqueController();
+			ItemEstoque itemEstoque = (ItemEstoque) estoqueController.getItem();
+			if (itemEstoque.getTipoProduto().getSuperTipoProduto() != null)
+				cmbCategoriaProduto.getModel().setSelectedItem(itemEstoque.getTipoProduto().getSuperTipoProduto());
+			if (itemEstoque.getTipoProduto() != null)
+				cmbSubCategoriaProduto.setSelectedItem(itemEstoque.getTipoProduto());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ItemEstoque itemEstoque = (ItemEstoque) estoqueController.getItem();
-		cmbCategoriaProduto.getModel().setSelectedItem(itemEstoque.getTipoProduto().getSuperTipoProduto());
-		cmbSubCategoriaProduto.setSelectedItem(itemEstoque.getTipoProduto());
 
 	}
 

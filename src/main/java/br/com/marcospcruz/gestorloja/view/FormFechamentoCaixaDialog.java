@@ -211,7 +211,7 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 	}
 
 	@Override
-	protected JPanel carregaJpanelTable(int y) {
+	protected JPanel carregaJpanelTable() {
 		// TODO Auto-generated method stub
 		return null;
 	}

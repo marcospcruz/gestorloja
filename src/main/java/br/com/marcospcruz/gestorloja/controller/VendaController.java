@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.persistence.NoResultException;
 
+import org.eclipse.jdt.core.compiler.ITerminalSymbols;
+
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -26,7 +28,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 public class VendaController implements ControllerBase {
 	public static final String PRODUTO_INVALIDO = "Selecão de Produto inválida.";
 	private EstoqueController estoqueController;
-	private ItemVenda itemVenda;
+	private Map<String, ItemVenda> itemVendaMap;
 	private Crud<Venda> vendaDao;
 	private Crud<ItemVenda> itemVendaDao;
 	private Venda venda;
@@ -56,15 +58,8 @@ public class VendaController implements ControllerBase {
 	public void buscaProduto(String codigoProduto) throws Exception {
 
 		try {
-			// estoqueController.buscaItemPorCodigoDeBarras(codigoProduto);
-			resetItemVenda();
-			ItemVenda item = venda.getItensVenda().get(codigoProduto);
-			itemVenda = new ItemVenda();
-			itemVenda.setItemEstoque(item.getItemEstoque());
-			itemVenda.setQuantidade(item.getQuantidade());
-			itemVenda.setOperador(item.getOperador());
-			setItemVenda(item);
-			setItemVendaBackup();
+			estoqueController.buscaItemPorCodigoDeBarras(codigoProduto);
+
 		} catch (NoResultException e) {
 			e.printStackTrace();
 			// throw new Exception("Produto código " + codigoProduto + " não encontrado no
@@ -119,7 +114,7 @@ public class VendaController implements ControllerBase {
 		if (venda.getItensVenda() == null)
 			return new ArrayList<>();
 
-		return new ArrayList<>(venda.getItensVenda().values());
+		return new ArrayList<>(venda.getItensVenda());
 	}
 
 	@Override
@@ -165,28 +160,34 @@ public class VendaController implements ControllerBase {
 	}
 
 	public ItemVenda getItemVenda() {
-
-		return itemVenda;
+		try {
+			String key = estoqueController.getItemEstoque().getCodigoDeBarras();
+			return itemVendaMap.get(key);
+		} catch (NullPointerException e) {
+			return null;
+		}
 	}
 
 	public void setItemVenda(ItemVenda itemVenda) {
-		this.itemVenda = itemVenda;
+		// this.itemVenda = itemVenda;
 
 	}
 
 	public void resetItemVenda() {
-		setItemVenda(new ItemVenda());
+		// setItemVenda(new ItemVenda());
 
-		itemVenda.setOperador(getUsuarioLogado());
+		// itemVenda.setOperador(getUsuarioLogado());
+		estoqueController.setItemEstoque(null);
 		itemVendaBackup = null;
+//		itemVendaMap = new HashMap<>();
 
 	}
 
 	public void devolveProduto() throws Exception {
-
+		ItemVenda itemVenda = getItemVenda();
 		ItemEstoque itemEstoque = itemVenda.getItemEstoque();
-		if (!itemEstoque.isEstoqueDedutivel())
-			return;
+		// if (!itemEstoque.isEstoqueDedutivel())
+		// return;
 		if (itemEstoque == null) {
 			throw new Exception("Selecione um ítem na lista.");
 		}
@@ -198,20 +199,24 @@ public class VendaController implements ControllerBase {
 		// throw new Exception();
 		// }
 		estoqueController.setItemEstoque(itemEstoque);
-		estoqueController.incrementaItem(itemVenda.getQuantidade());
+
+		if (itemEstoque.isEstoqueDedutivel())
+			estoqueController.incrementaItem(itemVenda.getQuantidade());
 
 		// float valorTotal = venda.getTotalVendido() - (item.getQuantidade() *
 		// item.getItemEstoque().getValorUnitario());
 		// venda.setTotalVendido(valorTotal);
 
-		resetItemVenda();
+		// resetItemVenda();
 
-		Map<String, ItemVenda> itensVenda = venda.getItensVenda();
+		List<ItemVenda> itensVenda = venda.getItensVenda();
 		String codigoDeBarras = itemEstoque.getCodigoDeBarras();
 		if (itemVendaBackup != null)
-			itensVenda.put(codigoDeBarras, itemVendaBackup);
-		else
-			itensVenda.remove(codigoDeBarras);
+			itensVenda.add(itemVendaBackup);
+		else {
+			itemVendaMap.remove(codigoDeBarras);
+			venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
+		}
 		calculaValorTotalVenda();
 	}
 
@@ -223,7 +228,7 @@ public class VendaController implements ControllerBase {
 
 	public void adicionaProdutoLista() throws Exception {
 		fazBackup = true;
-
+		ItemVenda itemVenda = getItemVenda();
 		if (itemVenda == null || itemVenda.getItemEstoque() == null) {
 			resetItemVenda();
 			throw new NullPointerException(PRODUTO_INVALIDO);
@@ -232,7 +237,7 @@ public class VendaController implements ControllerBase {
 		if (itemVenda.getQuantidade() < 1)
 			throw new Exception("Quantidade inválida.");
 		try {
-			if (venda.getItensVenda() != null && venda.getItensVenda().containsValue(itemVenda)) {
+			if (venda.getItensVenda() != null && venda.getItensVenda().contains(itemVenda)) {
 
 				// ItemVenda item = procuraProdutoLista(itemVenda);
 				// if (itensVenda.remove(itemVenda))
@@ -259,11 +264,14 @@ public class VendaController implements ControllerBase {
 		} finally {
 
 			if (venda.getItensVenda() == null)
-				venda.setItensVenda(new HashMap<>());
+				venda.setItensVenda(new ArrayList<>());
 
 			// itensVenda.add(itemVenda); alterar
 			if (itemVenda.getItemEstoque() != null) {
-				venda.getItensVenda().put(itemVenda.getItemEstoque().getCodigoDeBarras(), itemVenda);
+//				venda.getItensVenda().add(itemVenda);
+				itemVenda.setVenda(venda);
+				itemVendaMap.put(itemVenda.getItemEstoque().getCodigoDeBarras(), itemVenda);
+				venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
 				calculaValorTotalVenda();
 				resetItemVenda();
 			}
@@ -274,7 +282,7 @@ public class VendaController implements ControllerBase {
 
 	public void calculaValorTotalVenda() {
 		float valorTotal = 0f;
-		for (ItemVenda item : venda.getItensVenda().values()) {
+		for (ItemVenda item : venda.getItensVenda()) {
 			valorTotal += item.getQuantidade() * item.getItemEstoque().getValorUnitario();
 
 			valorTotal -= valorTotal * venda.getPorcentagemDesconto() / 100;
@@ -283,8 +291,14 @@ public class VendaController implements ControllerBase {
 	}
 
 	private ItemVenda getElementList(ItemVenda itemVenda) {
+		for (ItemVenda item : venda.getItensVenda()) {
+			if (itemVenda.getItemEstoque().getCodigoDeBarras().equals(item.getItemEstoque().getCodigoDeBarras())) {
+				return item;
+			}
+		}
 
-		return venda.getItensVenda().get(itemVenda.getItemEstoque().getCodigoDeBarras());
+		return null;
+
 	}
 
 	public void setItemVendaBackup() {
@@ -293,6 +307,7 @@ public class VendaController implements ControllerBase {
 		// && itemVendaBackup == null || itemVendaBackup != null &&
 		// !itemVenda.equals(itemVendaBackup))) {
 		itemVendaBackup = new ItemVenda();
+		ItemVenda itemVenda = getItemVenda();
 		itemVendaBackup.setItemEstoque(itemVenda.getItemEstoque());
 		itemVendaBackup.setQuantidade(itemVenda.getQuantidade());
 		itemVendaBackup.setOperador(itemVenda.getOperador());
@@ -302,21 +317,30 @@ public class VendaController implements ControllerBase {
 	}
 
 	public void populaItemEstoque(ItemEstoque itemEstoque) throws ProdutoNaListaException {
-		if (venda.getItensVenda() != null && venda.getItensVenda().containsKey(itemEstoque.getCodigoDeBarras())) {
-			estoqueController.anulaAtributos();
-			throw new ProdutoNaListaException("Produto já adicionado na lista de vendas.");
-
-		}
+		String key = itemEstoque.getCodigoDeBarras();
+		estoqueController.setItem(itemEstoque);
+		// if (venda.getItensVenda() != null &&
+		// venda.getItensVenda().contains(itemEstoque.getCodigoDeBarras())) {
+		// estoqueController.anulaAtributos();
+		// throw new ProdutoNaListaException("Produto já adicionado na lista de
+		// vendas.");
+		//
+		// }
+		ItemVenda itemVenda = new ItemVenda();
 		itemVenda.setItemEstoque(itemEstoque);
 		itemVenda.setQuantidade(1);
-		if (itemVenda.getItemEstoque().isEstoqueDedutivel())
-			itemVenda.getItemEstoque()
-					.setQuantidade(itemVenda.getItemEstoque().getQuantidade() - itemVenda.getQuantidade());
+
+		itemVenda.getItemEstoque()
+				.setQuantidade(itemVenda.getItemEstoque().getQuantidade() - itemVenda.getQuantidade());
 		itemVenda.setValorVendido(itemEstoque.getValorUnitario());
+		if (itemVendaMap == null)
+			itemVendaMap = new HashMap<>();
+		itemVendaMap.put(key, itemVenda);
 
 	}
 
 	public void deduzEstoqueProduto(int quantidadeItem) throws Exception {
+		ItemVenda itemVenda = getItemVenda();
 		if (!itemVenda.getItemEstoque().isEstoqueDedutivel())
 			return;
 		Integer quantidadeEstoque = itemVenda.getItemEstoque().getQuantidade() + itemVenda.getQuantidade()
@@ -337,7 +361,7 @@ public class VendaController implements ControllerBase {
 
 	public float getSubTotal() {
 		float valor = 0f;
-		for (ItemVenda item : venda.getItensVenda().values())
+		for (ItemVenda item : venda.getItensVenda())
 			valor += (item.getQuantidade() * item.getItemEstoque().getValorUnitario());
 		return valor;
 	}
@@ -348,10 +372,14 @@ public class VendaController implements ControllerBase {
 	}
 
 	public void finalizaVenda() throws Exception {
+		if(venda.getItensVenda().isEmpty()) {
+			throw new Exception("Venda sem produtos.");
+		}
 		venda.setDataVenda(SingletonManager.getInstance().getData());
 		venda.setOperador(getUsuarioLogado());
+//		venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
 		recebePagamento();
-		for (ItemVenda itemVenda : venda.getItensVenda().values()) {
+		for (ItemVenda itemVenda : venda.getItensVenda()) {
 			ItemEstoque novoItemEstoque = new ItemEstoque();
 			ItemEstoque itemEstoque = itemVenda.getItemEstoque();
 			novoItemEstoque.setIdItemEstoque(itemEstoque.getIdItemEstoque());
@@ -371,6 +399,7 @@ public class VendaController implements ControllerBase {
 
 		iniciaVenda();
 		estoqueController.anulaAtributos();
+		itemVendaMap=null;
 	}
 
 	public void salva() {
@@ -400,7 +429,7 @@ public class VendaController implements ControllerBase {
 	public void calculaDescontoProdutos() {
 		float porcentagemDesconto = (float) venda.getPorcentagemDesconto() / 100;
 		float valorTotalVenda = 0;
-		for (ItemVenda itemVenda : venda.getItensVenda().values()) {
+		for (ItemVenda itemVenda : venda.getItensVenda()) {
 			float valorItemVenda = itemVenda.getItemEstoque().getValorUnitario();
 			valorItemVenda -= valorItemVenda * porcentagemDesconto;
 			itemVenda.setValorVendido(valorItemVenda);
@@ -412,6 +441,12 @@ public class VendaController implements ControllerBase {
 
 	@Override
 	public void registraHistoricoOperacao(Operacao operacao) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void validaExistente(String text) throws Exception {
 		// TODO Auto-generated method stub
 
 	}

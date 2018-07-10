@@ -1,35 +1,21 @@
 package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-
-import org.apache.log4j.Layout;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
-import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
-import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
 
@@ -66,33 +52,6 @@ public class TipoProdutoDialog extends AbstractDialog {
 	}
 
 	/**
-	 * x
-	 */
-	protected void configuraJPanel() {
-
-		JPanel mainPanel = new JPanel();
-		getContentPane().setLayout(new GridLayout());
-		add(mainPanel);
-		// mainPanel.setLayout(new BorderLayout());
-		mainPanel.setLayout(new GridLayout(3, 1));
-		jPanelBusca = carregaJPanelBusca();
-		mainPanel.add(jPanelBusca, BorderLayout.NORTH);
-		mainPanel.add(carregaJpanelFormulario(), BorderLayout.CENTER);
-		mainPanel.add(carregaJpanelTable(), BorderLayout.SOUTH);
-
-	}
-
-	protected JPanel carregaJpanelActions() {
-
-		JPanel jPanel = super.carregaJpanelActions();
-
-		btnDeletar.setEnabled(false);
-
-		return jPanel;
-
-	}
-
-	/**
 	 * 
 	 * @return
 	 */
@@ -103,7 +62,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		formPanel.setBorder(criaTitledBorder(ConstantesEnum.TIPO_PRODUTO_LABEL.getValue().toString()));
 
-		formPanel.setLayout(new BorderLayout());
+		// formPanel.setLayout(new BorderLayout());
 		// GridLayout centerPnlLayout = new GridLayout(2, 1);
 		LayoutManager centerPnlLayout = new BorderLayout();
 		// LayoutManager leftPnlLayout = new GridLayout(2, 1);
@@ -161,28 +120,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 		return formPanel;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	@Override
-	protected JPanel carregaJpanelTable() {
-
-		JPanel jPanel = new JPanel(new GridLayout());
-
-		jPanel.setBorder(criaTitledBorder(ConstantesEnum.TIPOS_PRODUTOS_LABEL.getValue().toString()));
-
-		carregaTableModel();
-
-		jTable = inicializaJTable(myTableModel);
-
-		jScrollPane = new JScrollPane(jTable);
-
-		jPanel.add(jScrollPane);
-
-		return jPanel;
-
-	}
+	
 
 	/**
 	 * xx
@@ -278,7 +216,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 				e.printStackTrace();
 
-				JOptionPane.showMessageDialog(null, e.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
+				showErrorMessage(this, e.getMessage());
 
 				atualizaTable = false;
 

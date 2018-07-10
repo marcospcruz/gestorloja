@@ -30,6 +30,8 @@ public class ProdutoController implements ControllerBase {
 
 		produtoDao = new CrudDao<>();
 
+		produto = new Produto();
+
 	}
 
 	public List<Produto> getList() {
@@ -159,7 +161,7 @@ public class ProdutoController implements ControllerBase {
 
 		produtoDao.delete(produto);
 
-		produto = null;
+		produto = new Produto();
 	}
 
 	@Override
@@ -176,7 +178,7 @@ public class ProdutoController implements ControllerBase {
 
 	@Override
 	public void salva() throws Exception {
-		// TODO Auto-generated method stub
+		produto = produtoDao.update(produto);
 
 	}
 
@@ -190,6 +192,18 @@ public class ProdutoController implements ControllerBase {
 	public void salva(Object object, boolean validaDados) throws Exception {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void validaExistente(String text) throws Exception {
+		Produto novo = null;
+		try {
+			novo = produtoDao.busca("produto.readparametro", "descricao", text.toUpperCase());
+		} catch (Exception e) {
+
+		}
+		if (produto.getIdProduto() == null && novo != null)
+			throw new Exception("Produto já cadastrado.");
 	}
 
 }

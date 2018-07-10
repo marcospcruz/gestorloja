@@ -27,7 +27,7 @@ public class Pagamento implements Serializable {
 	private List<MeioPagamento> meiosPagamento;
 	private float valorPagamento;
 	private float trocoPagamento;
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne
 	@JoinColumn(name = "idVenda")
 	private Venda venda;
 

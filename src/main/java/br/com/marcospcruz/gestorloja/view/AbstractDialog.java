@@ -130,7 +130,9 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 		configuraJPanel();
 
+		// System.out.println(getPreferredSize());
 		setVisible(true);
+
 	}
 
 	protected AbstractDialog(JFrame owner, String tituloJanela, boolean modal) {
@@ -152,11 +154,11 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 	}
 
 	private void configuraDialog() {
-		setSize(new Dimension(800, 600));
+		setSize(new Dimension(800, 850));
 
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 
-		setLayout(null);
+		// setLayout(null);
 	}
 
 	protected Dimension configuraDimensaoJanela() {
@@ -192,41 +194,41 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 		JPanel mainPnl = new JPanel(new BorderLayout(20, 100));
 
-		LayoutManager layout = new BorderLayout(20,100);
+		LayoutManager layout = new BorderLayout(20, 100);
 		// new GridLayout(1, 2);
 		// new FlowLayout(FlowLayout.LEFT);
 		//
-//		JPanel jPanel = new JPanel(layout);
-//
-//		mainPnl.setBorder(criaTitledBorder("Pesquisa"));
-//
-//		mainPnl.add(jPanel, BorderLayout.CENTER);
-//
-//		JLabel lbl = criaJLabel("Descrição:");
-//		lbl.setBorder(BorderFactory.createEtchedBorder());
-//		jPanel.add(lbl,BorderLayout.WEST);
-//		//
-//		// lbl.setBounds(10, 15, 400, 30);
-//		//
-////		JPanel op = new JPanel(new BorderLayout());
-//
-//		// jPanel.add(lbl);
-//
-//		//
-//		txtBusca = new JFormattedTextField();
-//		txtBusca.setFont(FontMapper.getFont(22));
-//		//// txtBusca.setBounds(200, 20, 250, TXT_HEIGHT);
-//		//
-//		jPanel.add(txtBusca, BorderLayout.CENTER);
-//		//
-////		jPanel.add(op);
-//		btnBusca = inicializaJButton("Buscar");
-//		//// inicializaJButton("Buscar", 460, 20, 90, txtBusca.getHeight());
-//		//
-//		JPanel jp = new JPanel(new FlowLayout());
-//		// op.add(jp);
-////		jp.add(btnBusca);
+		JPanel jPanel = new JPanel(layout);
+		//
+		mainPnl.setBorder(criaTitledBorder("Pesquisa"));
+		//
+		mainPnl.add(jPanel, BorderLayout.NORTH);
+		//
+		JLabel lbl = criaJLabel("Descrição:");
+		// lbl.setBorder(BorderFactory.createEtchedBorder());
+		jPanel.add(lbl, BorderLayout.WEST);
+		// //
+		// // lbl.setBounds(10, 15, 400, 30);
+		// //
+		//// JPanel op = new JPanel(new BorderLayout());
+		//
+		// // jPanel.add(lbl);
+		//
+		// //
+		txtBusca = new JFormattedTextField();
+		txtBusca.setFont(FontMapper.getFont(22));
+		// txtBusca.setBounds(200, 20, 250, TXT_HEIGHT);
 
+		jPanel.add(txtBusca, BorderLayout.CENTER);
+		// //
+		//// jPanel.add(op);
+		btnBusca = inicializaJButton("Buscar");
+		// //// inicializaJButton("Buscar", 460, 20, 90, txtBusca.getHeight());
+		// //
+		// JPanel jp = new JPanel(new FlowLayout());
+		// // op.add(jp);
+		//// jp.add(btnBusca);
+		jPanel.add(btnBusca, BorderLayout.EAST);
 		return mainPnl;
 
 	}
@@ -234,13 +236,50 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 	/**
 	 * xxx
 	 */
-	protected abstract void configuraJPanel();
+	// protected abstract void configuraJPanel();
+	/**
+	 * x
+	 */
+	protected void configuraJPanel() {
+		setLayout(new BorderLayout());
+		JPanel mainPanel = new JPanel();
+		// getContentPane().setLayout(new GridLayout());
+		add(mainPanel);
+		mainPanel.setLayout(new BorderLayout());
+		// mainPanel.setLayout(new GridLayout(3, 1));
+
+		mainPanel.add(carregaJPanelBusca(), BorderLayout.NORTH);
+		mainPanel.add(carregaJpanelFormulario(), BorderLayout.CENTER);
+		mainPanel.add(carregaJpanelTable(), BorderLayout.SOUTH);
+		// System.out.println(getPreferredSize());
+	}
 
 	protected abstract void selecionaAcao(String actionCommand) throws Exception;
 
 	protected abstract JPanel carregaJpanelFormulario();
 
-	protected abstract JPanel carregaJpanelTable();
+	/**
+	 * 
+	 * @return
+	 */
+
+	protected JPanel carregaJpanelTable() {
+
+		jPanelTable = new JPanel(new GridLayout());
+
+		jPanelTable.setBorder(BorderFactory.createEtchedBorder());
+
+		carregaTableModel();
+
+		jTable = inicializaJTable(myTableModel);
+
+		jScrollPane = new JScrollPane(jTable);
+
+		jPanelTable.add(jScrollPane);
+
+		return jPanelTable;
+
+	}
 
 	protected abstract void atualizaTableModel(Object object);
 
@@ -283,6 +322,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		btnDeletar.setEnabled(false);
 
 		jPanel.add(btnDeletar);
+
+		btnDeletar.setEnabled(false);
 
 		return jPanel;
 
@@ -349,7 +390,7 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	private int showConfirmationMessage(String titleConfirmationDialog, String confirmationQuestion) {
 		// TODO Auto-generated method stub
-		return JOptionPane.showConfirmDialog(null, confirmationQuestion, titleConfirmationDialog,
+		return JOptionPane.showConfirmDialog(null, criaJLabel(confirmationQuestion), titleConfirmationDialog,
 				JOptionPane.YES_NO_OPTION);
 	}
 
@@ -361,7 +402,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	public void mostraMensagemConfirmacaoSalvamento() {
 
-		JOptionPane.showMessageDialog(this, ConstantesEnum.CONFIRMACAO_REGISTRO_ATUALIZADO.getValue().toString(),
+		JOptionPane.showMessageDialog(this,
+				criaJLabel(ConstantesEnum.CONFIRMACAO_REGISTRO_ATUALIZADO.getValue().toString()),
 				ConstantesEnum.CONFIRMANDO_ATUALIZACAO_MSG_TITLE.getValue().toString(),
 				JOptionPane.INFORMATION_MESSAGE);
 
@@ -525,13 +567,21 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 	public abstract void atualizaTableModel();
 
 	public TipoProduto parseCategoriaProduto(JComboBox jComboBox) throws Exception {
+		TipoProdutoController tpController = getTipoProdutoController();
 		validaSelecaoComboBox(jComboBox);
 		Object selectedItem = jComboBox.getSelectedItem();
 		TipoProduto categoriaProduto;
 		if (selectedItem instanceof TipoProduto)
 			return (TipoProduto) selectedItem;
 		else {
-			categoriaProduto = new SubTipoProduto();
+			try {
+				tpController.busca(selectedItem.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			categoriaProduto = tpController.getItem() == null ? new SubTipoProduto()
+					: (SubTipoProduto) tpController.getItem();
 			categoriaProduto.setDescricaoTipo(selectedItem.toString());
 		}
 		if (categoriaProduto.getOperador() == null)

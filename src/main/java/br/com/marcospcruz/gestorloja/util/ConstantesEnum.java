@@ -50,7 +50,7 @@ public enum ConstantesEnum {
 	FABRICANTE_NAO_ENCONTRADO(46), 
 	ITEM_DO_ESTOQUE_NAO_ENCONTRADO(47), 
 	CODIGO_DE_BARRAS(48), 
-	VALOR_CUSTO_LABEL(49);
+	VALOR_CUSTO_LABEL(49), CADASTRO_PRODUTO_TITLE(50);
 //@formatter:on
 	private int index;
 
@@ -76,8 +76,8 @@ public enum ConstantesEnum {
 			"Descrição", // 15
 			"Sub-Descrição", // 16
 			"Cadastro de Tipo de Produto", // 17
-			"Tipo de Produto", // 18
-			"Tipos de Produtos", // 19
+			"Categoria de Produto", // 18
+			"Categorias de Produtos", // 19
 			"Registro atualizado com Sucesso.", // 20
 			"Confirmando Atualização", // 21
 			"Sub-Tipo de:", // 22
@@ -103,11 +103,12 @@ public enum ConstantesEnum {
 			"É necessário selecionar um ítem de Estoque antes.", // 42
 			"Exclusão não permitida! Há ítens deste Produto no estoque.", // 43
 			"Não há Dados no Estoque.", // 44
-			"Fabricante", //45
-			"Fabricante / Marca não encontrado", //46
-			"Ítem não encontrado no Estoque", //47
-			"Código Produto", //48
-			"Preço de Custo (R$)" //49
+			"Fabricante", // 45
+			"Fabricante / Marca não encontrado", // 46
+			"Ítem não encontrado no Estoque", // 47
+			"Código Produto", // 48
+			"Preço de Custo (R$)", // 49
+			"Cadastro de Produto"//50
 			};
 
 	public Object getValue() {

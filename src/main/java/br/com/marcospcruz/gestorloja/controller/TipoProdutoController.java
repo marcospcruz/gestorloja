@@ -163,7 +163,7 @@ public class TipoProdutoController implements ControllerBase {
 
 		// if (tiposProdutos == null || tiposProdutos.size() < 1)
 		//
-		// carregaTiposProdutos();
+		carregaTiposProdutos();
 
 		return tiposProdutos;
 
@@ -174,12 +174,13 @@ public class TipoProdutoController implements ControllerBase {
 	}
 
 	public void setItem(Object tipoProduto) {
-		if (!(tipoProduto instanceof TipoProduto)) {
+		if (tipoProduto != null && !(tipoProduto instanceof TipoProduto)) {
 			tipoProduto = new SubTipoProduto(tipoProduto.toString(), getUsuarioLogado());
 		}
 		this.tipoProduto = (SubTipoProduto) tipoProduto;
 		// implementação para AutocompleteComboBox
-		setList((List) ((SubTipoProduto) tipoProduto).getSubTiposProduto());
+		if (tipoProduto != null)
+			setList((List) ((SubTipoProduto) tipoProduto).getSubTiposProduto());
 	}
 
 	public void carregaTiposProdutos() {
@@ -290,9 +291,10 @@ public class TipoProdutoController implements ControllerBase {
 
 		}
 
-//		if (tipoProduto.getProdutos() != null && tipoProduto.getProdutos().size() > 0)
-//
-//			throw new Exception(REMOCAO_TIPO_POPULADO);
+		// if (tipoProduto.getProdutos() != null && tipoProduto.getProdutos().size() >
+		// 0)
+		//
+		// throw new Exception(REMOCAO_TIPO_POPULADO);
 
 		if (tipoProduto.getSubTiposProduto().size() > 0)
 			throw new Exception(REMOCAO_SUPERTIPO_POPULADO);
@@ -330,7 +332,6 @@ public class TipoProdutoController implements ControllerBase {
 		return tipoProduto;
 	}
 
-
 	public void salva(Object descricao) throws Exception {
 		buscaSuperTipoProduto("Genérico");
 		SubTipoProduto superTipoProduto = tipoProduto;
@@ -363,11 +364,17 @@ public class TipoProdutoController implements ControllerBase {
 	@Override
 	public void salva() throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void registraHistoricoOperacao(Operacao operacao) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void validaExistente(String text) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

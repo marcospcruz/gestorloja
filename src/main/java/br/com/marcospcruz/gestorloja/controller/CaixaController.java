@@ -272,5 +272,11 @@ public class CaixaController implements ControllerBase {
 		return subTotalRecebido;
 	}
 
+	@Override
+	public void validaExistente(String text) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

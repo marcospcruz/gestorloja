@@ -19,11 +19,13 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporter;
+import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JRParameter;
-import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
 
 public class RelatorioEstoqueGeral {
 
@@ -75,11 +77,19 @@ public class RelatorioEstoqueGeral {
 
 			JasperPrint print = JasperFillManager.fillReport(inputStream, parametros, jrDataSource);
 
-			outPut = new FileOutputStream(arquivoRelatorio);
+			JRExporter exporter = new JRPdfExporter();
+			
+			exporter.setParameter(JRExporterParameter.JASPER_PRINT, print);
 
-			JasperExportManager.exportReportToPdfStream(print, outPut);
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, new FileOutputStream(arquivoRelatorio));
+			
+			exporter.exportReport();
+			
+			// outPut = new FileOutputStream(arquivoRelatorio);
 
-			outPut.close();
+			// JasperExportManager.exportReportToPdfStream(print, outPut);
+
+			// outPut.close();
 
 			Desktop.getDesktop().open(arquivoRelatorio);
 
@@ -101,7 +111,8 @@ public class RelatorioEstoqueGeral {
 
 	public static Collection<ItemEstoque> listaEstoque() throws Exception {
 
-		EstoqueController controller = (EstoqueController) SingletonManager.getInstance().getController(ControllerAbstractFactory.ESTOQUE);
+		EstoqueController controller = (EstoqueController) SingletonManager.getInstance()
+				.getController(ControllerAbstractFactory.ESTOQUE);
 
 		return controller.getItensEstoque();
 

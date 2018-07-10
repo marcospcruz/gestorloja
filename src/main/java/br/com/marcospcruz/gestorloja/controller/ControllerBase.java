@@ -77,4 +77,6 @@ public interface ControllerBase {
 
 	public void registraHistoricoOperacao(Operacao operacao);
 
+	public abstract void validaExistente(String text) throws Exception;
+
 }

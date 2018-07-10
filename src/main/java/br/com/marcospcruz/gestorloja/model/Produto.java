@@ -24,10 +24,10 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 ),
 		@NamedQuery(name = "produto.readparametrolike", query = "select distinct p from Produto p "
 //				+ "JOIN fetch p.tiposProduto t "
-				+ "where upper(p.descricaoProduto) like :descricao")
-//		@NamedQuery(name = "produto.readbytipo", query = "select distinct p from Produto p "
-//				+ "JOIN fetch p.tiposProduto t "
-//				+ "where t.idTipoItem=:id")
+				+ "where upper(p.descricaoProduto) like :descricao"),
+		@NamedQuery(name = "produto.readparametro", query = "select distinct p from Produto p "
+				
+				+"where upper(p.descricaoProduto) = :descricao")
 		})
 		
 //@formatter:on

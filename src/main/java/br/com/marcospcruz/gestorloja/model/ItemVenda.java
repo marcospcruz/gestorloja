@@ -22,7 +22,7 @@ public class ItemVenda implements Serializable {
 	private static final long serialVersionUID = 7647914068901369106L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int idVenda;
+	private int idItemVenda;
 	@ManyToOne
 	@JoinColumn(name = "idItemEstoque")
 	private ItemEstoque itemEstoque;
@@ -34,7 +34,7 @@ public class ItemVenda implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataVenda;
 	@ManyToOne
-	@JoinColumn(name = "idVenda", insertable = false, updatable = false)
+	@JoinColumn(name = "idVenda")
 	private Venda venda;
 
 	public void setItemEstoque(ItemEstoque itemEstoque) {
@@ -46,12 +46,12 @@ public class ItemVenda implements Serializable {
 		this.quantidade = quantidade;
 	}
 
-	public int getIdVenda() {
-		return idVenda;
+	public int getIdItemVenda() {
+		return idItemVenda;
 	}
 
-	public void setIdVenda(int idVenda) {
-		this.idVenda = idVenda;
+	public void setIdItemVenda(int idItemVenda) {
+		this.idItemVenda = idItemVenda;
 	}
 
 	public ItemEstoque getItemEstoque() {
@@ -99,7 +99,7 @@ public class ItemVenda implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((dataVenda == null) ? 0 : dataVenda.hashCode());
-		result = prime * result + idVenda;
+		result = prime * result + idItemVenda;
 		result = prime * result + ((itemEstoque == null) ? 0 : itemEstoque.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + ((quantidade == null) ? 0 : quantidade.hashCode());
@@ -122,7 +122,7 @@ public class ItemVenda implements Serializable {
 				return false;
 		} else if (!dataVenda.equals(other.dataVenda))
 			return false;
-		if (idVenda != other.idVenda)
+		if (idItemVenda != other.idItemVenda)
 			return false;
 		if (itemEstoque == null) {
 			if (other.itemEstoque != null)
@@ -151,7 +151,7 @@ public class ItemVenda implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ItemVenda [idVenda=" + idVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
+		return "ItemVenda [idItemVenda=" + idItemVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
 				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda + ", venda="
 				+ venda + "]";
 	}

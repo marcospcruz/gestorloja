@@ -53,9 +53,10 @@ import javax.persistence.Table;
 				+ "order by f.nome,t.descricaoTipo"
 				),
 		@NamedQuery(name = "itemEstoque.readAll", query = "select distinct ie from ItemEstoque ie " 
-				+ "JOIN ie.fabricante f "
-				+ "JOIN ie.produto p "
-				+ "JOIN ie.tipoProduto t "
+				+ "JOIN fetch ie.fabricante f "
+				+ "JOIN fetch ie.produto p "
+				+ "JOIN fetch ie.tipoProduto t "
+				+ "LEFT JOIN fetch t.superTipoProduto t "
 				+ "order by f.nome, t.descricaoTipo"),
 		@NamedQuery(name="itemEstoque.readProduto",query="select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p "

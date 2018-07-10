@@ -1,8 +1,9 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
@@ -13,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -35,16 +35,17 @@ public class Venda implements Serializable {
 
 	private float totalVendido;
 
-	@OneToMany(cascade = { CascadeType.MERGE })
-	@JoinColumn(name = "idItemVenda")
-	@MapKeyJoinColumn(name = "codigoDeBarras", table = "estoque")
-	private Map<String, ItemVenda> itensVenda;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,mappedBy="venda")
+	
+	// @MapKeyJoinColumn(name = "codigoDeBarras", table = "estoque")
+	// private Map<String, ItemVenda> itensVenda;
+	private List<ItemVenda> itensVenda;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataVenda;
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
-	@ManyToOne(cascade=CascadeType.MERGE)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "idCaixa")
 	private Caixa caixa;
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -55,7 +56,7 @@ public class Venda implements Serializable {
 
 	public Venda() {
 		setDataVenda(SingletonManager.getInstance().getData());
-		itensVenda = new HashMap<>();
+		itensVenda = new ArrayList<>();
 	}
 
 	public Caixa getCaixa() {
@@ -82,11 +83,11 @@ public class Venda implements Serializable {
 		this.totalVendido = totalVendido;
 	}
 
-	public Map<String, ItemVenda> getItensVenda() {
+	public List<ItemVenda> getItensVenda() {
 		return itensVenda;
 	}
 
-	public void setItensVenda(Map<String, ItemVenda> itensVenda) {
+	public void setItensVenda(List<ItemVenda> itensVenda) {
 		this.itensVenda = itensVenda;
 	}
 
@@ -136,7 +137,7 @@ public class Venda implements Serializable {
 		int result = 1;
 		result = prime * result + ((dataVenda == null) ? 0 : dataVenda.hashCode());
 		result = prime * result + idVenda;
-//		result = prime * result + ((itensVenda == null) ? 0 : itensVenda.hashCode());
+		// result = prime * result + ((itensVenda == null) ? 0 : itensVenda.hashCode());
 		result = prime * result + ((pagamento == null) ? 0 : pagamento.hashCode());
 		result = prime * result + ((operador == null) ? 0 : operador.hashCode());
 		result = prime * result + Float.floatToIntBits(porcentagemDesconto);
