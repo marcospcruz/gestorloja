@@ -399,6 +399,7 @@ public class VendaController implements ControllerBase {
 
 		iniciaVenda();
 		estoqueController.anulaAtributos();
+		
 		itemVendaMap=null;
 	}
 

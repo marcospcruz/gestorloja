@@ -92,7 +92,7 @@ public class PDV extends AbstractDialog {
 	private MyJCheckBox dinheiroCheckBox;
 	private MyJCheckBox debitoCheckBox;
 	private MyJCheckBox creditoCheckBox;
-	private Map<String, List<Component>> pagamentoComponentsMap;
+	private Map<MyJCheckBox, List<Component>> pagamentoComponentsMap;
 	private JRadioButton descricaoRadio;
 	private JRadioButton codigoBarrasRadioButton;
 	private Component btnFinalizar;
@@ -315,7 +315,7 @@ public class PDV extends AbstractDialog {
 				"Descrição: ", VALOR);
 		outrosPnl.setBorder(BorderFactory.createEtchedBorder());
 
-		pagamentoComponentsMap.put(string, Arrays.asList(txtDescricaoPagtoOutros, txtValorPagtoOutros));
+		mapMeioPagamentoComponents(outrosCheckBox, Arrays.asList(txtDescricaoPagtoOutros, txtValorPagtoOutros));
 
 		return outrosPnl;
 
@@ -330,7 +330,7 @@ public class PDV extends AbstractDialog {
 		JPanel cartCreditoPnl = criaDefaultFormaPagto(string, creditoCheckBox, txtQtParcelaCredito,
 				txtValorPagtoCredito, qtParcelasLabelString, VALOR);
 
-		pagamentoComponentsMap.put(string, Arrays.asList(txtQtParcelaCredito, txtValorPagtoCredito));
+		mapMeioPagamentoComponents(creditoCheckBox, Arrays.asList(txtQtParcelaCredito, txtValorPagtoCredito));
 		return cartCreditoPnl;
 	}
 
@@ -366,7 +366,7 @@ public class PDV extends AbstractDialog {
 		txtValorPagtoDebito.addKeyListener(calculaPagtoListener());
 		JPanel cartaoDebitoPnl = criaDefaultFormaPagto(string, debitoCheckBox, txtValorPagtoDebito, null, VALOR, null);
 
-		pagamentoComponentsMap.put(debitoCheckBox.getText(), Arrays.asList(txtValorPagtoDebito));
+		mapMeioPagamentoComponents(debitoCheckBox, Arrays.asList(txtValorPagtoDebito));
 		return cartaoDebitoPnl;
 	}
 
@@ -403,8 +403,12 @@ public class PDV extends AbstractDialog {
 		txtValorPagtoDinheiro.addKeyListener(calculaPagtoListener());
 		JPanel dinheiroPnl = criaDefaultFormaPagto(string, dinheiroCheckBox, txtValorPagtoDinheiro, null, VALOR, null);
 
-		pagamentoComponentsMap.put(string, Arrays.asList(txtValorPagtoDinheiro));
+		mapMeioPagamentoComponents(dinheiroCheckBox, Arrays.asList(txtValorPagtoDinheiro));
 		return dinheiroPnl;
+	}
+
+	private void mapMeioPagamentoComponents(MyJCheckBox checkBox, List list) {
+		pagamentoComponentsMap.put(checkBox, list);
 	}
 
 	private Component createDefaultTxtPanel(JTextComponent txtField) {
@@ -452,11 +456,15 @@ public class PDV extends AbstractDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				MyJCheckBox jCheckBox = (MyJCheckBox) e.getSource();
+
 				if (jCheckBox.isSelected()) {
-					meiosPagamentosSelecionadosList.add(jCheckBox);
+					if (!meiosPagamentosSelecionadosList.contains(jCheckBox))
+						meiosPagamentosSelecionadosList.add(jCheckBox);
 				} else
 					meiosPagamentosSelecionadosList.remove(jCheckBox);
-				List<Component> componentes = pagamentoComponentsMap.get(e.getActionCommand());
+				// System.out.println(meiosPagamentosSelecionadosList.size());
+				// System.out.println(pagamentoComponentsMap.get(jCheckBox));
+				List<Component> componentes = pagamentoComponentsMap.get(jCheckBox);
 				componentes.stream().forEach(componente -> {
 					componente.setEnabled(jCheckBox.isSelected());
 					if (!jCheckBox.isSelected() && componente instanceof JTextComponent) {
@@ -538,8 +546,28 @@ public class PDV extends AbstractDialog {
 		estoqueController.buscaTodos();
 		produtoPesquisaDropDown = new AutocompleteJComboBox<>(this, estoqueController, null, false);
 		produtoPesquisaDropDown.setFont(FontMapper.getFont(20));
-		produtoPesquisaDropDown.setModel(super.selectModelItemEstoque());
 
+		((JTextComponent) produtoPesquisaDropDown.getEditor().getEditorComponent()).addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+				if (codigoBarrasRadioButton.isSelected() && e.getKeyCode() != 10)
+					((JTextComponent) produtoPesquisaDropDown.getEditor().getEditorComponent()).setText("");
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 		ButtonGroup btnGroup = new ButtonGroup();
 		descricaoRadio = createJRadioButton("Descrição");
 		codigoBarrasRadioButton = createJRadioButton("Código de Barras", true);
@@ -560,7 +588,8 @@ public class PDV extends AbstractDialog {
 		radioButtonPnl.add(codigoBarrasRadioButton);
 		habilitaBtnPesquisar();
 		panel.add(btnPesquisar, BorderLayout.EAST);
-
+		if (!codigoBarrasRadioButton.isSelected())
+			produtoPesquisaDropDown.setModel(super.selectModelItemEstoque());
 		return panel;
 	}
 
@@ -813,12 +842,13 @@ public class PDV extends AbstractDialog {
 				meiosPagamentosSelecionadosList.stream().filter(jCheckBox -> jCheckBox.isSelected()).forEach(jc -> {
 					jc.setSelected(false);
 
-					List<Component> lista = pagamentoComponentsMap.get(jc.getText());
+					List<Component> lista = pagamentoComponentsMap.get(jc);
 					for (Component c : lista) {
 						((JTextComponent) c).setText("");
 						((JTextComponent) c).setEnabled(jc.isSelected());
 					}
 				});
+				meiosPagamentosSelecionadosList = new ArrayList<>();
 				txtTotalVenda.setText(Util.formataMoeda(0f));
 				lblValorTroco.setText(Util.formataMoeda(0f));
 			}
@@ -865,15 +895,15 @@ public class PDV extends AbstractDialog {
 	private void finalizaVenda() throws Exception {
 		Venda venda = vendaController.getVenda();
 		venda.setPorcentagemDesconto(Util.stringDecimaisToFloat(txtDesconto.getText()));
-		Pagamento pagamento = venda.getPagamento();
+		// Pagamento pagamento = venda.getPagamento();
 		float troco = Util.parseStringDecimalToFloat(lblValorTroco.getText().substring(3));
-		if (pagamento == null)
-			pagamento = new Pagamento();
+
+		Pagamento pagamento = new Pagamento();
 
 		float valorTotalRecebido = 0;
 		for (MyJCheckBox cb : meiosPagamentosSelecionadosList) {
 			String meioPagamentoString = cb.getText();
-			List<Component> pagamentosComponentes = pagamentoComponentsMap.get(meioPagamentoString);
+			List<Component> pagamentosComponentes = pagamentoComponentsMap.get(cb);
 			TipoMeioPagamento tipoMeioPagamento = new TipoMeioPagamento();
 			tipoMeioPagamento.setDescricaoTipoMeioPagamento(meioPagamentoString);
 			int cont = 0;
