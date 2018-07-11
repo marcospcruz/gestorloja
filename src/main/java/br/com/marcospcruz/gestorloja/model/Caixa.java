@@ -19,10 +19,13 @@ import javax.persistence.TemporalType;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
+//@formatter:off
 @NamedQueries({
-		@NamedQuery(name = "caixa.findCaixaAberto", query = "select distinct c from Caixa c " + "LEFT JOIN c.vendas "
+		@NamedQuery(name = "caixa.findCaixaAberto", query = "select distinct c from Caixa c " 
+				+ "LEFT JOIN c.vendas "
 				+ "where c.dataFechamento=null"),
 		@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c " + "LEFT JOIN c.vendas ") })
+//@formatter:on
 public class Caixa extends AbstractModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +42,7 @@ public class Caixa extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "idUsuarioFechamento")
 	private Usuario usuarioFechamento;
-	@OneToMany(fetch = FetchType.EAGER,mappedBy="caixa")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa")
 	private Set<Venda> vendas;
 
 	public Caixa() {

@@ -147,7 +147,8 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 						public void run() {
 
 							DefaultComboBoxModel<T> model = (DefaultComboBoxModel<T>) getModel();
-
+							if(tc.getText().length()<5)
+								return;
 							// removeAllItems();
 							// reloadModel(model);
 
