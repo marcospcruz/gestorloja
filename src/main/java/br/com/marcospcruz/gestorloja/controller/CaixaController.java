@@ -19,13 +19,11 @@ import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 
-public class CaixaController implements ControllerBase {
+public class CaixaController extends ControllerBase {
 
 	public CaixaController() {
 		super();
-		meioPagamentoDao = new CrudDao<>();
-		pagamentoDao = new CrudDao<>();
-		tipoMeioPagamentoDao = new CrudDao<>();
+
 	}
 
 	private static final String QUERY_BUSCA_TODOS = "caixa.findAll";
@@ -33,23 +31,21 @@ public class CaixaController implements ControllerBase {
 	// private Crud<Caixa> dao = new CrudDao<>();
 	private List<Caixa> caixaList;
 	private Caixa caixa;
-	private Crud<MeioPagamento> meioPagamentoDao;
-	private Crud<Pagamento> pagamentoDao;
+
 	private Pagamento pagamento;
-	private Crud<Caixa> dao;
-	private CrudDao<TipoMeioPagamento> tipoMeioPagamentoDao;
 
 	@Override
 	public void busca(Object id) {
-		// TODO Auto-generated method stub
+		Crud<Caixa> dao = new CrudDao<>();
+		caixa = dao.busca(Caixa.class, Integer.parseInt(id.toString()));
 
 	}
 
 	@Override
 	public List buscaTodos() {
-		if (dao == null)
-			dao = getDao();
-		caixaList=null;
+
+		Crud<Caixa> dao = getDao();
+		caixaList = null;
 		// if (caixaList == null || caixaList.isEmpty())
 		caixaList = dao.busca(QUERY_BUSCA_TODOS);
 
@@ -77,9 +73,10 @@ public class CaixaController implements ControllerBase {
 	public Object getItem() {
 
 		try {
-			busca(BUSCA_CAIXA_ABERTO);
-			caixa = caixaList.get(0);
-
+			if (caixa == null) {
+				busca(BUSCA_CAIXA_ABERTO);
+				caixa = caixaList.get(0);
+			}
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -103,7 +100,7 @@ public class CaixaController implements ControllerBase {
 
 	@Override
 	public void setItem(Object object) {
-		// TODO Auto-generated method stub
+		this.caixa = (Caixa) object;
 
 	}
 
@@ -124,6 +121,7 @@ public class CaixaController implements ControllerBase {
 
 		ajustaSaldoFinalZeroCaixa();
 
+		Crud<Caixa> dao = new CrudDao<>();
 		caixa = dao.update(caixa);
 
 	}
@@ -144,6 +142,7 @@ public class CaixaController implements ControllerBase {
 		if (caixaList == null || caixaList.isEmpty()) {
 			throw new Exception("Não há caixa aberto.");
 		}
+		caixa = caixaList.get(0);
 	}
 
 	public void fechaCaixa() throws Exception {
@@ -188,26 +187,14 @@ public class CaixaController implements ControllerBase {
 		for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
 			// for (int i = 0; i < pagamento.getMeiosPagamento().size(); i++) {
 			// MeioPagamento meioPagamento = pagamento.getMeiosPagamento().remove(i);
-			meioPagamento.setDataPagamento(dataVenda);
-			meioPagamento.setUsuarioLogado(operador);
-			TipoMeioPagamento tipoMeioPagamento = meioPagamento.getTipoMeioPagamento();
-			meioPagamento.setTipoMeioPagamento(buscaTipoMeioPagamento(tipoMeioPagamento));
-			// meioPagamento = meioPagamentoDao.update(meioPagamento);
-			if (meioPagamento.getTipoMeioPagamento().getIdTipoMeioPagamento() == 1) {
-				float saldoFinal = caixa.getSaldoFinal() + meioPagamento.getValorPago();
-				caixa.setSaldoFinal(saldoFinal);
-				salva();
-			}
-			// pagamento.getMeiosPagamento().add(meioPagamento);
-			meioPagamento.setPagamento(pagamento);
 
 		}
 		// setPagamento(pagamentoDao.update(pagamento));
 		setPagamento(pagamento);
 	}
 
-	private TipoMeioPagamento buscaTipoMeioPagamento(TipoMeioPagamento tipoMeioPagamento) {
-
+	public TipoMeioPagamento buscaTipoMeioPagamento(TipoMeioPagamento tipoMeioPagamento) {
+		CrudDao<TipoMeioPagamento> tipoMeioPagamentoDao = new CrudDao<>();
 		return tipoMeioPagamentoDao.busca("tipoMeioPagamento.buscaPorDescricao", "descricao",
 				tipoMeioPagamento.getDescricaoTipoMeioPagamento());
 	}
@@ -222,6 +209,7 @@ public class CaixaController implements ControllerBase {
 	}
 
 	public void atualizaPagamento(Pagamento pagamento) {
+		Crud<Pagamento> pagamentoDao = new CrudDao<>();
 		pagamento = pagamentoDao.update(pagamento);
 
 	}
@@ -241,7 +229,7 @@ public class CaixaController implements ControllerBase {
 	}
 
 	public List controcalculaSubTotalRecebido() {
-		
+
 		Set<Venda> vendas = caixa.getVendas();
 		Map<TipoMeioPagamento, Float> subTotalRecebido = mapMeioPagamentosRecebidosCaixa(vendas);
 		List linhas = new ArrayList();
@@ -275,8 +263,19 @@ public class CaixaController implements ControllerBase {
 	@Override
 	public void validaExistente(String text) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	public boolean validaMesmoTipoPagamento(MeioPagamento mp, Pagamento pagamento) {
+		if (pagamento.getMeiosPagamento().contains(mp))
+			for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+				if (meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento()
+						.equals(mp.getTipoMeioPagamento().getDescricaoTipoMeioPagamento())
+						&& meioPagamento.getValorPago() == mp.getValorPago()) {
+					return true;
+				}
+			}
+		return false;
+	}
 
 }

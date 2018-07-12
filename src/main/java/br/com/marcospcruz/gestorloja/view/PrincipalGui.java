@@ -21,6 +21,7 @@ import org.jdatepicker.impl.UtilDateModel;
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.controller.LoginFacade;
+import br.com.marcospcruz.gestorloja.controller.VendaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.Usuario;
@@ -139,6 +140,8 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 				CaixaController caixaController = (CaixaController) SingletonManager.getInstance()
 						.getController(ControllerAbstractFactory.CONTROLE_CAIXA);
 				Caixa caixaAberto = (Caixa) caixaController.getItem();
+				VendaController vendaController=(VendaController) SingletonManager.getInstance().getController(ControllerAbstractFactory.CONTROLE_VENDA);
+				vendaController.resetVenda();
 				if (caixaAberto == null) {
 					throw new NullPointerException("Não há Caixa aberto para realização de vendas.");
 				}

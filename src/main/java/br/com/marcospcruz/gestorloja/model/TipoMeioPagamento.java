@@ -75,8 +75,8 @@ public class TipoMeioPagamento implements Serializable {
 				return false;
 		} else if (!descricaoTipoMeioPagamento.equals(other.descricaoTipoMeioPagamento))
 			return false;
-		if (idTipoMeioPagamento != other.idTipoMeioPagamento)
-			return false;
+//		if (idTipoMeioPagamento != other.idTipoMeioPagamento)
+//			return false;
 		return true;
 	}
 

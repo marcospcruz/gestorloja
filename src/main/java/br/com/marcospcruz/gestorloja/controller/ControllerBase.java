@@ -1,21 +1,40 @@
 package br.com.marcospcruz.gestorloja.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import br.com.marcospcruz.gestorloja.model.Operacao;
-import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
-public interface ControllerBase {
+public abstract class ControllerBase {
 
 	static final String BUSCA_INVALIDA = "Busca Invïálida";
+
+	private Map<Object, Object> cacheMap;
+	
+	private List cacheList;
+
+	public Map<Object, Object> getCacheMap() {
+		return cacheMap;
+	}
+
+	public void setCacheMap(Map<Object, Object> cacheMap) {
+		this.cacheMap = cacheMap;
+	}
+
+	public ControllerBase() {
+		cacheMap = new HashMap<>();
+		cacheList=new ArrayList<>();
+	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	default Usuario getUsuarioLogado() {
+	public Usuario getUsuarioLogado() {
 		Usuario usuario = SingletonManager.getInstance().getUsuarioLogado();
 		if (usuario == null) {
 			usuario = new Usuario();
@@ -29,7 +48,7 @@ public interface ControllerBase {
 	 * @param parametro
 	 * @return
 	 */
-	default boolean contemAcentuacao(String parametro) {
+	protected boolean contemAcentuacao(String parametro) {
 
 		String pattern = "íéçú";
 
@@ -45,12 +64,12 @@ public interface ControllerBase {
 
 	}
 
-	default ControllerBase getController(String controllerClass) throws Exception {
+	protected ControllerBase getController(String controllerClass) throws Exception {
 		return SingletonManager.getInstance().getController(controllerClass);
 	}
-	
-	default void reloadLista() {
-		
+
+	protected void reloadLista() {
+
 	}
 
 	public abstract void busca(Object id) throws Exception;
@@ -75,7 +94,7 @@ public interface ControllerBase {
 
 	public abstract void salva() throws Exception;
 
-	public void registraHistoricoOperacao(Operacao operacao);
+	public abstract void registraHistoricoOperacao(Operacao operacao);
 
 	public abstract void validaExistente(String text) throws Exception;
 

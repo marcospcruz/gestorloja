@@ -132,6 +132,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 				break;
 			case FECHAR_CAIXA:
 				controller.validateCaixaFechado();
+				
 				new FormFechamentoCaixaDialog(this, controller);
 			}
 		} catch (Exception e) {

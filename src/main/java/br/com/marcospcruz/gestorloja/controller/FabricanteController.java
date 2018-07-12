@@ -7,7 +7,7 @@ import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 
-public class FabricanteController implements ControllerBase {
+public class FabricanteController extends ControllerBase {
 	private static final String FABRICANTE_INVALIDO = "Fabricante inválido!";
 	private Crud<Fabricante> fabricanteDao;
 	private List<Fabricante> fabricantes;

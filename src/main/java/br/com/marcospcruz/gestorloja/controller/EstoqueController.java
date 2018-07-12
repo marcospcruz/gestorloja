@@ -18,7 +18,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.Util;
 
-public class EstoqueController implements ControllerBase {
+public class EstoqueController extends ControllerBase {
 
 	private static final String MESSAGE_QT_INVALIDA_EXCEPTION = "Quantidade informada Inv�lida!";
 

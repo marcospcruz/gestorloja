@@ -3,8 +3,6 @@ package br.com.marcospcruz.gestorloja.view;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
-import java.text.SimpleDateFormat;
-import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -17,21 +15,20 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
-import javax.swing.text.DateFormatter;
 
-import org.jdatepicker.JDatePanel;
-import org.jdatepicker.JDatePicker;
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
-
+import br.com.marcospcruz.gestorloja.controller.ControllerBase;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
 import br.com.marcospcruz.gestorloja.util.NumberDocument;
-import br.com.marcospcruz.gestorloja.view.util.MyDateFormatter;
 import br.com.marcospcruz.gestorloja.view.util.MyTableCellRenderer;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 
 public interface MyWindowAction extends ActionListener, MouseListener {
+	default void removeController(ControllerBase controller) {
+		SingletonManager.getInstance().removeController(controller);
+		
+	}
+
 	default JButton inicializaJButton(String text) {
 
 		JButton jButton = new JButton(text);
@@ -98,9 +95,9 @@ public interface MyWindowAction extends ActionListener, MouseListener {
 		return label;
 	}
 
-	default JLabel criaJLabel(String string, boolean leftAlignment) {
+	default JLabel criaJLabel(String string, boolean rightAlignment) {
 
-		int alignment = !leftAlignment ? SwingConstants.RIGHT : SwingConstants.LEFT;
+		int alignment = !rightAlignment ? SwingConstants.RIGHT : SwingConstants.LEFT;
 		JLabel label = new JLabel(string);
 		label.setAlignmentX(alignment);
 		label.setFont(FontMapper.getFont(20));

@@ -12,6 +12,8 @@ public class MyTableCellRenderer extends DefaultTableCellRenderer {
 	static final Font FONT_TAHOMA_22 = new Font("Tahoma", Font.PLAIN, 22);
 	static final Font FONT_TAHOMA_20 = new Font("Tahoma", Font.PLAIN, 20);
 
+	
+	
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 			int row, int column) {

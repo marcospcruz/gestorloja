@@ -16,6 +16,7 @@ public class FontMapper {
 		map.put(22, new Font("Tahoma", Font.PLAIN, 22));
 		map.put(20, new Font("Tahoma", Font.PLAIN, 20));
 		map.put(25, new Font("Tahoma", Font.PLAIN, 25));
+		map.put(30, new Font("Tahoma", Font.PLAIN, 30));
 		return map;
 	}
 

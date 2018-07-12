@@ -23,7 +23,7 @@ public class OperacaoEstoqueFacade {
 
 		controller.registraHistoricoOperacao(ENTRADA_ESTOQUE);
 //		((EstoqueController)controller).anulaAtributos();
-		SingletonManager.getInstance().reloadControllers();
+//		SingletonManager.getInstance().reloadControllers();
 	}
 
 }

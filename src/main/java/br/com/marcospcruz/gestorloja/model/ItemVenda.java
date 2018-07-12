@@ -92,6 +92,7 @@ public class ItemVenda implements Serializable {
 
 	public void setVenda(Venda venda) {
 		this.venda = venda;
+
 		setDataVenda(venda.getDataVenda());
 		setOperador(venda.getOperador());
 	}
@@ -154,8 +155,7 @@ public class ItemVenda implements Serializable {
 	@Override
 	public String toString() {
 		return "ItemVenda [idItemVenda=" + idItemVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
-				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda + ", venda="
-				+ venda + "]";
+				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda;
 	}
 
 }

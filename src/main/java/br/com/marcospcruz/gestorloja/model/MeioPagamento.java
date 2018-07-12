@@ -88,32 +88,18 @@ public class MeioPagamento implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((dataPagamento == null) ? 0 : dataPagamento.hashCode());
+		result = prime * result + ((descricao == null) ? 0 : descricao.hashCode());
 		result = prime * result + idMeioPagamento;
 		result = prime * result + ((pagamento == null) ? 0 : pagamento.hashCode());
+		result = prime * result + parcelas;
+		result = prime * result + ((tipoMeioPagamento == null) ? 0 : tipoMeioPagamento.hashCode());
+		result = prime * result + ((usuarioLogado == null) ? 0 : usuarioLogado.hashCode());
 		result = prime * result + Float.floatToIntBits(valorPago);
 		return result;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		MeioPagamento other = (MeioPagamento) obj;
-		if (idMeioPagamento != other.idMeioPagamento)
-			return false;
-		if (pagamento == null) {
-			if (other.pagamento != null)
-				return false;
-		} else if (!pagamento.equals(other.pagamento))
-			return false;
-		if (Float.floatToIntBits(valorPago) != Float.floatToIntBits(other.valorPago))
-			return false;
-		return true;
-	}
+	
 
 	public void setDataPagamento(Date dataPagamento) {
 		this.dataPagamento = dataPagamento;
@@ -141,5 +127,51 @@ public class MeioPagamento implements Serializable {
 	public int getParcelas() {
 		return parcelas;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MeioPagamento other = (MeioPagamento) obj;
+		if (dataPagamento == null) {
+			if (other.dataPagamento != null)
+				return false;
+		} 
+//		else if (!dataPagamento.equals(other.dataPagamento))
+//			return false;
+		if (descricao == null) {
+			if (other.descricao != null)
+				return false;
+		} else if (!descricao.equals(other.descricao))
+			// return false;
+			// if (idMeioPagamento != other.idMeioPagamento)
+			// return false;
+			// if (pagamento == null) {
+			// if (other.pagamento != null)
+			// return false;
+			// } else if (!pagamento.equals(other.pagamento))
+			// return false;
+		if (parcelas != other.parcelas)
+			return false;
+		if (tipoMeioPagamento == null) {
+			if (other.tipoMeioPagamento != null)
+				return false;
+		} else if (!tipoMeioPagamento.equals(other.tipoMeioPagamento))
+			return false;
+//		if (usuarioLogado == null) {
+//			if (other.usuarioLogado != null)
+//				return false;
+//		} else if (!usuarioLogado.equals(other.usuarioLogado))
+//			return false;
+		if (Float.floatToIntBits(valorPago) != Float.floatToIntBits(other.valorPago))
+			return false;
+		return true;
+	}
+	
+	
 
 }

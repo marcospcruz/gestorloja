@@ -107,9 +107,13 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	protected static final boolean IS_DECIMAL = true;
 
+	private static final int INDICE_COLUNA = 0;
+
 	protected boolean atualizaTable;
 	protected boolean disableActionPerformed;
 	protected ControllerBase controller;
+
+	private int indiceColunaJtable;
 
 	public AbstractDialog(JDialog owner, String tituloJanela, boolean modal) {
 
@@ -417,7 +421,7 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 			indiceLinhaTableModel = table.getSelectedRow();
 
-			Object id = table.getModel().getValueAt(indiceLinhaTableModel, 0);
+			Object id = table.getModel().getValueAt(indiceLinhaTableModel, indiceColunaJtable);
 
 			try {
 				controller.busca(id);
@@ -431,6 +435,14 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	}
 
+	public int getIndiceColunaJtable() {
+		return indiceColunaJtable;
+	}
+
+	public void setIndiceColunaJtable(int indiceColunaJtable) {
+		this.indiceColunaJtable = indiceColunaJtable;
+	}
+
 	protected void habilitaBotaoExcluir(boolean enabled) {
 		btnDeletar.setEnabled(enabled);
 
@@ -440,7 +452,7 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 	protected DefaultComboBoxModel carregaComboTiposProdutoModel() throws Exception {
 
 		// TipoProdutoController controller = new TipoProdutoController();
-		ControllerBase tipoController = getTipoProdutoController();
+		TipoProdutoController tipoController = getCategoriaProdutoController();
 
 		List objetos = tipoController.buscaTodos();
 
@@ -512,9 +524,11 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		//
 		SubTipoProduto tipoProduto = null;
 		try {
-			ControllerBase tipoProdutoController = !(controller instanceof TipoProdutoController)
-					? getTipoProdutoController()
-					: controller;
+			 TipoProdutoController tipoProdutoController = getCategoriaProdutoController() 
+//					!(controller instanceof TipoProdutoController)
+//					? getCategoriaProdutoController()
+//					: controller
+					;
 			tipoProdutoController.busca(((SubTipoProduto) selectedItem).getIdTipoItem());
 			tipoProduto = (SubTipoProduto) tipoProdutoController.getItem();
 
@@ -555,19 +569,17 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	}
 
-	protected TipoProdutoController getTipoProdutoController() throws Exception {
-		return (TipoProdutoController) getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
-	}
 
-	public ControllerBase getCategoriaProdutoController() throws Exception {
 
-		return getTipoProdutoController();
+	public TipoProdutoController getCategoriaProdutoController() throws Exception {
+
+		return (TipoProdutoController)getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
 	}
 
 	public abstract void atualizaTableModel();
 
 	public TipoProduto parseCategoriaProduto(JComboBox jComboBox) throws Exception {
-		TipoProdutoController tpController = getTipoProdutoController();
+		TipoProdutoController tpController = getCategoriaProdutoController();
 		validaSelecaoComboBox(jComboBox);
 		Object selectedItem = jComboBox.getSelectedItem();
 		TipoProduto categoriaProduto;

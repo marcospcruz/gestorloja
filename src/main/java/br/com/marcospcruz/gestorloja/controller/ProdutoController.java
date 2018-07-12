@@ -14,7 +14,7 @@ import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
-public class ProdutoController implements ControllerBase {
+public class ProdutoController extends ControllerBase {
 
 	private static final String RESULTADO_NAO_ENCONTRADO = "Produto não encontrado";
 

@@ -255,7 +255,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 //				itemEstoque.getCodigoDeBarras(),
 				itemEstoque.isEstoqueDedutivel()?itemEstoque.getQuantidade():"Sem Estoque", 
 				valorUnitario, 
-				valorTotal 				
+				valorTotal			
 				};
 //@formatter:on
 

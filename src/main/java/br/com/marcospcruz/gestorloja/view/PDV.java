@@ -27,6 +27,7 @@ import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -60,7 +61,7 @@ import br.com.marcospcruz.gestorloja.view.components.MyJCheckBox;
 
 public class PDV extends AbstractDialog {
 	private static final String VALOR = "Valor: ";
-	private static final Object[] COLUNAS_JTABLE = { "Código Produto", "Fabricante", "Categoria", "Produto",
+	private static final Object[] COLUNAS_JTABLE = { "#", "Código Produto", "Fabricante", "Categoria", "Produto",
 			"Quantidade", "Valor Produto", "Valor Venda", "Valor Total" };
 	private static final String UM = "1";
 	private static final int DEFAULT_GAP = 450;
@@ -99,12 +100,27 @@ public class PDV extends AbstractDialog {
 	private Component btnPesquisar;
 	private JButton btnAdicionarVenda;
 	private JButton btnRemoverVenda;
+	private Venda venda;
+
+	public PDV(String tituloJanela, JDialog owner) throws Exception {
+		super(owner, tituloJanela, true);
+		setSize(configuraDimensaoJanela());
+		vendaController = super.getVendaController();
+		configuraPdv();
+	}
 
 	public PDV(String tituloJanela, JFrame owner) throws Exception {
 		super(owner, tituloJanela, ControllerAbstractFactory.CONTROLE_VENDA, true);
-		meiosPagamentosSelecionadosList = new ArrayList<>();
 		vendaController = super.getVendaController();
 		vendaController.resetVenda();
+		configuraPdv();
+	}
+
+	private void configuraPdv() throws Exception {
+		meiosPagamentosSelecionadosList = new ArrayList<>();
+
+		venda = vendaController.getVenda();
+		// vendaController.resetVenda();
 		getContentPane().setLayout(new BorderLayout());
 		JPanel centerPanel = new JPanel(new GridLayout());
 
@@ -132,6 +148,7 @@ public class PDV extends AbstractDialog {
 	private Component criaSubTotalDescontoPanel() {
 		// JPanel panel = new JPanel(new GridLayout(2, 2));
 		// LayoutManager layout = new FlowLayout(FlowLayout.CENTER);
+
 		JPanel principal = new JPanel();
 		LayoutManager layout = new GridLayout(1, 2);
 		JPanel panel = new JPanel(layout);
@@ -241,6 +258,9 @@ public class PDV extends AbstractDialog {
 		principal.add(panel, BorderLayout.WEST);
 		// principal.add(centerPanel(), BorderLayout.CENTER);
 		// principal.add(panel3, BorderLayout.EAST);
+		txtTotalVenda.setText(Util.formataStringDecimais(venda.getTotalVendido()));
+		txtDesconto.setText(Util.formataStringDecimais(venda.getPorcentagemDesconto()));
+
 		return principal;
 	}
 
@@ -250,7 +270,7 @@ public class PDV extends AbstractDialog {
 		// panel3.setBackground(Color.CYAN);
 
 		btnFinalizar = inicializaJButton("Finalizar Venda");
-		btnFinalizar.setEnabled(false);
+		btnFinalizar.setEnabled(venda != null && venda.getPagamento() != null);
 		panel3.add(btnFinalizar);
 		return panel3;
 	}
@@ -302,6 +322,41 @@ public class PDV extends AbstractDialog {
 		JPanel pnl = new JPanel();
 
 		panel.add(pnl, BorderLayout.EAST);
+
+		Pagamento pagamento = venda.getPagamento();
+		if (pagamento != null) {
+			for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+				String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
+				for (MyJCheckBox jc : pagamentoComponentsMap.keySet()) {
+					if (jc.getText().equals(key)) {
+						jc.setSelected(true);
+						meiosPagamentosSelecionadosList.add((MyJCheckBox) jc);
+						List<Component> lista = pagamentoComponentsMap.get(jc);
+						int cont = 0;
+						for (Component component : lista) {
+							String valor = null;
+
+							if (cont == 0 && lista.size() == 2) {
+								if (jc.getText().equals("Outros")) {
+									valor = meioPagamento.getDescricao();
+								} else if (jc.getText().equals("Outros")) {
+									valor = Integer.toString(meioPagamento.getParcelas());
+								}
+							} else
+								valor = Util.formataStringDecimais(meioPagamento.getValorPago());
+
+							// if(cont==1) {
+							// valor=meioPagamento.getDescricao();
+							// }
+							((JTextComponent) component).setEnabled(true);
+
+							((JTextComponent) component).setText(valor);
+							cont++;
+						}
+					}
+				}
+			}
+		}
 		return panel;
 	}
 
@@ -462,7 +517,7 @@ public class PDV extends AbstractDialog {
 						meiosPagamentosSelecionadosList.add(jCheckBox);
 				} else
 					meiosPagamentosSelecionadosList.remove(jCheckBox);
-				// System.out.println(meiosPagamentosSelecionadosList.size());
+				 System.out.println(meiosPagamentosSelecionadosList.size());
 				// System.out.println(pagamentoComponentsMap.get(jCheckBox));
 				List<Component> componentes = pagamentoComponentsMap.get(jCheckBox);
 				componentes.stream().forEach(componente -> {
@@ -851,6 +906,8 @@ public class PDV extends AbstractDialog {
 				meiosPagamentosSelecionadosList = new ArrayList<>();
 				txtTotalVenda.setText(Util.formataMoeda(0f));
 				lblValorTroco.setText(Util.formataMoeda(0f));
+//				super.removeController(vendaController);
+				btnFinalizar.setEnabled(false);
 			}
 
 		} catch (Exception e) {
@@ -893,7 +950,7 @@ public class PDV extends AbstractDialog {
 	}
 
 	private void finalizaVenda() throws Exception {
-		Venda venda = vendaController.getVenda();
+
 		venda.setPorcentagemDesconto(Util.stringDecimaisToFloat(txtDesconto.getText()));
 		// Pagamento pagamento = venda.getPagamento();
 		float troco = Util.parseStringDecimalToFloat(lblValorTroco.getText().substring(3));
@@ -941,8 +998,7 @@ public class PDV extends AbstractDialog {
 		}
 		pagamento.setValorPagamento(valorTotalRecebido);
 		pagamento.setTrocoPagamento(troco);
-		venda.setPagamento(pagamento);
-		pagamento.setVenda(venda);
+		vendaController.validaPagamento(pagamento);
 		vendaController.finalizaVenda();
 
 	}
@@ -1015,13 +1071,15 @@ public class PDV extends AbstractDialog {
 	protected List parseListToLinhasTableModel(List lista) {
 		List linhas = new ArrayList<>();
 
-		for (Object objeto : lista) {
-			ItemVenda itemVenda = (ItemVenda) objeto;
+		// for (Object objeto : lista) {
+		for (int i = 0; i < lista.size(); i++) {
+			ItemVenda itemVenda = (ItemVenda) lista.get(i);
 			ItemEstoque itemEstoque = itemVenda.getItemEstoque();
 			//@formatter:off
 			float valorProduto= itemEstoque.getValorUnitario();
 			float valorVenda = itemVenda.getValorVendido();
 			linhas.add(new Object[] { 
+					i+1,
 					itemEstoque.getCodigoDeBarras(),
 					itemEstoque.getFabricante().getNome(),
 					itemEstoque.getTipoProduto().getDescricaoTipo(),
@@ -1067,6 +1125,7 @@ public class PDV extends AbstractDialog {
 
 	@Override
 	protected void populaFormulario() {
+
 		ItemVenda itemVenda = vendaController.getItemVenda();
 
 		ItemEstoque itemEstoque = itemVenda != null ? itemVenda.getItemEstoque() : null;
@@ -1107,6 +1166,7 @@ public class PDV extends AbstractDialog {
 			controller = getVendaController();
 			btnRemoverVenda.setEnabled(true);
 			btnAdicionarVenda.setEnabled(true);
+			setIndiceColunaJtable(1);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

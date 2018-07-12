@@ -19,17 +19,19 @@ import br.com.marcospcruz.gestorloja.facade.OperacaoEstoqueFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.ItemVenda;
+import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
+import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
-public class VendaController implements ControllerBase {
+public class VendaController extends ControllerBase {
 	public static final String PRODUTO_INVALIDO = "Selecão de Produto inválida.";
 	private EstoqueController estoqueController;
 	private Map<String, ItemVenda> itemVendaMap;
-	private Crud<Venda> vendaDao;
+
 	private Crud<ItemVenda> itemVendaDao;
 	private Venda venda;
 	private ItemVenda itemVendaBackup;
@@ -42,7 +44,7 @@ public class VendaController implements ControllerBase {
 		estoqueController = (EstoqueController) getController(ControllerAbstractFactory.ESTOQUE);
 		caixaController = (CaixaController) getController(ControllerAbstractFactory.CONTROLE_CAIXA);
 		iniciaVenda();
-		vendaDao = new CrudDao<>();
+		// vendaDao = new CrudDao<>();
 		itemVendaDao = new CrudDao<>();
 	}
 
@@ -143,7 +145,7 @@ public class VendaController implements ControllerBase {
 
 	@Override
 	public void setItem(Object object) {
-		// TODO Auto-generated method stub
+		this.venda = (Venda) object;
 
 	}
 
@@ -179,7 +181,7 @@ public class VendaController implements ControllerBase {
 		// itemVenda.setOperador(getUsuarioLogado());
 		estoqueController.setItemEstoque(null);
 		itemVendaBackup = null;
-//		itemVendaMap = new HashMap<>();
+		// itemVendaMap = new HashMap<>();
 
 	}
 
@@ -268,7 +270,7 @@ public class VendaController implements ControllerBase {
 
 			// itensVenda.add(itemVenda); alterar
 			if (itemVenda.getItemEstoque() != null) {
-//				venda.getItensVenda().add(itemVenda);
+				// venda.getItensVenda().add(itemVenda);
 				itemVenda.setVenda(venda);
 				itemVendaMap.put(itemVenda.getItemEstoque().getCodigoDeBarras(), itemVenda);
 				venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
@@ -368,42 +370,48 @@ public class VendaController implements ControllerBase {
 
 	public void resetVenda() {
 		venda = new Venda();
+		itemVendaMap = new HashMap<>();
 
 	}
 
 	public void finalizaVenda() throws Exception {
-		if(venda.getItensVenda().isEmpty()) {
-			throw new Exception("Venda sem produtos.");
+		// if (venda.getIdVenda() != 0)
+		// venda = vendaDao.busca(Venda.class, venda.getIdVenda());
+		if (venda.getItensVenda().isEmpty()) {
+			throw new Exception("Lista de Produtos vazia!");
 		}
 		venda.setDataVenda(SingletonManager.getInstance().getData());
 		venda.setOperador(getUsuarioLogado());
-//		venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
+		// venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
 		recebePagamento();
-		for (ItemVenda itemVenda : venda.getItensVenda()) {
-			ItemEstoque novoItemEstoque = new ItemEstoque();
-			ItemEstoque itemEstoque = itemVenda.getItemEstoque();
-			novoItemEstoque.setIdItemEstoque(itemEstoque.getIdItemEstoque());
-			novoItemEstoque.setCodigoDeBarras(itemEstoque.getCodigoDeBarras());
-			novoItemEstoque.setDataContagem(itemEstoque.getDataContagem());
-			novoItemEstoque.setFabricante(itemEstoque.getFabricante());
-			novoItemEstoque.setOperador(itemEstoque.getOperador());
-			novoItemEstoque.setProduto(itemEstoque.getProduto());
-			novoItemEstoque.setQuantidade(itemVenda.getQuantidade());
-			novoItemEstoque.setValorUnitario(itemVenda.getValorVendido());
-			estoqueController.setItem(novoItemEstoque);
-			estoqueController.registraHistoricoOperacao(OperacaoEstoqueFacade.SAIDA_ESTOQUE);
-			// salvaItemVenda(itemVenda);
-		}
-		venda.setCaixa((Caixa) caixaController.getItem());
+		if (venda.getIdVenda() == 0)
+			for (ItemVenda itemVenda : venda.getItensVenda()) {
+				ItemEstoque novoItemEstoque = new ItemEstoque();
+				ItemEstoque itemEstoque = itemVenda.getItemEstoque();
+				novoItemEstoque.setIdItemEstoque(itemEstoque.getIdItemEstoque());
+				novoItemEstoque.setCodigoDeBarras(itemEstoque.getCodigoDeBarras());
+				novoItemEstoque.setDataContagem(itemEstoque.getDataContagem());
+				novoItemEstoque.setFabricante(itemEstoque.getFabricante());
+				novoItemEstoque.setOperador(itemEstoque.getOperador());
+				novoItemEstoque.setProduto(itemEstoque.getProduto());
+				novoItemEstoque.setQuantidade(itemVenda.getQuantidade());
+				novoItemEstoque.setValorUnitario(itemVenda.getValorVendido());
+				estoqueController.setItem(novoItemEstoque);
+				estoqueController.registraHistoricoOperacao(OperacaoEstoqueFacade.SAIDA_ESTOQUE);
+				// salvaItemVenda(itemVenda);
+			}
+		if (venda.getCaixa() == null)
+			venda.setCaixa((Caixa) caixaController.getItem());
 		salva();
 
 		iniciaVenda();
 		estoqueController.anulaAtributos();
-		
-		itemVendaMap=null;
+
+		itemVendaMap = null;
 	}
 
 	public void salva() {
+		Crud<Venda> vendaDao = new CrudDao<>();
 		venda = vendaDao.update(venda);
 		venda.getPagamento().setVenda(venda);
 		// caixaController.atualizaPagamento(venda.getPagamento());
@@ -416,8 +424,26 @@ public class VendaController implements ControllerBase {
 		pagamento.setdataVenda(dataVenda);
 		Usuario operador = venda.getOperador();
 		pagamento.setUsuarioLogado(operador);
-		caixaController.recebePagamento(pagamento);
+		// caixaController.recebePagamento(pagamento);
+		Caixa caixa = venda.getCaixa() == null ? (Caixa) caixaController.getItem() : venda.getCaixa();
+		pagamento.getMeiosPagamento().stream().forEach(meioPagamento -> {
+			meioPagamento.setDataPagamento(dataVenda);
+			meioPagamento.setUsuarioLogado(operador);
+			TipoMeioPagamento tipoMeioPagamento = meioPagamento.getTipoMeioPagamento();
+			meioPagamento.setTipoMeioPagamento(caixaController.buscaTipoMeioPagamento(tipoMeioPagamento));
+			// meioPagamento = meioPagamentoDao.update(meioPagamento);
+
+			// pagamento.getMeiosPagamento().add(meioPagamento);
+			meioPagamento.setPagamento(pagamento);
+			if (meioPagamento.getIdMeioPagamento() == 0
+					&& meioPagamento.getTipoMeioPagamento().getIdTipoMeioPagamento() == 1) {
+				float saldoFinal = caixa.getSaldoFinal() + meioPagamento.getValorPago();
+				caixa.setSaldoFinal(saldoFinal);
+				// salva();
+			}
+		});
 		venda.setPagamento(pagamento);
+		caixaController.setItem(caixa);
 	}
 
 	private void salvaItemVenda(ItemVenda itemVenda) {
@@ -449,6 +475,157 @@ public class VendaController implements ControllerBase {
 	@Override
 	public void validaExistente(String text) throws Exception {
 		// TODO Auto-generated method stub
+
+	}
+
+	public void validaPagamento(Pagamento pagamento) {
+
+		Pagamento pagamentoAtual = venda.getPagamento();
+		// CrudDao<Pagamento> dao = new CrudDao<>();
+		if (pagamentoAtual != null) {
+			List<MeioPagamento> meiosPagamentoAtual = pagamentoAtual.getMeiosPagamento();
+			meiosPagamentoAtual.stream().forEach(mp -> {
+				if (mp.getTipoMeioPagamento().getIdTipoMeioPagamento() == 1) {
+					if (venda.getCaixa() != null) {
+						float valor = venda.getCaixa().getSaldoFinal() - mp.getValorPago();
+						venda.getCaixa().setSaldoFinal(valor);
+					}
+				}
+			});
+			meiosPagamentoAtual.removeAll(meiosPagamentoAtual);
+
+			// CrudDao<MeioPagamento> dao = new CrudDao<>();
+			// meiosPagamentoAtual.stream().forEach(mp -> {
+			//
+			// mp = dao.busca(MeioPagamento.class, mp.getIdMeioPagamento());
+			// if (mp != null)
+			// dao.delete(mp);
+			// });
+			// meiosPagamentoAtual.removeAll(meiosPagamentoAtual);
+			float valorTotal = 0;
+			for (MeioPagamento novoMp : pagamento.getMeiosPagamento()) {
+
+				// MeioPagamento mp = meiosPagamentoAtual.stream()
+				// .filter(p ->
+				// novoMp.getTipoMeioPagamento().equals(p.getTipoMeioPagamento())).findAny()
+				// // .orElse(novoMp)
+				// .orElse(null);
+				// if (mp != null) {
+				// mp.setValorPago(mp.getValorPago());
+				// mp.setDescricao(novoMp.getDescricao());
+				// mp.setParcelas(novoMp.getParcelas());
+				// } else if (mp == null) {
+				// mp = novoMp;
+				novoMp.setPagamento(pagamentoAtual);
+				meiosPagamentoAtual.add(novoMp);
+
+				valorTotal += novoMp.getValorPago();
+				// if
+				// (novoMp.getTipoMeioPagamento().getDescricaoTipoMeioPagamento().equals("Dinheiro"))
+				// {
+				// float valor = venda.getCaixa().getSaldoFinal() + novoMp.getValorPago();
+				// venda.getCaixa().setSaldoFinal(valor);
+				// }
+				// meiosPagamentoAtual.add(novoMp);
+				// }
+				// boolean isMesmoPagamento = mp != null && mp.equals(novoMp);
+				// mp.getValorPago() == novoMp.getValorPago();
+				// isMesmoPagamento = mp.getDescricao() == novoMp.getDescricao()
+				// && mp.getDescricao().equals(novoMp.getDescricao())
+				// ;
+				// (&& mp.getDescricao().equals(novoMp.getDescricao()))
+				// if (!isMesmoPagamento) {
+				// meiosPagamentoAtual.remove(mp);
+				//// meiosPagamentoAtual.add(novoMp)
+				// }
+
+				//// if (!pagtoOk) {
+				// Crud<Pagamento> dao = new CrudDao<>();
+				// dao.delete(pagamentoAtual);
+				// venda.setPagamento(pagamento);
+				// break;
+				// }
+
+			}
+			pagamentoAtual.setValorPagamento(valorTotal);
+		}
+		if (venda.getIdVenda() == 0)
+			venda.setPagamento(pagamento);
+
+	}
+
+	// @Override
+	// public int hashCode() {
+	// final int prime = 31;
+	// int result = 1;
+	// result = prime * result + ((caixaController == null) ? 0 :
+	// caixaController.hashCode());
+	// result = prime * result + ((estoqueController == null) ? 0 :
+	// estoqueController.hashCode());
+	// result = prime * result + (fazBackup ? 1231 : 1237);
+	// result = prime * result + ((itemVendaBackup == null) ? 0 :
+	// itemVendaBackup.hashCode());
+	// result = prime * result + ((itemVendaDao == null) ? 0 :
+	// itemVendaDao.hashCode());
+	// result = prime * result + ((itemVendaMap == null) ? 0 :
+	// itemVendaMap.hashCode());
+	// result = prime * result + ((venda == null) ? 0 : venda.hashCode());
+	// result = prime * result + ((vendaDao == null) ? 0 : vendaDao.hashCode());
+	// return result;
+	// }
+
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (this == obj)
+	// return true;
+	// if (obj == null)
+	// return false;
+	// if (getClass() != obj.getClass())
+	// return false;
+	// VendaController other = (VendaController) obj;
+	// if (caixaController == null) {
+	// if (other.caixaController != null)
+	// return false;
+	// } else if (!caixaController.equals(other.caixaController))
+	// return false;
+	// if (estoqueController == null) {
+	// if (other.estoqueController != null)
+	// return false;
+	// } else if (!estoqueController.equals(other.estoqueController))
+	// return false;
+	// if (fazBackup != other.fazBackup)
+	// return false;
+	// if (itemVendaBackup == null) {
+	// if (other.itemVendaBackup != null)
+	// return false;
+	// } else if (!itemVendaBackup.equals(other.itemVendaBackup))
+	// return false;
+	// if (itemVendaDao == null) {
+	// if (other.itemVendaDao != null)
+	// return false;
+	// } else if (!itemVendaDao.equals(other.itemVendaDao))
+	// return false;
+	// if (itemVendaMap == null) {
+	// if (other.itemVendaMap != null)
+	// return false;
+	// } else if (!itemVendaMap.equals(other.itemVendaMap))
+	// return false;
+	// if (venda == null) {
+	// if (other.venda != null)
+	// return false;
+	// } else if (!venda.equals(other.venda))
+	// return false;
+	// if (vendaDao == null) {
+	// if (other.vendaDao != null)
+	// return false;
+	// } else if (!vendaDao.equals(other.vendaDao))
+	// return false;
+	// return true;
+	// }
+
+	public void buscaVenda(Venda venda) {
+		Crud<Venda> dao = new CrudDao<>();
+		this.venda = dao.busca(Venda.class, venda.getIdVenda());
 
 	}
 

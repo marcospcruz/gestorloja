@@ -27,7 +27,7 @@ public abstract class AbstractJFrame extends JFrame implements MyWindowAction {
 
 	}
 
-	protected Usuario getUsuarioLogado(){
+	protected Usuario getUsuarioLogado() {
 		return SingletonManager.getInstance().getUsuarioLogado();
 	}
 }

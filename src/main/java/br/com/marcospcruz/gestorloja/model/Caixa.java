@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -24,7 +25,9 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 		@NamedQuery(name = "caixa.findCaixaAberto", query = "select distinct c from Caixa c " 
 				+ "LEFT JOIN c.vendas "
 				+ "where c.dataFechamento=null"),
-		@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c " + "LEFT JOIN c.vendas ") })
+		@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c "
+				+ "LEFT JOIN fetch c.vendas v "
+				+ "LEFT JOIN fetch v.pagamento p") })
 //@formatter:on
 public class Caixa extends AbstractModel {
 	@Id
@@ -43,6 +46,7 @@ public class Caixa extends AbstractModel {
 	@JoinColumn(name = "idUsuarioFechamento")
 	private Usuario usuarioFechamento;
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa")
+	@OrderBy(value = "idVenda")
 	private Set<Venda> vendas;
 
 	public Caixa() {

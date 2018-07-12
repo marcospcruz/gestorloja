@@ -23,7 +23,7 @@ public class Pagamento implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int idPagamento;
-	@OneToMany(cascade = CascadeType.ALL,mappedBy="pagamento")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "pagamento", orphanRemoval = true)
 	private List<MeioPagamento> meiosPagamento;
 	private float valorPagamento;
 	private float trocoPagamento;

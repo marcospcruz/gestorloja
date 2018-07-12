@@ -23,7 +23,7 @@ import br.com.marcospcruz.gestorloja.util.TipoProdutoNotFoundException;
  * @author Marcos
  * 
  */
-public class TipoProdutoController implements ControllerBase {
+public class TipoProdutoController extends ControllerBase {
 
 	private static final String RESULTADO_NAO_ENCONTRADO = ConstantesEnum.TIPO_PRODUTO_NAO_ENCONTRADO.getValue()
 			.toString();

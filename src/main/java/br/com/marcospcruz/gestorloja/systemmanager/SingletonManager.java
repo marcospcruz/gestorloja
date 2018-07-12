@@ -5,6 +5,10 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.ControllerBase;
@@ -16,6 +20,7 @@ public class SingletonManager {
 	private Usuario usuarioLogado;
 	private Map<String, ControllerBase> controllersMap;
 	private LocalDate dataManutencao;
+
 
 	private SingletonManager() {
 
@@ -49,13 +54,13 @@ public class SingletonManager {
 		return controllersMap.get(controllerClass);
 	}
 
-	public void reloadControllers() {
-		controllersMap.values().stream().forEach(controller -> {
-			controller.setList(null);
-			controller.buscaTodos();
-		});
-
-	}
+//	public void reloadControllers() {
+//		controllersMap.values().stream().forEach(controller -> {
+//			controller.setList(null);
+//			controller.buscaTodos();
+//		});
+//
+//	}
 
 	public void setDataManutencaoSistema(LocalDate dataManutencao) {
 		this.dataManutencao = dataManutencao;
@@ -76,6 +81,21 @@ public class SingletonManager {
 		}
 		Date data=Date.from(dataManutencao.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		return data;
+	}
+
+	public void removeController(ControllerBase controller) {
+		Set<Entry<String, ControllerBase>> entrySet = controllersMap.entrySet();
+		Entry<String, ControllerBase> teste = entrySet
+		.stream()
+		.filter(entry->controller.equals(entry.getValue()))
+		.findAny()
+		.orElse(null);
+//		.filter(entry->Objects.equals(controller,entry))
+//		.map(Map.Entry::getKey)
+//		.collect(Collectors.toSet());
+//		
+		controllersMap.remove(teste.getKey());
+		System.out.println(controllersMap);
 	}
 
 }
