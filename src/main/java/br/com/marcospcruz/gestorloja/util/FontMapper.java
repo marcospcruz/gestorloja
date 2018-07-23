@@ -13,6 +13,7 @@ public class FontMapper {
 
 	private static Map<Integer, Font> createMap() {
 		Map<Integer, Font> map = new HashMap<>();
+		map.put(15, new Font("Tahoma", Font.PLAIN, 15));
 		map.put(22, new Font("Tahoma", Font.PLAIN, 22));
 		map.put(20, new Font("Tahoma", Font.PLAIN, 20));
 		map.put(25, new Font("Tahoma", Font.PLAIN, 25));
@@ -21,6 +22,7 @@ public class FontMapper {
 	}
 
 	public static Font getFont(int size) {
+		size = 15;
 		return FONT_MAP.get(size);
 	}
 

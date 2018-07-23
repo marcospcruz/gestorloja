@@ -12,15 +12,31 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @Table(name = "TipoProduto")
-@NamedQueries({
-		@NamedQuery(name = "tipoProduto.readAll", query = "select distinct t from SubTipoProduto t LEFT JOIN FETCH t.subTiposProduto order by t.descricaoTipo"),
-		@NamedQuery(name = "tipoProduto.readtiposabstratos", query = "select distinct t from SubTipoProduto t LEFT JOIN FETCH t.subTiposProduto where t.superTipoProduto is null order by t.descricaoTipo"),
-		@NamedQuery(name = "tipoProduto.readParametro", query = "select distinct t from SubTipoProduto t LEFT JOIN FETCH t.subTiposProduto where lower(t.descricaoTipo) = :descricao"),
-		@NamedQuery(name = "tipoProduto.readParametroLike", query = "select distinct t from SubTipoProduto t LEFT JOIN FETCH t.subTiposProduto where UPPER(t.descricaoTipo) like :descricao "
+//@formatter:off
+@NamedQueries({ 
+	@NamedQuery(name = "tipoProduto.readAll", query = "select distinct t from SubTipoProduto t "
+		+ "LEFT JOIN FETCH t.subTiposProduto " 
+//		+ "LEFT JOIN FETCH t.itensEstoque " 
+		+ "order by t.descricaoTipo"),
+		@NamedQuery(name = "tipoProduto.readtiposabstratos", query = "select distinct t from SubTipoProduto t "
+				+ "LEFT JOIN FETCH t.subTiposProduto " 
+//				+ "LEFT JOIN FETCH t.itensEstoque "
+				+ "where t.superTipoProduto is null order by t.descricaoTipo"),
+		@NamedQuery(name = "tipoProduto.readParametro", query = "select distinct t from SubTipoProduto t "
+				+ "LEFT JOIN FETCH t.subTiposProduto " 
+//				+ "LEFT JOIN FETCH t.itensEstoque "
+				+ "where lower(t.descricaoTipo) = :descricao"),
+		@NamedQuery(name = "tipoProduto.readParametroLike", query = "select distinct t from SubTipoProduto t "
+				+ "LEFT JOIN FETCH t.subTiposProduto " 
+//				+ "LEFT JOIN FETCH t.itensEstoque "
+				+ "where UPPER(t.descricaoTipo) like :descricao "
 		// + "and t.superTipoProduto is null"
 		) })
 public class SubTipoProduto extends TipoProduto {
@@ -34,8 +50,8 @@ public class SubTipoProduto extends TipoProduto {
 	@JoinColumn(name = "idSuperTipoProduto")
 	private SubTipoProduto superTipoProduto;
 
-	@OneToMany(mappedBy="tipoProduto")
-	// @Fetch(FetchMode.JOIN)
+	@OneToMany(mappedBy = "tipoProduto", fetch = FetchType.EAGER,orphanRemoval=true)
+	@Fetch(FetchMode.SUBSELECT)
 	private List<ItemEstoque> itensEstoque;
 
 	private String sexo;
@@ -68,6 +84,14 @@ public class SubTipoProduto extends TipoProduto {
 
 	public void setSuperTipoProduto(SubTipoProduto superTipoProduto) {
 		this.superTipoProduto = superTipoProduto;
+	}
+
+	public List<ItemEstoque> getItensEstoque() {
+		return itensEstoque;
+	}
+
+	public void setItensEstoque(List<ItemEstoque> itensEstoque) {
+		this.itensEstoque = itensEstoque;
 	}
 
 	@Override

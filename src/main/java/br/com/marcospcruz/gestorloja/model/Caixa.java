@@ -24,12 +24,20 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 @NamedQueries({
 		@NamedQuery(name = "caixa.findCaixaAberto", query = "select distinct c from Caixa c " 
 				+ "LEFT JOIN c.vendas "
+				+ "LEFT JOIN fetch c.usuarioAbertura u "
+				+ "LEFT JOIN fetch c.usuarioFechamento u "
 				+ "where c.dataFechamento=null"),
 		@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c "
 				+ "LEFT JOIN fetch c.vendas v "
+				+ "LEFT JOIN fetch c.usuarioAbertura u "
+				+ "LEFT JOIN fetch c.usuarioFechamento u "
 				+ "LEFT JOIN fetch v.pagamento p") })
 //@formatter:on
 public class Caixa extends AbstractModel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1891194078556715854L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idCaixa;

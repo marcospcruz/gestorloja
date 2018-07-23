@@ -5,10 +5,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
-
-import org.eclipse.jdt.core.compiler.ITerminalSymbols;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
@@ -113,10 +112,10 @@ public class VendaController extends ControllerBase {
 	@Override
 	public List getList() {
 
-		if (venda.getItensVenda() == null)
+		if (venda.getItensVenda() == null || venda.getItensVenda().isEmpty())
 			return new ArrayList<>();
 
-		return new ArrayList<>(venda.getItensVenda());
+		return new ArrayList<>(itemVendaMap.values());
 	}
 
 	@Override
@@ -134,7 +133,7 @@ public class VendaController extends ControllerBase {
 	@Override
 	public Object getItem() {
 
-		return null;
+		return venda;
 	}
 
 	@Override
@@ -146,6 +145,9 @@ public class VendaController extends ControllerBase {
 	@Override
 	public void setItem(Object object) {
 		this.venda = (Venda) object;
+		itemVendaMap = venda.getItensVenda().stream()
+				.collect(Collectors.toMap(iv -> ((ItemVenda) iv).getItemEstoque().getCodigoDeBarras(), iv -> iv));
+		// setCacheMap(null);
 
 	}
 
@@ -164,6 +166,7 @@ public class VendaController extends ControllerBase {
 	public ItemVenda getItemVenda() {
 		try {
 			String key = estoqueController.getItemEstoque().getCodigoDeBarras();
+
 			return itemVendaMap.get(key);
 		} catch (NullPointerException e) {
 			return null;
@@ -415,6 +418,13 @@ public class VendaController extends ControllerBase {
 		venda = vendaDao.update(venda);
 		venda.getPagamento().setVenda(venda);
 		// caixaController.atualizaPagamento(venda.getPagamento());
+		// caixaController.setItem(venda.getCaixa());
+		try {
+			caixaController.salva();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void recebePagamento() throws Exception {
@@ -625,8 +635,20 @@ public class VendaController extends ControllerBase {
 
 	public void buscaVenda(Venda venda) {
 		Crud<Venda> dao = new CrudDao<>();
-		this.venda = dao.busca(Venda.class, venda.getIdVenda());
+		setItem(dao.busca(Venda.class, venda.getIdVenda()));
 
+	}
+
+	@Override
+	public void carregaCache() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String validaExclusaoItem() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

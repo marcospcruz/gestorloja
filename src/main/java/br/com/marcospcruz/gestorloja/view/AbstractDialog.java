@@ -2,20 +2,14 @@ package br.com.marcospcruz.gestorloja.view;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
@@ -30,11 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-import javax.swing.table.TableColumn;
 
 import org.hibernate.LazyInitializationException;
 
@@ -53,10 +43,7 @@ import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
-import br.com.marcospcruz.gestorloja.util.NumberDocument;
-import br.com.marcospcruz.gestorloja.view.util.MyTableCellRenderer;
 import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
-import net.sf.jasperreports.olap.mapping.MappingParser;
 
 public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
@@ -75,8 +62,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	protected static final String MESSAGE_CONFIRMING_DELETE = ConstantesEnum.CONFIRMACAO_EXCLUSAO.getValue().toString();
 
-	private JButton btnNovo;
-	private JButton btnSalvar;
+	protected JButton btnNovo;
+	protected JButton btnSalvar;
 	protected boolean acaoBuscar;
 	protected JButton btnDeletar;
 	protected JPanel jPanelBusca;
@@ -220,7 +207,7 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		//
 		// //
 		txtBusca = new JFormattedTextField();
-		txtBusca.setFont(FontMapper.getFont(22));
+		txtBusca.setFont(FontMapper.getFont(20));
 		// txtBusca.setBounds(200, 20, 250, TXT_HEIGHT);
 
 		jPanel.add(txtBusca, BorderLayout.CENTER);
@@ -383,13 +370,17 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	/**
 	 * 
+	 * @param msg
 	 * @param title
 	 * @param message
 	 * @return
 	 */
-	protected int confirmaExclusaoItem() {
+	protected int confirmaExclusaoItem(String msg) {
+		String mensagem = MESSAGE_CONFIRMING_DELETE;
+		if (msg != null)
+			mensagem = msg;
 
-		return showConfirmationMessage(TITLE_CONFIRMING_DELETE, MESSAGE_CONFIRMING_DELETE);
+		return showConfirmationMessage(TITLE_CONFIRMING_DELETE, mensagem);
 	}
 
 	private int showConfirmationMessage(String titleConfirmationDialog, String confirmationQuestion) {
@@ -430,6 +421,7 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 			}
 
 			populaFormulario();
+			controller.setList(null);
 
 		}
 
@@ -453,10 +445,12 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 		TipoProdutoController tipoController = getCategoriaProdutoController();
+		if (tipoController.getList() == null)
+			tipoController.buscaTodos();
+		List<TipoProduto> backup = new ArrayList(tipoController.getList());
+		// List objetos = tipoController.buscaTodos();
 
-		List objetos = tipoController.buscaTodos();
-
-		// List objetos = controller.getList();
+		List objetos = tipoController.getList();
 
 		DefaultComboBoxModel<TipoProduto> model = new DefaultComboBoxModel<>();
 		TipoProduto t1 = new SubTipoProduto();
@@ -496,7 +490,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 		// if (combo.getSelectedIndex() > 0)
 
-		return carregaSubTiposProdutoModel(combo.getSelectedItem());
+		Object item = combo.getSelectedItem();
+		return carregaSubTiposProdutoModel(item);
 
 		// else
 
@@ -524,11 +519,11 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		//
 		SubTipoProduto tipoProduto = null;
 		try {
-			 TipoProdutoController tipoProdutoController = getCategoriaProdutoController() 
-//					!(controller instanceof TipoProdutoController)
-//					? getCategoriaProdutoController()
-//					: controller
-					;
+			TipoProdutoController tipoProdutoController = getCategoriaProdutoController()
+			// !(controller instanceof TipoProdutoController)
+			// ? getCategoriaProdutoController()
+			// : controller
+			;
 			tipoProdutoController.busca(((SubTipoProduto) selectedItem).getIdTipoItem());
 			tipoProduto = (SubTipoProduto) tipoProdutoController.getItem();
 
@@ -536,8 +531,10 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 			tipoProduto = new SubTipoProduto();
 			tipoProduto.setDescricaoTipo(selectedItem.toString());
 		}
-		List<SubTipoProduto> tiposProduto = (List<SubTipoProduto>) tipoProduto.getSubTiposProduto();
-
+		List<SubTipoProduto> tiposProduto = null;
+		if (tipoProduto != null) {
+			tiposProduto = (List<SubTipoProduto>) tipoProduto.getSubTiposProduto();
+		}
 		Object[] arrayTipos = null;
 
 		if (tiposProduto == null)
@@ -545,16 +542,18 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 			tiposProduto = new ArrayList<>();
 
 		try {
+			if (tiposProduto != null && !tiposProduto.isEmpty()) {
+				arrayTipos = new Object[tiposProduto.size() + 1];
 
-			arrayTipos = new Object[tiposProduto == null ? 1 : tiposProduto.size() + 1];
+				arrayTipos[0] = ITEM_ZERO_COMBO;
 
-			arrayTipos[0] = ITEM_ZERO_COMBO;
+				for (int i = 0; i < tiposProduto.size(); i++)
 
-			for (int i = 0; i < tiposProduto.size(); i++)
+					arrayTipos[i + 1] = tiposProduto.get(i);
 
-				arrayTipos[i + 1] = tiposProduto.get(i);
-
-			model = new DefaultComboBoxModel(arrayTipos);
+				model = new DefaultComboBoxModel(arrayTipos);
+			} else
+				model = new DefaultComboBoxModel<>();
 
 		} catch (LazyInitializationException e) {
 
@@ -569,32 +568,32 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	}
 
-
-
 	public TipoProdutoController getCategoriaProdutoController() throws Exception {
 
-		return (TipoProdutoController)getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+		return (TipoProdutoController) getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
 	}
 
 	public abstract void atualizaTableModel();
 
 	public TipoProduto parseCategoriaProduto(JComboBox jComboBox) throws Exception {
 		TipoProdutoController tpController = getCategoriaProdutoController();
+		tpController.setItem(null);
 		validaSelecaoComboBox(jComboBox);
 		Object selectedItem = jComboBox.getSelectedItem();
-		TipoProduto categoriaProduto;
-		if (selectedItem instanceof TipoProduto)
+		TipoProduto categoriaProduto = null;
+		if (selectedItem instanceof SubTipoProduto)
 			return (TipoProduto) selectedItem;
 		else {
 			try {
-				tpController.busca(selectedItem.toString());
+				tpController.busca(selectedItem.toString().trim());
 			} catch (Exception e) {
 				e.printStackTrace();
+
 			}
 
 			categoriaProduto = tpController.getItem() == null ? new SubTipoProduto()
 					: (SubTipoProduto) tpController.getItem();
-			categoriaProduto.setDescricaoTipo(selectedItem.toString());
+			categoriaProduto.setDescricaoTipo(selectedItem.toString().trim());
 		}
 		if (categoriaProduto.getOperador() == null)
 			categoriaProduto.setOperador(getUsuarioLogado());
@@ -616,10 +615,11 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 			return (Produto) selectedItem;
 		else {
 			produto = new Produto();
-			produto.setDescricaoProduto(selectedItem.toString());
+			produto.setDescricaoProduto(selectedItem.toString().trim());
 		}
-		if (produto.getOperador() == null)
-			produto.setOperador(getUsuarioLogado());
+		// if (produto.getOperador() == null)
+		produto.setOperador(getUsuarioLogado());
+		produto.setDataInsercao(SingletonManager.getInstance().getData());
 		return produto;
 	}
 
@@ -662,7 +662,14 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 			return (Fabricante) selectedItem;
 		else {
 			fabricante = new Fabricante();
-			fabricante.setNome(selectedItem.toString());
+			fabricante.setNome(selectedItem.toString().trim());
+			try {
+				getFabricanteController().busca(fabricante.getNome());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (getFabricanteController().getItem() != null)
+				fabricante = (Fabricante) getFabricanteController().getItem();
 		}
 		if (fabricante.getOperador() == null)
 			fabricante.setOperador(getUsuarioLogado());

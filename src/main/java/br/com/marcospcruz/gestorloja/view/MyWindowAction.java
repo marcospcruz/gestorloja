@@ -5,12 +5,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -26,7 +29,7 @@ import br.com.marcospcruz.gestorloja.view.util.MyTableModel;
 public interface MyWindowAction extends ActionListener, MouseListener {
 	default void removeController(ControllerBase controller) {
 		SingletonManager.getInstance().removeController(controller);
-		
+
 	}
 
 	default JButton inicializaJButton(String text) {
@@ -35,7 +38,7 @@ public interface MyWindowAction extends ActionListener, MouseListener {
 
 		jButton.addActionListener(this);
 
-		jButton.setFont(FontMapper.getFont(22));
+		jButton.setFont(FontMapper.getFont(20));
 
 		return jButton;
 	}
@@ -61,7 +64,7 @@ public interface MyWindowAction extends ActionListener, MouseListener {
 			txtField.setDocument(new NumberDocument(isNumericDecimalField));
 
 		txtField.setColumns(10);
-		txtField.setFont(FontMapper.getFont(22));
+		txtField.setFont(FontMapper.getFont(20));
 		return txtField;
 	}
 
@@ -101,7 +104,7 @@ public interface MyWindowAction extends ActionListener, MouseListener {
 		JLabel label = new JLabel(string);
 		label.setAlignmentX(alignment);
 		label.setFont(FontMapper.getFont(20));
-//		label.setBorder(BorderFactory.createEtchedBorder());
+		// label.setBorder(BorderFactory.createEtchedBorder());
 		return label;
 	}
 
@@ -121,16 +124,24 @@ public interface MyWindowAction extends ActionListener, MouseListener {
 
 	public default JTable inicializaJTable(MyTableModel myTableModel) {
 
-		JTable jTable = new JTable(myTableModel);
-		jTable.getTableHeader().setFont(FontMapper.getFont(22));
+		JTable jTable = new JTable(myTableModel) {
+			@Override
+			public Class getColumnClass(int x) {
+				return getModel().getColumnClass(x);
+			}
+		};
+		jTable.getTableHeader().setFont(FontMapper.getFont(20));
 		jTable.addMouseListener(this);
-
+		jTable.setFillsViewportHeight(true);
+		jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
 		for (int i = 0; i < jTable.getColumnCount(); i++) {
 			TableColumn coluna = jTable.getColumnModel().getColumn(i);
 
 			MyTableCellRenderer tableCellRenderer = new MyTableCellRenderer();
 			coluna.setCellRenderer(tableCellRenderer);
-
+			if(i==8)
+				coluna.setCellEditor(new DefaultCellEditor(new JCheckBox()));
 			// coluna.setPreferredWidth(15);
 		}
 		jTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);

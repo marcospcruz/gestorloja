@@ -2,7 +2,9 @@ package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -38,8 +41,8 @@ public class Fabricante implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date dataInsercao;
 
-//	@OneToMany(mappedBy="fabricante")
-//	private List<Produto> produtos;
+	@OneToMany(mappedBy = "fabricante", cascade = CascadeType.REMOVE)
+	private List<ItemEstoque> itensEstoque;
 
 	public Fabricante() {
 		dataInsercao = SingletonManager.getInstance().getData();
@@ -78,15 +81,13 @@ public class Fabricante implements Serializable {
 		this.dataInsercao = dataInsercao;
 	}
 
-//	public List<Produto> getProdutos() {
-//		return produtos;
-//	}
-//
-//	public void setProdutos(List<Produto> produtos) {
-//		this.produtos = produtos;
-//	}
+	public List<ItemEstoque> getItensEstoque() {
+		return itensEstoque;
+	}
 
-
+	public void setItensEstoque(List<ItemEstoque> itensEstoque) {
+		this.itensEstoque = itensEstoque;
+	}
 
 	@Override
 	public String toString() {
@@ -131,8 +132,7 @@ public class Fabricante implements Serializable {
 		if (operador == null) {
 			if (other.operador != null)
 				return false;
-		} 
-		else if (!operador.equals(other.operador))
+		} else if (!operador.equals(other.operador))
 			return false;
 		return true;
 	}

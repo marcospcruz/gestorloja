@@ -83,7 +83,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		jpanel.add(jScrollPane, BorderLayout.CENTER);
 
 		getContentPane().add(jpanel, BorderLayout.CENTER);
-		
+
 		repaint();
 	}
 
@@ -132,7 +132,7 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 				break;
 			case FECHAR_CAIXA:
 				controller.validateCaixaFechado();
-				
+
 				new FormFechamentoCaixaDialog(this, controller);
 			}
 		} catch (Exception e) {
@@ -200,6 +200,8 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 
 	@Override
 	protected void carregaTableModel() {
+		controller.setList(null);
+		controller.setCacheMap(null);
 		List linhas = parseListToLinhasTableModel(controller.getList());
 		carregaTableModel(linhas, COLUNAS_JTABLE);
 
@@ -210,10 +212,14 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 
 		List linhas = new ArrayList();
 
-		for (Object linha : lista) {
-			linhas.add(processaLinha((Caixa) linha));
-		}
+		try {
+			for (Object linha : lista) {
+				linhas.add(processaLinha((Caixa) linha));
+			}
 
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 		return linhas;
 	}
 
@@ -237,17 +243,17 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 
 		};
 	}
-
+	// @formatter:on
 	private Float calculaTotalVendido(Caixa linha) {
-		Set<Venda>vendas=linha.getVendas();
+		Set<Venda> vendas = linha.getVendas();
 		float totalVendido = 0;
-		for(Venda venda:vendas){
-			totalVendido+=venda.getTotalVendido();
-		}
+		if (vendas != null)
+			for (Venda venda : vendas) {
+				totalVendido += venda.getTotalVendido();
+			}
 		return totalVendido;
 	}
 
-	// @formatter:on
 	@Override
 	protected void excluiItem() throws Exception {
 		// TODO Auto-generated method stub

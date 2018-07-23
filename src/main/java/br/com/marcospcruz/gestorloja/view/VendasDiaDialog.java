@@ -21,13 +21,14 @@ import br.com.marcospcruz.gestorloja.controller.VendaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.ItemVenda;
+import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.util.Util;
 
 public class VendasDiaDialog extends AbstractDialog {
 
 	private static final Object[] COLUNAS = new Object[] { "#", "Id", "Data Venda", "Total Vendido", "Total Recebido",
-			"Desconto Concedido" };
+			"Forma Pagto.", "Desconto Concedido" };
 	private Caixa caixa;
 	private float totalVendido;
 	private float valorRecebido;
@@ -111,7 +112,7 @@ public class VendasDiaDialog extends AbstractDialog {
 		// jScrollPane = null;
 		// jTable = null;
 		try {
-			getCaixaController().busca(caixa.getIdCaixa());
+			// getCaixaController().busca(caixa.getIdCaixa());
 			caixa = (Caixa) getCaixaController().getItem();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -154,12 +155,22 @@ public class VendasDiaDialog extends AbstractDialog {
 			Venda venda=(Venda) lista.get(i);
 			 totalVendido += venda.getTotalVendido();
 			 valorRecebido += venda.getPagamento().getValorPagamento();
-			linhas.add(new Object[] {
+			 String formaPagamento=new String();
+			 //@formatter:on
+			if (venda.getPagamento().getMeiosPagamento().size() == 1)
+				for (MeioPagamento pgto : venda.getPagamento().getMeiosPagamento()) {
+					formaPagamento = formaPagamento + pgto.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
+				}
+			else
+				formaPagamento = "Múltiplos Pagamentos";
+			//@formatter:off
+			 linhas.add(new Object[] {
 				i+1,
 				venda.getIdVenda(),
 				Util.formataData(venda.getDataVenda()),
 				Util.formataMoeda(venda.getTotalVendido()),
 				Util.formataMoeda(venda.getPagamento().getValorPagamento()),
+				formaPagamento,
 				Util.formataStringDecimais(venda.getPorcentagemDesconto())+"%"
 			});
 		}
@@ -188,11 +199,14 @@ public class VendasDiaDialog extends AbstractDialog {
 
 			vendaController.buscaVenda(venda);
 			JDialogFactory.createDialog(InterfaceGrafica.CLASS_NAME_PDV, this, InterfaceGrafica.CLASS_NAME_PDV);
+			getCaixaController().setItem(null);
+			getCaixaController().setCacheMap(null);
 			carregaTableModel();
 			// repaint();
 			totalVendidoLbl.setText(Util.formataMoeda(totalVendido));
 			valorRecebidoLbl.setText(Util.formataMoeda(valorRecebido));
 			totalVendasLbl.setText(Integer.toString(caixa.getVendas().size()) + " vendas");
+
 		} catch (Exception e) {
 
 			e.printStackTrace();

@@ -97,7 +97,7 @@ public class FabricanteDialog extends AbstractDialog {
 		formPanel.add(centerPanel, BorderLayout.CENTER);
 		txtDescricao = new JFormattedTextField();
 
-		txtDescricao.setFont(FontMapper.getFont(22));
+		txtDescricao.setFont(FontMapper.getFont(20));
 
 		centerPanel.add(txtDescricao, BorderLayout.NORTH);
 
@@ -127,11 +127,11 @@ public class FabricanteDialog extends AbstractDialog {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 
-		if (controller.getItem() == null) {
+		// if (controller.getItem() == null) {
 
-			controller.buscaTodos();
-			
-		}
+		controller.buscaTodos();
+
+		// }
 
 		carregaTableModel(parseListToLinhasTableModel(controller.getList()), COLUNAS_TABLE_MODEL);
 
@@ -239,7 +239,7 @@ public class FabricanteDialog extends AbstractDialog {
 
 				showErrorMessage(this, e.getMessage());
 
-				atualizaTable = false;
+				atualizaTable = true;
 
 			} finally {
 
@@ -303,9 +303,9 @@ public class FabricanteDialog extends AbstractDialog {
 		// TipoProdutoController controller = new TipoProdutoController();
 
 		controller.busca(txtBusca.getText());
-		
-		controller.setList(new ArrayList());
-		controller.getList().add(controller.getItem());
+
+		// controller.setList(new ArrayList());
+		// controller.getList().add(controller.getItem());
 
 		limpaFormulario();
 
@@ -323,15 +323,17 @@ public class FabricanteDialog extends AbstractDialog {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 		Fabricante fabricante = (Fabricante) controller.getItem();
-		txtDescricao.setText(fabricante.getNome());
+		boolean encontrado = fabricante != null;
+		if (encontrado)
+			txtDescricao.setText(fabricante.getNome());
 
 		//
 
 		// provisï¿½rio
-		txtDescricao.setEnabled(true);
+		txtDescricao.setEnabled(encontrado);
 		//
 		// provisï¿½rio
-		btnDeletar.setEnabled(true);
+		btnDeletar.setEnabled(encontrado);
 		//
 		// cmbSexo.setEnabled(isSubTipo);
 		//
@@ -348,9 +350,11 @@ public class FabricanteDialog extends AbstractDialog {
 		if (!acaoBuscar) {
 
 			controller.setItem(new Fabricante());
-			
+
+			controller.setList(null);
+
 			controller.buscaTodos();
-//			controller.setList(null);
+			// controller.setList(null);
 		}
 
 		txtDescricao.setEnabled(true);
@@ -391,15 +395,20 @@ public class FabricanteDialog extends AbstractDialog {
 
 		atualizaTable = false;
 
-		int confirmacao = confirmaExclusaoItem();
+		String msg = controller.validaExclusaoItem();
+		int
+
+		confirmacao = confirmaExclusaoItem(msg);
 
 		if (confirmacao == 0) {
 
 			controller.excluir();
 
-			controller.setItem(new Fabricante());
+			showMessage(this, "Fabricante / Marca excluído com sucesso!");
 
-			controller.setList(null);
+			// controller.setItem(new Fabricante());
+			//
+			// controller.setList(null);
 
 			limpaFormulario();
 
@@ -409,10 +418,11 @@ public class FabricanteDialog extends AbstractDialog {
 
 	@Override
 	protected void adicionaItemEstoque() throws Exception {
-
+		String nome = txtDescricao.getText().trim();
+		controller.validaExistente(nome);
 		if (confirmaSalvamentoItem() == 0) {
-			controller.validaExistente(txtDescricao.getText());
-			((Fabricante) controller.getItem()).setNome(txtDescricao.getText());
+
+			((Fabricante) controller.getItem()).setNome(nome);
 			controller.salva();
 			mostraMensagemConfirmacaoSalvamento();
 		}

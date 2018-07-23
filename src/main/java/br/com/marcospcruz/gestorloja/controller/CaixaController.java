@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -36,19 +37,34 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public void busca(Object id) {
-		Crud<Caixa> dao = new CrudDao<>();
-		caixa = dao.busca(Caixa.class, Integer.parseInt(id.toString()));
+		Map cache = getCacheMap();
+		if (cache.isEmpty()) {
+			Crud<Caixa> dao = new CrudDao<>();
+			caixa = dao.busca(Caixa.class, Integer.parseInt(id.toString()));
+		} else {
+
+		}
 
 	}
 
 	@Override
 	public List buscaTodos() {
-
-		Crud<Caixa> dao = getDao();
-		caixaList = null;
-		// if (caixaList == null || caixaList.isEmpty())
-		caixaList = dao.busca(QUERY_BUSCA_TODOS);
-
+		Map<Object, Object> cacheMap = getCacheMap();
+		// && cacheMap.isEmpty()
+		if (cacheMap == null || cacheMap.isEmpty()) {
+			Crud<Caixa> dao = getDao();
+			caixaList = null;
+			// if (caixaList == null || caixaList.isEmpty())
+			caixaList = dao.busca(QUERY_BUSCA_TODOS);
+			// setCacheMap(
+			// caixaList.stream().collect(Collectors.toMap(caixa -> ((Caixa)
+			// caixa).getIdCaixa(), caixa -> caixa)));
+			if (caixaList != null && !caixaList.isEmpty()) {
+				carregaCache();
+			}
+		} else {
+			caixaList = new ArrayList(cacheMap.values());
+		}
 		return caixaList;
 	}
 
@@ -65,8 +81,14 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public void busca(String query) throws Exception {
-		Crud<Caixa> dao = getDao();
-		caixaList = dao.busca(query);
+		Map<Object, Object> cacheMap = getCacheMap();
+		if (cacheMap == null || cacheMap.isEmpty()) {
+			Crud<Caixa> dao = getDao();
+			caixaList = dao.busca(query);
+
+			carregaCache();
+		}
+
 	}
 
 	@Override
@@ -123,26 +145,54 @@ public class CaixaController extends ControllerBase {
 
 		Crud<Caixa> dao = new CrudDao<>();
 		caixa = dao.update(caixa);
+		Map<Object, Object> cacheMap = getCacheMap();
+		cacheMap.put(caixa.getIdCaixa(), caixa);
 
 	}
 
 	public void validateCaixaAberto() throws Exception {
-
-		busca(BUSCA_CAIXA_ABERTO);
-
-		if (caixaList != null && !caixaList.isEmpty()) {
+		Map<Object, Object> cache = getCacheMap();
+		if (cache == null || cache.isEmpty())
+			busca(BUSCA_CAIXA_ABERTO);
+		caixa = (Caixa) cache.values().stream().filter(caixa -> ((Caixa) caixa).getDataFechamento() == null).findFirst()
+				.orElse(null);
+		// if (caixaList != null && !caixaList.isEmpty()) {
+		if (caixa != null) {
 			throw new Exception("Há caixa aberto.");
 		}
 	}
 
 	public void validateCaixaFechado() throws Exception {
 
-		busca(BUSCA_CAIXA_ABERTO);
-
-		if (caixaList == null || caixaList.isEmpty()) {
+		// Map<Object, Object> cacheMap = getCacheMap();
+		// if (cacheMap.isEmpty()) {
+		// busca(BUSCA_CAIXA_ABERTO);
+		// } // caixaList = new ArrayList(getCacheMap().values());
+		// loadCaixasAbertosFromCache();
+		// Caixa caixaAberto = (Caixa) cacheMap.values().stream()
+		// .filter(caixa -> ((Caixa) caixa).getDataFechamento() ==
+		// null).findAny().orElse(null);
+		// // if (caixaList == null || caixaList.isEmpty()) {
+		// // if (!cacheMap.containsKey("status_aberto")) {
+		// if (caixaAberto == null) {
+		// throw new Exception("Não há caixa aberto.");
+		// }
+		// caixa = caixaAberto;
+		try {
+			validateCaixaAberto();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (caixa == null) {
 			throw new Exception("Não há caixa aberto.");
 		}
-		caixa = caixaList.get(0);
+	}
+
+	private void loadCaixasAbertosFromCache() {
+		Map<Object, Object> cache = getCacheMap();
+		caixaList = new ArrayList(cache.values().stream().filter(caixa -> ((Caixa) caixa).getDataFechamento() == null)
+				.collect(Collectors.toList()));
 	}
 
 	public void fechaCaixa() throws Exception {
@@ -222,21 +272,25 @@ public class CaixaController extends ControllerBase {
 
 	public Float getSubTotalVendas() {
 		float subTotalVendas = 0;
-		for (Venda venda : caixa.getVendas()) {
-			subTotalVendas += venda.getTotalVendido();
-		}
+		Set<Venda> vendas = caixa.getVendas();
+		if (vendas != null)
+			for (Venda venda : vendas) {
+				subTotalVendas += venda.getTotalVendido();
+			}
 		return subTotalVendas;
 	}
 
 	public List controcalculaSubTotalRecebido() {
-
-		Set<Venda> vendas = caixa.getVendas();
-		Map<TipoMeioPagamento, Float> subTotalRecebido = mapMeioPagamentosRecebidosCaixa(vendas);
 		List linhas = new ArrayList();
-		for (TipoMeioPagamento tm : subTotalRecebido.keySet()) {
-			Object linha = new Object[] { tm.getDescricaoTipoMeioPagamento(),
-					Util.formataMoeda(subTotalRecebido.get(tm)) };
-			linhas.add(linha);
+		Set<Venda> vendas = caixa.getVendas();
+		if (vendas != null) {
+			Map<TipoMeioPagamento, Float> subTotalRecebido = mapMeioPagamentosRecebidosCaixa(vendas);
+
+			for (TipoMeioPagamento tm : subTotalRecebido.keySet()) {
+				Object linha = new Object[] { tm.getDescricaoTipoMeioPagamento(),
+						Util.formataMoeda(subTotalRecebido.get(tm)) };
+				linhas.add(linha);
+			}
 		}
 		return linhas;
 	}
@@ -278,4 +332,31 @@ public class CaixaController extends ControllerBase {
 		return false;
 	}
 
+//@formatter:off
+	public Caixa getCaixaAberto() {
+		 if(!getCacheMap().isEmpty())
+		 {
+			 Map<Object, Object> cache = getCacheMap();
+			 caixa=(Caixa) cache.values()
+					 .stream()
+					 .filter(caixa->((Caixa)caixa).getDataFechamento()==null)
+					 .findFirst()
+					 .orElse(null);
+		 }
+		return caixa;
+	}
+//@formatter:on
+
+	@Override
+	public void carregaCache() {
+
+		Map results = caixaList.stream().collect(Collectors.toMap(caixa -> caixa.getIdCaixa(), caixa -> caixa));
+		setCacheMap(results);
+	}
+
+	@Override
+	public String validaExclusaoItem() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

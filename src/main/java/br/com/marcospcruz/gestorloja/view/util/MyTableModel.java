@@ -4,11 +4,15 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.hibernate.dialect.ColumnAliasExtractor;
+
 public class MyTableModel extends AbstractTableModel {
 
 	private List linhas;
 
 	private Object[] colunas;
+
+	private Class<? extends Object>[] tiposColuna;
 
 	public MyTableModel(List linhas, Object[] colunas) {
 
@@ -16,8 +20,25 @@ public class MyTableModel extends AbstractTableModel {
 
 		this.colunas = colunas;
 
+		defineTipoColuna();
+
 		fireTableDataChanged();
 
+	}
+
+	private void defineTipoColuna() {
+		// for (Object linha : linhas) {
+		// Object[] colunas = (Object[]) linha;
+		// int i = 0;
+		// if (tiposColuna == null) {
+		// tiposColuna = new Class[colunas.length];
+		// }
+		// for (Object coluna : colunas) {
+		//
+		// tiposColuna[i++] = coluna.getClass();
+		// }
+		//
+		// }
 	}
 
 	public int getColumnCount() {
@@ -34,15 +55,25 @@ public class MyTableModel extends AbstractTableModel {
 
 		Object[] array = (Object[]) linhas.get(linha);
 
-		return array[coluna];
+		Object value = array[coluna];
+		if (value instanceof String)
+			return value.toString();
+		else if (value instanceof Boolean)
+			return Boolean.valueOf(value.toString());
+		return value;
 
 	}
 
 	@Override
 	public Class<?> getColumnClass(int arg0) {
-		System.out.println(arg0);
-		return super.getColumnClass(arg0);
+		int x = colunas.length - 1;
+		if (arg0 == x) {
+			return Boolean.class;
+
+		} else
+			return String.class;
 	}
+	// return tiposColuna[arg0];
 
 	public String getColumnName(int col) {
 
@@ -53,14 +84,14 @@ public class MyTableModel extends AbstractTableModel {
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 
-		// return super.isCellEditable(rowIndex, columnIndex);
+		return super.isCellEditable(rowIndex, columnIndex);
 
-		return false;
+		// return true;
 
 	}
 
 	public List getLinhas() {
-	
+
 		return linhas;
 	}
 

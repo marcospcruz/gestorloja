@@ -21,7 +21,6 @@ public class SingletonManager {
 	private Map<String, ControllerBase> controllersMap;
 	private LocalDate dataManutencao;
 
-
 	private SingletonManager() {
 
 	}
@@ -54,13 +53,13 @@ public class SingletonManager {
 		return controllersMap.get(controllerClass);
 	}
 
-//	public void reloadControllers() {
-//		controllersMap.values().stream().forEach(controller -> {
-//			controller.setList(null);
-//			controller.buscaTodos();
-//		});
-//
-//	}
+	// public void reloadControllers() {
+	// controllersMap.values().stream().forEach(controller -> {
+	// controller.setList(null);
+	// controller.buscaTodos();
+	// });
+	//
+	// }
 
 	public void setDataManutencaoSistema(LocalDate dataManutencao) {
 		this.dataManutencao = dataManutencao;
@@ -76,26 +75,30 @@ public class SingletonManager {
 	}
 
 	public Date getData() {
-		if(dataManutencao==null) {
+		if (dataManutencao == null) {
 			return new Date();
 		}
-		Date data=Date.from(dataManutencao.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		Date data = Date.from(dataManutencao.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		return data;
 	}
 
 	public void removeController(ControllerBase controller) {
 		Set<Entry<String, ControllerBase>> entrySet = controllersMap.entrySet();
-		Entry<String, ControllerBase> teste = entrySet
-		.stream()
-		.filter(entry->controller.equals(entry.getValue()))
-		.findAny()
-		.orElse(null);
-//		.filter(entry->Objects.equals(controller,entry))
-//		.map(Map.Entry::getKey)
-//		.collect(Collectors.toSet());
-//		
+		Entry<String, ControllerBase> teste = entrySet.stream().filter(entry -> controller.equals(entry.getValue()))
+				.findAny().orElse(null);
+		// .filter(entry->Objects.equals(controller,entry))
+		// .map(Map.Entry::getKey)
+		// .collect(Collectors.toSet());
+		//
 		controllersMap.remove(teste.getKey());
 		System.out.println(controllersMap);
+	}
+
+	public void resetControllers() {
+		controllersMap.values().stream().forEach(controller -> {
+			controller.setList(null);
+		});
+
 	}
 
 }

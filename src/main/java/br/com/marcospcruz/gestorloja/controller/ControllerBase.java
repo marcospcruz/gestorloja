@@ -5,17 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 public abstract class ControllerBase {
 
-	static final String BUSCA_INVALIDA = "Busca Invïálida";
+	static final String BUSCA_INVALIDA = "Busca Inválida";
 
 	private Map<Object, Object> cacheMap;
 	
-	private List cacheList;
+//	private List cacheList;
 
 	public Map<Object, Object> getCacheMap() {
 		return cacheMap;
@@ -27,7 +28,7 @@ public abstract class ControllerBase {
 
 	public ControllerBase() {
 		cacheMap = new HashMap<>();
-		cacheList=new ArrayList<>();
+//		cacheList=new ArrayList<>();
 	}
 
 	/**
@@ -72,6 +73,14 @@ public abstract class ControllerBase {
 
 	}
 
+//	public List getCacheList() {
+//		return cacheList;
+//	}
+//
+//	public void setCacheList(List cacheList) {
+//		this.cacheList = cacheList;
+//	}
+
 	public abstract void busca(Object id) throws Exception;
 
 	public abstract List buscaTodos();
@@ -97,5 +106,10 @@ public abstract class ControllerBase {
 	public abstract void registraHistoricoOperacao(Operacao operacao);
 
 	public abstract void validaExistente(String text) throws Exception;
+
+	public abstract void carregaCache();
+
+	public abstract String validaExclusaoItem() ;
+	
 
 }

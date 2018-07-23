@@ -70,7 +70,7 @@ public class ProdutoDialog extends AbstractDialog {
 		formPanel.add(centerPanel, BorderLayout.CENTER);
 		txtDescricao = new JFormattedTextField();
 
-		txtDescricao.setFont(FontMapper.getFont(22));
+		txtDescricao.setFont(FontMapper.getFont(20));
 
 		centerPanel.add(txtDescricao, BorderLayout.NORTH);
 
@@ -100,8 +100,8 @@ public class ProdutoDialog extends AbstractDialog {
 
 		// TipoProdutoController controller = new TipoProdutoController();
 
-		if (!acaoBuscar)
-			controller.buscaTodos();
+		// if (!acaoBuscar)
+		// controller.buscaTodos();
 
 		carregaTableModel(parseListToLinhasTableModel(controller.getList()), COLUNAS_TABLE_MODEL);
 
@@ -162,7 +162,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 				selecionaAcao(arg0.getActionCommand());
 
-//				atualizaTable = true;
+				atualizaTable = true;
 
 			} catch (Exception e) {
 
@@ -170,7 +170,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 				showErrorMessage(this, e.getMessage());
 
-				atualizaTable = false;
+				atualizaTable = true;
 
 			} finally {
 
@@ -200,6 +200,10 @@ public class ProdutoDialog extends AbstractDialog {
 
 			excluiItem();
 
+			controller.setList(null);
+
+			controller.buscaTodos();
+			
 		} else if (actionCommand.equals(NOVO_BUTTON_LBL)) {
 
 			acaoBuscar = false;
@@ -207,6 +211,10 @@ public class ProdutoDialog extends AbstractDialog {
 			atualizaTable = true;
 
 			limpaFormulario();
+
+			controller.setList(null);
+
+			controller.buscaTodos();
 
 		} else if (actionCommand.equals(SALVAR_BUTTON_LBL)) {
 
@@ -286,7 +294,7 @@ public class ProdutoDialog extends AbstractDialog {
 
 		// cmbSexo.setSelectedIndex(0);
 
-//		acaoBuscar = acaoBuscar == true ? false : true;
+		// acaoBuscar = acaoBuscar == true ? false : true;
 
 		txtBusca.setText("");
 
@@ -323,8 +331,8 @@ public class ProdutoDialog extends AbstractDialog {
 	protected void excluiItem() throws Exception {
 
 		atualizaTable = false;
-
-		int confirmacao = confirmaExclusaoItem();
+		String msg = controller.validaExclusaoItem();
+		int confirmacao = confirmaExclusaoItem(msg);
 
 		if (confirmacao == 0) {
 
@@ -338,8 +346,9 @@ public class ProdutoDialog extends AbstractDialog {
 
 	@Override
 	protected void adicionaItemEstoque() throws Exception {
+		controller.validaExistente(txtDescricao.getText());
 		if (confirmaSalvamentoItem() == 0) {
-			controller.validaExistente(txtDescricao.getText());
+			// controller.validaExistente(txtDescricao.getText());
 			((Produto) controller.getItem()).setDescricaoProduto(txtDescricao.getText());
 			controller.salva();
 			mostraMensagemConfirmacaoSalvamento();

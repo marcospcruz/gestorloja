@@ -2,6 +2,7 @@ package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,7 +14,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 //@formatter:off
 @Entity
@@ -48,8 +55,8 @@ import javax.persistence.Table;
 				+ "JOIN ie.tipoProduto t "
 				+ "JOIN t.superTipoProduto st "
 				+ "where "
-				+ "upper(t.descricaoTipo) like :descricaoTipo "
-				+ "OR UPPER(st.descricaoTipo) like :descricaoTipo "
+				+ "upper(t.descricaoTipo) =:descricaoTipo "
+				+ "OR UPPER(st.descricaoTipo) =:descricaoTipo "
 				+ "order by f.nome,t.descricaoTipo"
 				),
 		@NamedQuery(name = "itemEstoque.readAll", query = "select distinct ie from ItemEstoque ie " 
@@ -112,10 +119,22 @@ public class ItemEstoque implements Serializable {
 	private boolean estoqueDedutivel;
 	private float valorUnitario;
 	private float valorCusto;
+	@OneToMany
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "idItemEstoque")
+	private List<HistoricoOperacao> historicoOperacao;
 
 	public ItemEstoque() {
-		// setDataContagem(SingletonManager.getInstance().getData());
-		// setOperador(SingletonManager.getInstance().getUsuarioLogado());
+		setDataContagem(SingletonManager.getInstance().getData());
+		setOperador(SingletonManager.getInstance().getUsuarioLogado());
+	}
+
+	public List<HistoricoOperacao> getHistoricoOperacao() {
+		return historicoOperacao;
+	}
+
+	public void setHistoricoOperacao(List<HistoricoOperacao> historicoOperacao) {
+		this.historicoOperacao = historicoOperacao;
 	}
 
 	public Integer getIdItemEstoque() {

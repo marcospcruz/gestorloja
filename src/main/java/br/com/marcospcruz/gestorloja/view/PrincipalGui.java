@@ -66,17 +66,17 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 		getContentPane().add(panel, BorderLayout.CENTER);
 		JButton btnLimpaData = inicializaJButton("Limpar data");
 		btnLimpaData.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SingletonManager.getInstance().setDataManutencao(null);
 				calendario.getJFormattedTextField().setText("");
 			}
 		});
-		JPanel dataPanel=criaDatePanel();
+		JPanel dataPanel = criaDatePanel();
 		dataPanel.add(btnLimpaData);
 		panel.add(dataPanel);
-		
+
 	}
 
 	private JPanel criaDatePanel() {
@@ -90,9 +90,9 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 		JDatePanelImpl jDatePanel = new JDatePanelImpl(model, properties);
 
 		calendario = new JDatePickerImpl(jDatePanel, new MyDateFormatter());
-		calendario.getJFormattedTextField().setFont(FontMapper.getFont(22));
+		calendario.getJFormattedTextField().setFont(FontMapper.getFont(20));
 		datePanel.add(calendario);
-		calendario.setFont(FontMapper.getFont(22));
+		calendario.setFont(FontMapper.getFont(20));
 		calendario.addActionListener(this);
 		return datePanel;
 	}
@@ -123,7 +123,9 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			LocalDate dataManutencao = Util.parseDate(calendario.getJFormattedTextField().getText());
+			LocalDate dataManutencao = null;
+			if (calendario != null)
+				dataManutencao = Util.parseDate(calendario.getJFormattedTextField().getText());
 			if (dataManutencao != null)
 				SingletonManager.getInstance().setDataManutencaoSistema(dataManutencao);
 			switch (e.getActionCommand()) {
@@ -139,8 +141,11 @@ public class PrincipalGui extends AbstractJFrame implements WindowListener {
 			case InterfaceGrafica.PONTO_DE_VENDA:
 				CaixaController caixaController = (CaixaController) SingletonManager.getInstance()
 						.getController(ControllerAbstractFactory.CONTROLE_CAIXA);
-				Caixa caixaAberto = (Caixa) caixaController.getItem();
-				VendaController vendaController=(VendaController) SingletonManager.getInstance().getController(ControllerAbstractFactory.CONTROLE_VENDA);
+				caixaController.buscaTodos();
+				// Caixa caixaAberto = (Caixa) caixaController.getItem();
+				Caixa caixaAberto = caixaController.getCaixaAberto();
+				VendaController vendaController = (VendaController) SingletonManager.getInstance()
+						.getController(ControllerAbstractFactory.CONTROLE_VENDA);
 				vendaController.resetVenda();
 				if (caixaAberto == null) {
 					throw new NullPointerException("Não há Caixa aberto para realização de vendas.");

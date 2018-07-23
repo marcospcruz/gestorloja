@@ -18,6 +18,7 @@ import javax.swing.text.JTextComponent;
 
 import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.view.AbstractDialog;
+import br.com.marcospcruz.gestorloja.view.PDV;
 
 /**
  * 
@@ -33,9 +34,9 @@ import br.com.marcospcruz.gestorloja.view.AbstractDialog;
  */
 
 public class AutocompleteJComboBox<T> extends JComboBox<T> {
-
+	private static final int TRIGGER = 2;
 	static final long serialVersionUID = 4321421L;
-
+	private int searchingStartPoint;
 	private JComboBox primaryComboBox;
 	private String desc;
 	private ControllerBase controller;
@@ -45,6 +46,18 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 	private boolean keepCurrentModel;
 
 	private Object objetoSelecionado;
+	private boolean carregaModel;
+	private boolean changeTcText;
+
+	public AutocompleteJComboBox(AbstractDialog owner, ControllerBase controller, JComboBox object,
+			boolean setPopupVisibleOnFocus, boolean carregaModel) {
+		this(owner, controller, object, setPopupVisibleOnFocus);
+		this.carregaModel = carregaModel;
+		if (carregaModel) {
+			reloadModel();
+			searchingStartPoint = 0;
+		}
+	}
 
 	public AutocompleteJComboBox(AbstractDialog owner, ControllerBase controller, JComboBox primaryComboBox) {
 		this(owner, controller, primaryComboBox, true);
@@ -64,6 +77,7 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 			boolean setPopupVisibleOnFocus) {
 
 		super();
+		searchingStartPoint = TRIGGER;
 		this.primaryComboBox = primaryComboBox;
 
 		this.owner = owner;
@@ -99,12 +113,18 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 							JTextComponent textComponent = (JTextComponent) e.getSource();
 							// textComponent.setSelectionEnd(textComponent.getCaretPosition());
 							try {
+								if (carregaModel) {
+									reloadModel();
+								}
 								textComponent.selectAll();
 								setPopupVisible(setPopupVisibleOnFocus);
+								setChangeTcText(true);
+								
 							} catch (IllegalComponentStateException e) {
 								e.printStackTrace();
 							}
 						}
+
 					});
 
 				}
@@ -147,7 +167,7 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 						public void run() {
 
 							DefaultComboBoxModel<T> model = (DefaultComboBoxModel<T>) getModel();
-							if(tc.getText().length()<5)
+							if (tc.getText().length() < searchingStartPoint)
 								return;
 							// removeAllItems();
 							// reloadModel(model);
@@ -157,15 +177,19 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 							if (keepCurrentModel) {
 
 								model.setSelectedItem(objetoSelecionado);
-								tc.setText(objetoSelecionado.toString());
+								if (!changeTcText)
+									tc.setText(objetoSelecionado.toString());
 								// setSelectedItem(object);
 								// keepCurrentModel = false;
+								setKeepCurrentModel(false);
 								return;
 							}
 							ComboBoxModel<T> primaryModel;
 							if (primaryComboBox != null) {
 								primaryModel = primaryComboBox.getModel();
-								if (primaryModel.getSelectedItem().toString().equals("Selecione uma Opção"))
+
+								if (primaryModel.getSelectedItem() != null
+										&& primaryModel.getSelectedItem().toString().equals("Selecione uma Opção"))
 
 									return;
 							}
@@ -181,10 +205,10 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 
 									// model.removeAllElements();
 									owner.disableActionPerformed();
-									
+
 									try {
 										removeAllItems();
-									}catch(NullPointerException e) {
+									} catch (NullPointerException e) {
 										e.printStackTrace();
 									}
 									reloadModel(model);
@@ -309,6 +333,11 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 
 	}
 
+	private void setChangeTcText(boolean b) {
+		this.changeTcText = b;
+
+	}
+
 	@SuppressWarnings("unchecked")
 	private void reloadModel(DefaultComboBoxModel<T> model) {
 		T t1 = (T) "Selecione uma Opção.";
@@ -341,18 +370,28 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 	}
 
 	public T getSelectedItem() {
-		return (T) super.getSelectedItem();
+		T selectedItem = (T) new String();
+		try {
+			selectedItem = (T) super.getSelectedItem();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		return selectedItem;
 	}
 
 	public ComboBoxModel<T> getModel(boolean keepCurrentModel) {
-		this.keepCurrentModel = keepCurrentModel;
+		setKeepCurrentModel(keepCurrentModel);
 		return super.getModel();
 	}
 
 	public void setSelectedItem(Object arg0, boolean keepCurrentModel) {
-		this.keepCurrentModel = keepCurrentModel;
+		setKeepCurrentModel(keepCurrentModel);
 		objetoSelecionado = arg0;
 		setSelectedItem(arg0);
+	}
+
+	private void setKeepCurrentModel(boolean keepCurrentModel) {
+		this.keepCurrentModel = keepCurrentModel;
 	}
 
 	@Override

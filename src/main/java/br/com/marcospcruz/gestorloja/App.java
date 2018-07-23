@@ -31,8 +31,8 @@ public class App {
 				criaUsuario();
 				createOperacao();
 				createTipoMeioPagamento();
-//				if (args.length > 1)
-//					loadEstoqueSheet(args[1]);
+				// if (args.length > 1)
+				// loadEstoqueSheet(args[1]);
 			}
 		initApp();
 
@@ -71,27 +71,26 @@ public class App {
 
 	}
 
-//	private static void loadEstoqueSheet(String sheetString) {
-//
-//		PlanilhaHandlerFacade facade = new PlanilhaHandlerFacade();
-//
-//		try {
-//			facade.importaPlanilha(sheetString);
-//		} catch (Exception e) {
-//
-//			e.printStackTrace();
-//		}
-//
-//	}
+	// private static void loadEstoqueSheet(String sheetString) {
+	//
+	// PlanilhaHandlerFacade facade = new PlanilhaHandlerFacade();
+	//
+	// try {
+	// facade.importaPlanilha(sheetString);
+	// } catch (Exception e) {
+	//
+	// e.printStackTrace();
+	// }
+	//
+	// }
 
 	/**
 	 * s
 	 */
 	private static void initApp() {
 
-		// new EstoquePrincipalGui("Controle de Estoque");
-		new LoginGui("Gestão Loja - Login de Usuário").setVisible(true);
-		// new UsuarioGui().setVisible(true);
+		Runnable gestorApp = new LoginGui("Gestão Loja - Login de Usuário");
+		gestorApp.run();
 
 	}
 
@@ -150,7 +149,8 @@ public class App {
 				.asList(new PerfilUsuario[] { dao.busca("perfilusuario.findperfil", DESCRICAO, "Administrador") });
 
 		List<Usuario> usuarios = Arrays
-				.asList(new Usuario[] { new Usuario("Marcos Pereira da Cruz", "marcos", "123456", perfilUsuario) });
+				.asList(new Usuario[] { new Usuario("Marcos Pereira da Cruz", "marcos", "12345@6", perfilUsuario),
+						new Usuario("Cibele Pereira Bellini", "cibele", "123456", perfilUsuario)});
 
 		usuarios.stream().forEach(usuario -> {
 			Crud<Usuario> userdao = new CrudDao<>();

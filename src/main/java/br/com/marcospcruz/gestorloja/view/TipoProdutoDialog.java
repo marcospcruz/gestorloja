@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -15,7 +16,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
+import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
 
@@ -76,7 +79,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 		formPanel.add(centerPanel, BorderLayout.CENTER);
 		txtDescricao = new JFormattedTextField();
 
-		txtDescricao.setFont(FontMapper.getFont(22));
+		txtDescricao.setFont(FontMapper.getFont(20));
 
 		centerPanel.add(txtDescricao, BorderLayout.NORTH);
 
@@ -97,7 +100,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 		chkSubTipo = new JCheckBox(ConstantesEnum.SUB_TIPO_DE_LABEL.getValue().toString());
 		// setBounds(10, 90, 150, 30);
 
-		chkSubTipo.setFont(FontMapper.getFont(22));
+		chkSubTipo.setFont(FontMapper.getFont(20));
 
 		chkSubTipo.addActionListener(this);
 
@@ -111,7 +114,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 		}
 
 		cmbTiposProduto.setEnabled(chkSubTipo.isSelected());
-		cmbTiposProduto.setFont(FontMapper.getFont(22));
+		cmbTiposProduto.setFont(FontMapper.getFont(20));
 
 		// formPanel.add(cmbTiposProduto);
 		centerPanel.add(cmbTiposProduto, BorderLayout.SOUTH);
@@ -119,8 +122,6 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 		return formPanel;
 	}
-
-	
 
 	/**
 	 * xx
@@ -167,7 +168,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 	@Override
 	protected void carregaTableModel() {
 		// TipoProdutoController controller = new TipoProdutoController();
-
+		controller.buscaTodos();
 		List linhas = parseListToLinhasTableModel(controller.getList());
 
 		carregaTableModel(linhas, COLUNAS_TABLE_MODEL);
@@ -227,6 +228,13 @@ public class TipoProdutoDialog extends AbstractDialog {
 					// atualizaTableModel(controller.getItem());
 
 					atualizaTableModel();
+					try {
+						EstoqueController estoqueController = getItemEstoqueController();
+						// estoqueController.setCacheMap(null);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
 				}
 
@@ -251,6 +259,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 		if (actionCommand.equals(EXCLUIR_BUTTON_LBL)) {
 
 			excluiItem();
+			limpaFormulario();
 
 		} else if (actionCommand.equals(NOVO_BUTTON_LBL)) {
 
@@ -303,47 +312,55 @@ public class TipoProdutoDialog extends AbstractDialog {
 	protected void populaFormulario() {
 
 		// TipoProdutoController controller = new TipoProdutoController();
+		if (controller.getItem() != null) {
+			boolean isSubTipo = ((SubTipoProduto) controller.getItem()).getSuperTipoProduto() != null;
 
-		boolean isSubTipo = ((SubTipoProduto) controller.getItem()).getSuperTipoProduto() != null;
+			txtDescricao.setText(((SubTipoProduto) controller.getItem()).getDescricaoTipo());
 
-		txtDescricao.setText(((SubTipoProduto) controller.getItem()).getDescricaoTipo());
-
-		chkSubTipo.setEnabled(isSubTipo);
-		//
-		chkSubTipo.setSelected(isSubTipo);
-
-		// provisï¿½rio
-		txtDescricao.setEnabled(true);
-		//
-		// provisï¿½rio
-		btnDeletar.setEnabled(true);
-		//
-		// cmbSexo.setEnabled(isSubTipo);
-		//
-		cmbTiposProduto.setEnabled(isSubTipo);
-
-		if (isSubTipo) {
-
-			// String sexo = controller.getItem().getSexo();
-
-			// cmbSexo.setSelectedItem(sexo);
-
-			SubTipoProduto subTipoProduto = ((SubTipoProduto) controller.getItem()).getSuperTipoProduto();
-
-			// cmbTiposProduto.setSelectedItem(subTipoProduto);
-			cmbTiposProduto.getModel().setSelectedItem(subTipoProduto);
-
-		} else {
-
-			// cmbSexo.setSelectedIndex(0);
-
-			cmbTiposProduto.setSelectedIndex(0);
+			chkSubTipo.setEnabled(isSubTipo);
 			//
-			// btnDeletar.setEnabled(!(controller.getItem()
-			// .getSubTiposProduto().size() > 0));
+			chkSubTipo.setSelected(isSubTipo);
 
+			// provisï¿½rio
+			txtDescricao.setEnabled(true);
+			//
+			// provisï¿½rio
+			btnDeletar.setEnabled(true);
+			//
+			// cmbSexo.setEnabled(isSubTipo);
+			//
+			cmbTiposProduto.setEnabled(isSubTipo);
+
+			if (isSubTipo) {
+
+				// String sexo = controller.getItem().getSexo();
+
+				// cmbSexo.setSelectedItem(sexo);
+
+				TipoProduto subTipoProduto = ((SubTipoProduto) controller.getItem()).getSuperTipoProduto();
+				try {
+					List<SubTipoProduto> backup = new ArrayList<>(controller.getList());
+					controller.setList(null);
+					cmbTiposProduto.setModel(super.carregaComboTiposProdutoModel());
+					// controller.setList(backup);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// cmbTiposProduto.setSelectedItem(subTipoProduto);
+				cmbTiposProduto.getModel().setSelectedItem(subTipoProduto);
+
+			} else {
+
+				// cmbSexo.setSelectedIndex(0);
+
+				cmbTiposProduto.setSelectedIndex(0);
+				//
+				// btnDeletar.setEnabled(!(controller.getItem()
+				// .getSubTiposProduto().size() > 0));
+
+			}
 		}
-
 		acaoBuscar = true;
 
 	}
@@ -381,6 +398,8 @@ public class TipoProdutoDialog extends AbstractDialog {
 			controller.setItem(null);
 
 			controller.setList(null);
+
+			controller.setCacheMap(null);
 		}
 
 		txtDescricao.setEnabled(true);
@@ -421,13 +440,15 @@ public class TipoProdutoDialog extends AbstractDialog {
 
 			try {
 
-				for (SubTipoProduto tipo : subTipo.getSubTiposProduto()) {
+				Collection<SubTipoProduto> subTiposProduto = subTipo.getSubTiposProduto();
+
+				for (SubTipoProduto tipo : subTiposProduto) {
 
 					linhas.add(processaColuna(tipo));
 
 				}
 
-			} catch (NullPointerException e) {
+			} catch (Exception e) {
 
 				e.printStackTrace();
 
@@ -441,14 +462,16 @@ public class TipoProdutoDialog extends AbstractDialog {
 	@Override
 	protected void excluiItem() throws Exception {
 
-		atualizaTable = false;
+		atualizaTable = true;
 
-		int confirmacao = confirmaExclusaoItem();
+		String msg = controller.validaExclusaoItem();
+
+		int confirmacao = confirmaExclusaoItem(msg);
 
 		if (confirmacao == 0) {
 
 			controller.excluir();
-
+			showMessage(this, "Tipo Produto excluído com sucesso!");
 			limpaFormulario();
 
 		}
@@ -459,7 +482,12 @@ public class TipoProdutoDialog extends AbstractDialog {
 	protected void adicionaItemEstoque() throws Exception {
 		// TODO Auto-generated method stub
 		// TipoProdutoController controller = new TipoProdutoController();
+		String descricaoTipo = txtDescricao.getText().trim();
 
+		if (descricaoTipo.isEmpty()) {
+			throw new Exception("Descrição inválida.");
+		}
+		controller.validaExistente(descricaoTipo);
 		if (confirmaSalvamentoItem() == 0) {
 
 			// String sexo = cmbSexo.getSelectedIndex() == 0 ? null : cmbSexo
@@ -470,7 +498,7 @@ public class TipoProdutoDialog extends AbstractDialog {
 			// controller.salva(txtDescricao.getText(), chkSubTipo.isSelected(),
 			// tipoProduto, sexo);
 
-			controller.salva(txtDescricao.getText(), chkSubTipo.isSelected(), tipoProduto);
+			controller.salva(descricaoTipo, chkSubTipo.isSelected(), tipoProduto);
 
 			mostraMensagemConfirmacaoSalvamento();
 

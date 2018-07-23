@@ -202,6 +202,7 @@
 					<encoding>utf8</encoding>
 					<archive>
 						<manifest>
+							<addClasspath>true</addClasspath>
 							<mainClass>br.com.marcospcruz.gestorloja.App</mainClass>
 						</manifest>
 

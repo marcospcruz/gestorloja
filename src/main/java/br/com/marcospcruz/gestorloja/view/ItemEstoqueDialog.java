@@ -38,6 +38,7 @@ import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
+import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
 import br.com.marcospcruz.gestorloja.util.Util;
@@ -51,7 +52,6 @@ public class ItemEstoqueDialog extends AbstractDialog {
 	private static final long serialVersionUID = -3124929220441244866L;
 	private AutocompleteJComboBox<Produto> cmbProduto;
 	private JFormattedTextField txtQuantidadeInicial;
-	private JButton btnAdicionarItem;
 
 	private AutocompleteJComboBox<SubTipoProduto> cmbCategoriaProduto;
 	private AutocompleteJComboBox<SubTipoProduto> cmbSubCategoriaProduto;
@@ -78,9 +78,10 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 		JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-		btnAdicionarItem = inicializaJButton("Salvar Item");
-
-		btnPanel.add(btnAdicionarItem, BorderLayout.CENTER);
+		btnSalvar = inicializaJButton("Salvar Item");
+		btnDeletar = inicializaJButton("Excluir");
+		btnPanel.add(btnSalvar, BorderLayout.CENTER);
+		btnPanel.add(btnDeletar);
 		add(btnPanel, BorderLayout.SOUTH);
 		populaFormulario();
 
@@ -171,7 +172,34 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 		cmbProduto = createAutoCompleteComboBox(produtoController, cmbSubCategoriaProduto,
 				carregaComboProdutoModel(produtoController), true, false);
+		((JTextComponent) cmbProduto.getEditor().getEditorComponent()).addKeyListener(new KeyListener() {
 
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+//				DefaultComboBoxModel model = (DefaultComboBoxModel) cmbProduto.getModel();
+//				model.removeAllElements();
+				try {
+					ProdutoController produtoController=getProdutoController();
+					produtoController.getItem();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 		// panel.add(cmbProduto);
 
 		// panel.add(super.criaJLabel("Código de Barras"));
@@ -193,9 +221,12 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		// panel.add(super.criaJLabel("Quantidade"));
 		JPanel txtQt = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		txtQuantidadeInicial = inicializaNumberField();
+		txtQt.add(txtQuantidadeInicial);
+		// if (txtQuantidadeInicial.isPreferredSizeSet()) {
 		Dimension dimension = txtQuantidadeInicial.getPreferredSize();
 		txtCodigoDeBarras.setPreferredSize(dimension);
-		txtQt.add(txtQuantidadeInicial);
+		// }
+
 		// criaBox("Quantidade", txtQuantidadeInicial);
 		labelPanel.add(super.criaJLabel("Quantidade"));
 		fieldPanel.add(txtQt);
@@ -227,7 +258,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 	// private JLabel createJLabel(String string) {
 	// JLabel jLabel = new JLabel(string);
-	// jLabel.setFont(FontMapper.getFont(22));
+	// jLabel.setFont(FontMapper.getFont(20));
 	// return jLabel;
 	// }
 
@@ -282,7 +313,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 				setPopupVisibleOnFocus);
 		autoComboBox.setModel(comboBoxModel);
 		// autoComboBox.setPreferredSize(new Dimension(100,100));
-		autoComboBox.setFont(FontMapper.getFont(22));
+		autoComboBox.setFont(FontMapper.getFont(20));
 		if (apagaTextoOnFocus) {
 		}
 
@@ -296,7 +327,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 	 * @throws Exception
 	 */
 	private ComboBoxModel<Produto> carregaComboProdutoModel(ProdutoController produtoController) throws Exception {
-
+		produtoController.buscaTodos();
 		List lista = produtoController.getList();
 		if (lista == null)
 			lista = new ArrayList<>();
@@ -343,7 +374,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 				cmbSubCategoriaProduto.setModel(selectModelSubTiposDeProduto(jComboBox));
 
 			} else if (arg0.getSource().equals(cmbSubCategoriaProduto)) {
-				cleanDropDownComponentModel(cmbProduto.getModel());
+				// cleanDropDownComponentModel(cmbProduto.getModel());
 				// if (produtos != null)
 				// cmbProduto.setModel(super.selectModelProdutos(produtos));
 				// SubTipoProduto superCategoria = ((SubTipoProduto)
@@ -358,15 +389,22 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		{
 
 			try {
-				if (confirmaSalvamentoItem() == 0) {
-					adicionaItemEstoque();
+				if (arg0.getActionCommand().equals(btnDeletar.getText())) {
+					if (confirmaExclusaoItem(null) == 0) {
+						getItemEstoqueController().excluir();
+					}
+				} else if (arg0.getActionCommand().equals(btnSalvar.getText()))
+					if (confirmaSalvamentoItem() == 0) {
+						adicionaItemEstoque();
 
-					mensagem = "Estoque atualizado com sucesso!";
+						mensagem = "Estoque atualizado com sucesso!";
 
-					tipoMensagem = JOptionPane.INFORMATION_MESSAGE;
+						tipoMensagem = JOptionPane.INFORMATION_MESSAGE;
 
-					exibeMensagemSucesso(this, mensagem);
-				}
+						exibeMensagemSucesso(this, mensagem);
+
+						// dispose();
+					}
 			} catch (Exception e) {
 
 				e.printStackTrace();
@@ -445,11 +483,13 @@ public class ItemEstoqueDialog extends AbstractDialog {
 			controller = (EstoqueController) super.getItemEstoqueController();
 
 			ItemEstoque itemEstoque = (ItemEstoque) controller.getItem();
-			if (itemEstoque != null) {
+			boolean isExistente = itemEstoque.getIdItemEstoque() != null;
+			btnDeletar.setEnabled(isExistente);
+			if (isExistente) {
 				Fabricante fabricante = itemEstoque.getFabricante();
 				Produto produto = itemEstoque.getProduto();
 				SubTipoProduto categoria = itemEstoque.getTipoProduto();
-				SubTipoProduto superCategoria = categoria.getSuperTipoProduto();
+				TipoProduto superCategoria = categoria.getSuperTipoProduto();
 				cmbFabricante.setSelectedItem(fabricante);
 				cmbProduto.setSelectedItem(produto, true);
 
@@ -492,11 +532,12 @@ public class ItemEstoqueDialog extends AbstractDialog {
 				deduzEstoqueChkBox.setSelected(itemEstoque.isEstoqueDedutivel());
 				String valorCusto = Util.formataMoeda(itemEstoque.getValorCusto());
 				txtValorCusto.setText(valorCusto.substring(3));
-
+				cmbProduto.setSelectedItem(produto);
 				// cmbProduto.setEnabled(produto == null);
 				// cmbFabricante.setEnabled(fabricante == null);
 				// cmbSubCategoriaProduto.setEnabled(categoria == null);
 				// cmbCategoriaProduto.setEnabled(superCategoria == null);
+
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -539,8 +580,10 @@ public class ItemEstoqueDialog extends AbstractDialog {
 
 		SubTipoProduto subTipoProduto = (SubTipoProduto) parseCategoriaProduto(cmbSubCategoriaProduto);
 		SubTipoProduto superTipoProduto = (SubTipoProduto) parseCategoriaProduto(cmbCategoriaProduto);
-		if (!superTipoProduto.equals(subTipoProduto))
+		if (subTipoProduto.getSuperTipoProduto() == null && !superTipoProduto.equals(subTipoProduto)) {
 			subTipoProduto.setSuperTipoProduto(superTipoProduto);
+			// superTipoProduto.getSubTiposProduto().add(subTipoProduto);
+		}
 		// produto.setTipoProduto((SubTipoProduto) subTipoProduto);
 		// List<SubTipoProduto> tipos = produto.getTiposProduto();
 		// if (tipos == null)
@@ -551,11 +594,11 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		String qtString = txtQuantidadeInicial.getText();
 		if (qtString.isEmpty())
 			qtString = "0";
-		Integer quantidade = Integer.valueOf(qtString);
+		Integer quantidade = Integer.valueOf(qtString.trim());
 		String vlUnit = txtValueToStringDecimal(txtValorUnitario.getText());
-		Float valorUnitario = Util.parseStringDecimalToFloat(vlUnit);
-		String valorCusto = txtValueToStringDecimal(txtValorCusto.getText());
-		Float valorCustoFloat = Util.parseStringDecimalToFloat(valorCusto);
+		Float valorUnitario = Util.parseStringDecimalToFloat(vlUnit.trim());
+		String valorCusto = txtValueToStringDecimal(txtValorCusto.getText().trim());
+		Float valorCustoFloat = Util.parseStringDecimalToFloat(valorCusto.trim());
 		ItemEstoque itemEstoque = controller.getItemEstoque() == null ? new ItemEstoque()
 				: (ItemEstoque) controller.getItemEstoque();
 		itemEstoque.setEstoqueDedutivel(deduzEstoqueChkBox.isSelected());
@@ -565,7 +608,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		itemEstoque.setValorUnitario(valorUnitario);
 		itemEstoque.setTipoProduto(subTipoProduto);
 		itemEstoque.setValorCusto(valorCustoFloat);
-		String codigoBarras = txtCodigoDeBarras.getText();
+		String codigoBarras = txtCodigoDeBarras.getText().trim();
 
 		if (codigoBarras.isEmpty()) {
 			throw new Exception("Código de Barras inválido!");

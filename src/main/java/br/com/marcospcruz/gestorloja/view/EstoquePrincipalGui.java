@@ -17,13 +17,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -32,7 +32,9 @@ import javax.swing.text.JTextComponent;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
-import br.com.marcospcruz.gestorloja.controller.relatorio.RelatorioEstoqueGeral;
+import br.com.marcospcruz.gestorloja.controller.relatorio.RelatorioEstoqueGeralPdf;
+import br.com.marcospcruz.gestorloja.controller.relatorio.RelatorioEstoqueGeralXlsX;
+import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
@@ -77,11 +79,13 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	private JPanel jPanelTableEstoque;
 	private JComboBox<TipoProduto> cmbCategoriaProduto;
 	private AutocompleteJComboBox<SubTipoProduto> cmbSubCategoriaProduto;
+	private EstoqueController estoqueController;
 
 	public EstoquePrincipalGui(String tituloJanela, JFrame owner) throws Exception {
 
 		super(owner, tituloJanela, ControllerAbstractFactory.ESTOQUE, true);
-
+		estoqueController = getController();
+		estoqueController.setList(null);
 		carregaJPanel();
 
 		setVisible(true);
@@ -173,11 +177,12 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	@SuppressWarnings("rawtypes")
 	protected void carregaTableModel() {
 		try {
-			EstoqueController estoqueController = getController();
+
 			// estoqueController.setList(null);
 
-			if (estoqueController.getList() == null || estoqueController.getList().isEmpty())
-				estoqueController.buscaTodos();
+			// if (estoqueController.getList() == null ||
+			// estoqueController.getList().isEmpty())
+			// estoqueController.buscaTodos();
 			List<ItemEstoque> itemsEstoque = estoqueController.getList();
 			List linhas = parseListToLinhasTableModel(itemsEstoque);
 
@@ -240,7 +245,8 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		SubTipoProduto tipoProduto = itemEstoque.getTipoProduto();
 
 		Produto produto = itemEstoque.getProduto();
-		String nomeFabricante = itemEstoque.getFabricante() == null ? "" : itemEstoque.getFabricante().getNome();
+		Fabricante fabricante = itemEstoque.getFabricante();
+		String nomeFabricante = fabricante == null ? "" : fabricante.getNome();
 
 		String descricaoSuperTipoProduto = tipoProduto.getSuperTipoProduto() == null ? ""
 				: tipoProduto.getSuperTipoProduto().getDescricaoTipo();
@@ -255,7 +261,8 @@ public class EstoquePrincipalGui extends AbstractDialog {
 //				itemEstoque.getCodigoDeBarras(),
 				itemEstoque.isEstoqueDedutivel()?itemEstoque.getQuantidade():"Sem Estoque", 
 				valorUnitario, 
-				valorTotal			
+				valorTotal
+//				true
 				};
 //@formatter:on
 
@@ -285,6 +292,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private JPanel carregaFormularioBusca() throws Exception {
 
 		JPanel panel = new JPanel();
@@ -302,7 +310,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		cmbSubCategoriaProduto = new AutocompleteJComboBox<>(this, getCategoriaProdutoController(),
 				cmbCategoriaProduto);
 		cmbSubCategoriaProduto.setFont(FontMapper.getFont(20));
-
+		cmbSubCategoriaProduto.setEnabled(false);
 		cmbSubCategoriaProduto.addActionListener(this);
 		JTextComponent component = (JTextComponent) cmbSubCategoriaProduto.getEditor().getEditorComponent();
 		component.addKeyListener(new KeyListener() {
@@ -318,7 +326,12 @@ public class EstoquePrincipalGui extends AbstractDialog {
 				String string = component.getText();
 
 				if (string.isEmpty() || string.equals("Selecione uma Opção.")) {
-					loadItensSuperTipoEstoque();
+					try {
+						loadItensSuperTipoEstoque();
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					atualizaTableModel();
 				}
 
@@ -330,7 +343,9 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 			}
 		});
-		cmbSubCategoriaProduto.setModel(selectModelSubTiposDeProduto(cmbCategoriaProduto));
+		if (!cmbCategoriaProduto.getSelectedItem().toString().equals("Selecione uma Opção")) {
+			cmbSubCategoriaProduto.setModel(selectModelSubTiposDeProduto(cmbCategoriaProduto));
+		}
 		panel.add(cmbSubCategoriaProduto);
 
 		panel.add(super.criaJLabel(ConstantesEnum.DESCRICAO_ITEM_LABEL.getValue().toString()));
@@ -384,13 +399,20 @@ public class EstoquePrincipalGui extends AbstractDialog {
 	private JPanel carregaPanelBtnRelatorios() {
 
 		JPanel panel = new JPanel();
-
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		// panel.setLayout(new GridLayout(2, 1));
 		panel.setBorder(super.criaTitledBorder(ConstantesEnum.RELATORIO_TITLE_BORDER.getValue().toString()));
 
 		JButton btnRelatorioGeralEstoque = inicializaJButton(ConstantesEnum.LBL_BTN_RELATORIO.getValue().toString());
-
+		JButton btnRelatorioGeralEstoqueXlsx = inicializaJButton("Relatório de Estoque (XLSX)");
+		JPanel teste = new JPanel();
+		JPanel teste2 = new JPanel();
+		// teste.add(btnRelatorioGeralEstoque);
+		// teste2.add(btnRelatorioGeralEstoqueXlsx);
+		panel.add(teste);
+		panel.add(teste2);
 		panel.add(btnRelatorioGeralEstoque);
-
+		panel.add(btnRelatorioGeralEstoqueXlsx);
 		return panel;
 	}
 
@@ -465,12 +487,15 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		}
 	}
 
-	private void selecionaAcaoComboBox(ActionEvent e, EstoqueController estoqueController) {
+	private void selecionaAcaoComboBox(ActionEvent e, EstoqueController estoqueController) throws Exception {
 
 		Object categoriaProduto = ((JComboBox<TipoProduto>) e.getSource()).getSelectedItem();
 		if (e.getSource().equals(cmbCategoriaProduto)) {
-			loadItensSuperTipoEstoque();
-
+			try {
+				loadItensSuperTipoEstoque();
+			} catch (Exception ee) {
+				ee.printStackTrace();
+			}
 		} else {
 			// if (categoriaProduto == null) {
 			// JTextComponent component = (JTextComponent) ((JComboBox<TipoProduto>)
@@ -499,9 +524,11 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 	}
 
-	private void loadItensSuperTipoEstoque() {
+	private void loadItensSuperTipoEstoque() throws Exception {
 		Object categoriaProduto = cmbCategoriaProduto.getSelectedItem();
 		cmbSubCategoriaProduto.setModel(selectModelSubTiposDeProduto(cmbCategoriaProduto));
+		boolean enableSubCategorias = cmbSubCategoriaProduto.getModel().getSize() > 0;
+		cmbSubCategoriaProduto.setEnabled(enableSubCategorias);
 		EstoqueController estoqueController = null;
 		try {
 			estoqueController = getController();
@@ -509,7 +536,14 @@ public class EstoquePrincipalGui extends AbstractDialog {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		estoqueController.busca(categoriaProduto.toString(), null, null);
+		String descricaoCategoria = null;
+		String descricaoProduto = txtBuscaDescricaoProduto.getText();
+
+		descricaoCategoria = ((SubTipoProduto) categoriaProduto).getDescricaoTipo();
+		if (!descricaoCategoria.equals("Selecione uma Opção"))
+			estoqueController.busca(descricaoCategoria, descricaoProduto, null);
+		else
+			estoqueController.setList(null);
 	}
 
 	@Override
@@ -553,12 +587,21 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		if (actionCommand.equals(ConstantesEnum.LBL_BTN_NOVO_ITEM_ESTOQUE.getValue().toString())) {
 			estoqueController.setItem(new ItemEstoque());
 			new ItemEstoqueDialog(estoqueController, this);
+			cmbCategoriaProduto.setSelectedIndex(0);
+			txtBuscaDescricaoProduto.setText("");
 			estoqueController.anulaAtributos();
+			estoqueController.setCacheMap(null);
+			cmbCategoriaProduto.setModel(super.carregaComboTiposProdutoModel());
 		} else if (actionCommand.equals(ConstantesEnum.LBL_BTN_RELATORIO.getValue().toString())) {
 
-			RelatorioEstoqueGeral printer = new RelatorioEstoqueGeral();
+			RelatorioEstoqueGeralPdf printer = new RelatorioEstoqueGeralPdf();
 
-			printer.gerarRelatorio();
+			printer.geraRelatorio();
+
+		} else if (actionCommand.contains("XLSX")) {
+			RelatorioEstoqueGeralXlsX printer = new RelatorioEstoqueGeralXlsX();
+			
+			printer.geraRelatorio();
 
 		} else if (actionCommand.equals(ConstantesEnum.CONSULTA_ESTOQUE.getValue().toString())) {
 
@@ -567,12 +610,18 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		} else if (actionCommand.equals(ConstantesEnum.LBL_BTN_TIPO_PRODUTO.getValue().toString())) {
 
 			new TipoProdutoDialog(this);
+			txtBuscaDescricaoProduto.setText("");
+			estoqueController.anulaAtributos();
+			estoqueController.setCacheMap(null);
 
 			// atualizaView();
 
 		} else if (actionCommand.equals(ConstantesEnum.PRODUTO_LABEL.getValue().toString())) {
 
 			new ProdutoDialog(this);
+			txtBuscaDescricaoProduto.setText("");
+			estoqueController.anulaAtributos();
+			estoqueController.setCacheMap(null);
 
 			// atualizaView();
 
@@ -581,6 +630,10 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		} else if (actionCommand.equals(ConstantesEnum.LBL_BTN_LIMPAR.getValue().toString())) {
 
 			estoqueController.anulaAtributos();
+			estoqueController.setCacheMap(null);
+			txtBuscaDescricaoProduto.setText("");
+			estoqueController.anulaAtributos();
+			estoqueController.setCacheMap(null);
 
 			// atualizaView();
 
@@ -588,7 +641,9 @@ public class EstoquePrincipalGui extends AbstractDialog {
 
 			new FabricanteDialog(this);
 
-			// atualizaView();
+			txtBuscaDescricaoProduto.setText("");
+			estoqueController.anulaAtributos();
+			estoqueController.setCacheMap(null);
 
 		} else {
 
@@ -598,7 +653,7 @@ public class EstoquePrincipalGui extends AbstractDialog {
 			// cmbSubCategoriaProduto.getEditor().getEditorComponent()).setText("Selecione
 			// uma Opção");
 
-			// controller.anulaAtributos();
+			estoqueController.anulaAtributos();
 
 		}
 
@@ -621,6 +676,8 @@ public class EstoquePrincipalGui extends AbstractDialog {
 		} catch (ClassCastException e) {
 			if (descricao.isEmpty())
 				throw new Exception("Seleção de Categoria Inválida.");
+		} catch (NullPointerException e) {
+			e.printStackTrace();
 		}
 
 		estoqueController.anulaAtributos();

@@ -3,6 +3,8 @@ package br.com.marcospcruz.gestorloja.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
@@ -105,31 +107,52 @@ public class ProdutoController extends ControllerBase {
 
 	}
 
+//@formatter:off
 	public void busca(String parametro) throws Exception {
-
-		setItem(null);
-		setList(null);
-
-		if (contemAcentuacao(parametro)) {
-
-			buscaInWorkAround(parametro);
-
-		} else {
-
-			String valor = "%" + parametro.trim().toUpperCase() + "%";
-
-			produtos = produtoDao.buscaList("produto.readparametrolike", "descricao", valor);
+		buscaTodos();
+		Map<Object, Object> cache = getCacheMap();
+		produtos = new ArrayList(
+				cache.values()
+				.stream()
+				.filter(p -> ((Produto) p).getDescricaoProduto().toUpperCase().contains(parametro.toUpperCase()))
+				.collect(Collectors.toList()));
+		if (produtos.size() == 1) {
+			produto = produtos.get(0);
+		}else if(produtos.isEmpty()) {
+			produtos=new ArrayList(cache.values());
+			throw new Exception("Produto não encontrado.");
 		}
 
-		if (produtos.size() >= 1)
-
-			produto = produtos.get(0);
-
-		else if (produtos.size() == 0)
-
-			throw new Exception(RESULTADO_NAO_ENCONTRADO);
-
 	}
+	//@formatter:on
+	// public void busca(String parametro) throws Exception {
+	// buscaTodos();
+	// Map<Object, Object> cache = getCacheMap();
+	//
+	// setItem(null);
+	// setList(null);
+	//
+	// if (contemAcentuacao(parametro)) {
+	//
+	// buscaInWorkAround(parametro);
+	//
+	// } else {
+	//
+	// String valor = "%" + parametro.trim().toUpperCase() + "%";
+	//
+	// produtos = produtoDao.buscaList("produto.readparametrolike", "descricao",
+	// valor);
+	// }
+	//
+	// if (produtos.size() >= 1)
+	//
+	// produto = produtos.get(0);
+	//
+	// else if (produtos.size() == 0)
+	//
+	// throw new Exception(RESULTADO_NAO_ENCONTRADO);
+	//
+	// }
 
 	private void buscaInWorkAround(String parametro) {
 
@@ -151,17 +174,24 @@ public class ProdutoController extends ControllerBase {
 
 	@Override
 	public List buscaTodos() {
+		if (getCacheMap() == null || getCacheMap().isEmpty()) {
+			produtos = produtoDao.busca("produto.readall");
 
-		produtos = produtoDao.busca("produto.readall");
+			setCacheMap(produtos.stream().collect(Collectors.toMap(p -> ((Produto) p).getIdProduto(), p -> p)));
+		} else {
+			produtos = new ArrayList(getCacheMap().values());
+		}
 		return getList();
 	}
 
 	@Override
 	public void excluir() throws Exception {
 
+		getCacheMap().remove(produto.getIdProduto());
 		produtoDao.delete(produto);
 
 		produto = new Produto();
+		produtos = null;
 	}
 
 	@Override
@@ -179,6 +209,10 @@ public class ProdutoController extends ControllerBase {
 	@Override
 	public void salva() throws Exception {
 		produto = produtoDao.update(produto);
+		if (getCacheMap() != null) {
+			getCacheMap().put(produto.getIdProduto(), produto);
+			produtos = new ArrayList(getCacheMap().values());
+		}
 
 	}
 
@@ -196,6 +230,9 @@ public class ProdutoController extends ControllerBase {
 
 	@Override
 	public void validaExistente(String text) throws Exception {
+		if (text.isEmpty()) {
+			throw new Exception("Descrição de Produto Inválida.");
+		}
 		Produto novo = null;
 		try {
 			novo = produtoDao.busca("produto.readparametro", "descricao", text.toUpperCase());
@@ -204,6 +241,21 @@ public class ProdutoController extends ControllerBase {
 		}
 		if (produto.getIdProduto() == null && novo != null)
 			throw new Exception("Produto já cadastrado.");
+	}
+
+	@Override
+	public void carregaCache() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String validaExclusaoItem() {
+		if (!produto.getEstoqueProduto().isEmpty()) {
+			return "Produto contém " + produto.getEstoqueProduto().size() + " ítem(ns) no estoque relacionado a ele."
+					+ " A exclusão poderá causar perda de dados. Deseja continuar?";
+		}
+		return null;
 	}
 
 }

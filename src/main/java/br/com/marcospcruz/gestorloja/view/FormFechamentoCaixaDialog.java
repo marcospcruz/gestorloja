@@ -243,6 +243,7 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 	@Override
 	protected void carregaTableModel() {
 		
+		@SuppressWarnings("rawtypes")
 		List linhas = caixaController.controcalculaSubTotalRecebido();
 		super.carregaTableModel(linhas, new Object[] { "Meio Pagamento", "Valor Recebido" });
 

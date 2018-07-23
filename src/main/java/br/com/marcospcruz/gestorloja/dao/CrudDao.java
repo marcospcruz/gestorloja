@@ -65,7 +65,7 @@ public class CrudDao<T> implements Crud<T> {
 			e.printStackTrace();
 
 			throw e;
-			
+
 		} finally {
 
 			closeEntityManager();
@@ -80,14 +80,15 @@ public class CrudDao<T> implements Crud<T> {
 
 		if (!entityManager.isOpen())
 			inicializaEntityManager();
+		try {
+			entityManager.getTransaction().begin();
 
-		entityManager.getTransaction().begin();
+			entityManager.remove(entity);
 
-		entityManager.remove(entity);
-
-		entityManager.getTransaction().commit();
-
-		closeEntityManager();
+			entityManager.getTransaction().commit();
+		} finally {
+			closeEntityManager();
+		}
 
 	}
 

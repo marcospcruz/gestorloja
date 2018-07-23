@@ -19,7 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 
-public class LoginGui extends JDialog implements ActionListener {
+public class LoginGui extends JDialog implements ActionListener, Runnable {
 	private JTextField txtUsuario;
 	private JPasswordField passwordField;
 
@@ -99,6 +99,12 @@ public class LoginGui extends JDialog implements ActionListener {
 			JOptionPane.showMessageDialog(null, e1.getMessage(), "Alerta", JOptionPane.ERROR_MESSAGE);
 
 		}
+	}
+
+	@Override
+	public void run() {
+		setVisible(true);
+
 	}
 
 }

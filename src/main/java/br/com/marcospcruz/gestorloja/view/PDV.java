@@ -35,7 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -44,7 +43,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
+import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
+import br.com.marcospcruz.gestorloja.controller.MeioPagamentoDiversosController;
 import br.com.marcospcruz.gestorloja.controller.VendaController;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.ItemVenda;
@@ -66,6 +67,7 @@ public class PDV extends AbstractDialog {
 	private static final String UM = "1";
 	private static final int DEFAULT_GAP = 450;
 	private static final int PRODUTO_HORIZONTAL_DEFAULT_GAP = 750;
+	private static final String TITULO_JANELA = "Venda - " + SingletonManager.getInstance().getData();
 	// private Java2sAutoComboBox autoCompleteComboBox;
 	private VendaController vendaController;
 	AutocompleteJComboBox<ItemEstoque> produtoPesquisaDropDown;
@@ -88,7 +90,7 @@ public class PDV extends AbstractDialog {
 	private JFormattedTextField txtValorPagtoDebito;
 	private JFormattedTextField txtQtParcelaCredito;
 	private JFormattedTextField txtValorPagtoOutros;
-	private JTextField txtDescricaoPagtoOutros;
+	private AutocompleteJComboBox<MeioPagamento> txtDescricaoPagtoOutros;
 	private MyJCheckBox outrosCheckBox;
 	private MyJCheckBox dinheiroCheckBox;
 	private MyJCheckBox debitoCheckBox;
@@ -101,16 +103,17 @@ public class PDV extends AbstractDialog {
 	private JButton btnAdicionarVenda;
 	private JButton btnRemoverVenda;
 	private Venda venda;
+	private boolean fechaJanela;
 
 	public PDV(String tituloJanela, JDialog owner) throws Exception {
-		super(owner, tituloJanela, true);
+		super(owner, TITULO_JANELA, true);
 		setSize(configuraDimensaoJanela());
 		vendaController = super.getVendaController();
 		configuraPdv();
 	}
 
 	public PDV(String tituloJanela, JFrame owner) throws Exception {
-		super(owner, tituloJanela, ControllerAbstractFactory.CONTROLE_VENDA, true);
+		super(owner, TITULO_JANELA, ControllerAbstractFactory.CONTROLE_VENDA, true);
 		vendaController = super.getVendaController();
 		vendaController.resetVenda();
 		configuraPdv();
@@ -160,7 +163,7 @@ public class PDV extends AbstractDialog {
 		// labelPanel.add(descontoLabel);
 		txtDesconto = inicializaDecimalNumberField();
 		// txtDesconto.setPreferredSize(new Dimension(100, 100));
-		txtDesconto.setFont(FontMapper.getFont(25));
+		txtDesconto.setFont(FontMapper.getFont(20));
 		// fieldPanel.add(descontoJLabel);
 		txtDesconto.addKeyListener(new KeyListener() {
 
@@ -189,7 +192,7 @@ public class PDV extends AbstractDialog {
 		});
 		JLabel vlTotalLabel = super.criaJLabel("Valor Total R$:", 25);
 		txtTotalVenda = inicializaDecimalNumberField();
-		txtTotalVenda.setFont(FontMapper.getFont(25));
+		txtTotalVenda.setFont(FontMapper.getFont(20));
 		txtTotalVenda.addFocusListener(new FocusListener() {
 
 			@Override
@@ -348,9 +351,16 @@ public class PDV extends AbstractDialog {
 							// if(cont==1) {
 							// valor=meioPagamento.getDescricao();
 							// }
-							((JTextComponent) component).setEnabled(true);
+							JTextComponent jTextComponent = null;
 
-							((JTextComponent) component).setText(valor);
+							if (component instanceof AutocompleteJComboBox)
+								jTextComponent = (JTextComponent) ((AutocompleteJComboBox) component).getEditor()
+										.getEditorComponent();
+							else
+								jTextComponent = (JTextComponent) component;
+							component.setEnabled(true);
+
+							jTextComponent.setText(valor);
 							cont++;
 						}
 					}
@@ -364,7 +374,15 @@ public class PDV extends AbstractDialog {
 		outrosCheckBox = criaJCheckBox(string);
 		txtValorPagtoOutros = inicializaDecimalNumberField();
 		txtValorPagtoOutros.addKeyListener(calculaPagtoListener());
-		txtDescricaoPagtoOutros = inicializaAlfaNumericTextField();
+		ControllerBase meioPagamentoDiversosController = new MeioPagamentoDiversosController();
+		boolean carregaModel = true;
+		txtDescricaoPagtoOutros = new AutocompleteJComboBox(this, meioPagamentoDiversosController, null, true,
+				carregaModel);
+		txtDescricaoPagtoOutros.setFont(FontMapper.getFont(20));
+		// List items = meioPagamentoDiversosController.getList();
+		// DefaultComboBoxModel<MeioPagamento> mpModel = new DefaultComboBoxModel<>();
+		// txtDescricaoPagtoOutros.setModel(mpModel);
+		// inicializaAlfaNumericTextField();
 
 		JPanel outrosPnl = criaDefaultFormaPagto(string, outrosCheckBox, txtDescricaoPagtoOutros, txtValorPagtoOutros,
 				"Descrição: ", VALOR);
@@ -389,8 +407,8 @@ public class PDV extends AbstractDialog {
 		return cartCreditoPnl;
 	}
 
-	private JPanel criaDefaultFormaPagto(String string, JCheckBox checkBox, JTextComponent txtField1,
-			JTextComponent txtField2, String stringLabel1, String stringLabel2) {
+	private JPanel criaDefaultFormaPagto(String string, JCheckBox checkBox, Component txtField1, Component txtField2,
+			String stringLabel1, String stringLabel2) {
 		// LayoutManager layout = new GridLayout(1, 1, 10, 0);
 		JPanel defaultPnl = new JPanel(new BorderLayout());
 		defaultPnl.setBorder(BorderFactory.createEtchedBorder());
@@ -466,9 +484,9 @@ public class PDV extends AbstractDialog {
 		pagamentoComponentsMap.put(checkBox, list);
 	}
 
-	private Component createDefaultTxtPanel(JTextComponent txtField) {
+	private Component createDefaultTxtPanel(Component txtField1) {
 		JPanel panel = new JPanel();
-		panel.add(txtField);
+		panel.add(txtField1);
 		return panel;
 	}
 
@@ -499,7 +517,7 @@ public class PDV extends AbstractDialog {
 
 	private MyJCheckBox criaJCheckBox(String string) {
 		MyJCheckBox checkBox = new MyJCheckBox(string);
-		checkBox.setFont(FontMapper.getFont(22));
+		checkBox.setFont(FontMapper.getFont(20));
 		checkBox.addActionListener(criaJCheckBoxActionListener());
 		return checkBox;
 	}
@@ -517,7 +535,7 @@ public class PDV extends AbstractDialog {
 						meiosPagamentosSelecionadosList.add(jCheckBox);
 				} else
 					meiosPagamentosSelecionadosList.remove(jCheckBox);
-				 System.out.println(meiosPagamentosSelecionadosList.size());
+				System.out.println(meiosPagamentosSelecionadosList.size());
 				// System.out.println(pagamentoComponentsMap.get(jCheckBox));
 				List<Component> componentes = pagamentoComponentsMap.get(jCheckBox);
 				componentes.stream().forEach(componente -> {
@@ -651,7 +669,7 @@ public class PDV extends AbstractDialog {
 	private JRadioButton createJRadioButton(String string, boolean isSelected) {
 		JRadioButton jb = new JRadioButton(string);
 		jb.addActionListener(this);
-		jb.setFont(FontMapper.getFont(22));
+		jb.setFont(FontMapper.getFont(20));
 		jb.setSelected(isSelected);
 		return jb;
 	}
@@ -843,9 +861,9 @@ public class PDV extends AbstractDialog {
 				getItemEstoqueController().anulaAtributos();
 				EstoqueController itemEstoqueController = getItemEstoqueController();
 				new ItemEstoqueDialog(itemEstoqueController, this);
-				vendaController.getItemVenda().setItemEstoque(itemEstoqueController.getItemEstoque());
-				btnAdicionarVenda.setEnabled(true);
-				populaFormulario = true;
+				// vendaController.getItemVenda().setItemEstoque(itemEstoqueController.getItemEstoque());
+				// btnAdicionarVenda.setEnabled(true);
+				// populaFormulario = true;
 			} else if (actionCommand.equals("comboBoxChanged")) {
 				if (codigoBarrasRadioButton.isSelected()) {
 					String codigoDeBarras = ((JTextComponent) produtoPesquisaDropDown.getEditor().getEditorComponent())
@@ -899,15 +917,25 @@ public class PDV extends AbstractDialog {
 
 					List<Component> lista = pagamentoComponentsMap.get(jc);
 					for (Component c : lista) {
-						((JTextComponent) c).setText("");
-						((JTextComponent) c).setEnabled(jc.isSelected());
+
+						JTextComponent jTextComponent = null;
+						if (c instanceof AutocompleteJComboBox)
+							jTextComponent = (JTextComponent) ((AutocompleteJComboBox) c).getEditor()
+									.getEditorComponent();
+						else
+							jTextComponent = (JTextComponent) c;
+						jTextComponent.setText("");
+						c.setEnabled(jc.isSelected());
 					}
 				});
 				meiosPagamentosSelecionadosList = new ArrayList<>();
 				txtTotalVenda.setText(Util.formataMoeda(0f));
 				lblValorTroco.setText(Util.formataMoeda(0f));
-//				super.removeController(vendaController);
+				// super.removeController(vendaController);
 				btnFinalizar.setEnabled(false);
+				if (fechaJanela) {
+					dispose();
+				}
 			}
 
 		} catch (Exception e) {
@@ -970,8 +998,12 @@ public class PDV extends AbstractDialog {
 			float valorPago = 0f;
 			String valorPagoString = null;
 			for (Component comp : pagamentosComponentes) {
-
-				valorPagoString = ((JTextComponent) comp).getText();
+				JTextComponent jTextComponent = null;
+				if (comp instanceof AutocompleteJComboBox) {
+					jTextComponent = (JTextComponent) ((AutocompleteJComboBox) comp).getEditor().getEditorComponent();
+				} else
+					jTextComponent = (JTextComponent) comp;
+				valorPagoString = jTextComponent.getText();
 				if (!Util.isEqualsAny(meioPagamentoString, "Dinheiro", "Cartão de Débito") && cont == 0) {
 
 					if (Util.isEqualsAny(meioPagamentoString, "Cartão de Crédito")) {
@@ -1125,7 +1157,8 @@ public class PDV extends AbstractDialog {
 
 	@Override
 	protected void populaFormulario() {
-
+		if (vendaController.getItem() != null)
+			this.fechaJanela = ((Venda) vendaController.getItem()).getIdVenda() != 0;
 		ItemVenda itemVenda = vendaController.getItemVenda();
 
 		ItemEstoque itemEstoque = itemVenda != null ? itemVenda.getItemEstoque() : null;

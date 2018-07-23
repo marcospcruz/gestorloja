@@ -22,8 +22,11 @@ public class Util {
 	}
 
 	public static String formataMoeda(Float valorMoeda) {
-
-		return NumberFormat.getCurrencyInstance(CURRENT_LOCALE).format(valorMoeda);
+		if (Float.isNaN(valorMoeda)) {
+			valorMoeda = 0f;
+		}
+		String valor = NumberFormat.getCurrencyInstance(CURRENT_LOCALE).format(valorMoeda);
+		return valor;
 	}
 
 	public static String formataData(Date data) {
@@ -92,19 +95,19 @@ public class Util {
 	}
 
 	public static LocalDate parseDate(String text) {
-		if(text.isEmpty()) {
+		if (text.isEmpty()) {
 			return null;
 		}
 		String[] data = text.split("/");
-		
-		int ano=Integer.parseInt(data[2]);
-		int mes=Integer.parseInt(data[1]);
-		int diaMes=Integer.parseInt(data[0]);
+
+		int ano = Integer.parseInt(data[2]);
+		int mes = Integer.parseInt(data[1]);
+		int diaMes = Integer.parseInt(data[0]);
 		return LocalDate.of(ano, mes, diaMes);
 	}
 
 	public static float stringDecimaisToFloat(String text) {
-		if(!text.isEmpty())
+		if (!text.isEmpty())
 			return Float.parseFloat(text);
 		return 0;
 	}
