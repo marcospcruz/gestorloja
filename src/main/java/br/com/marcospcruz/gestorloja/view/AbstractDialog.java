@@ -524,11 +524,11 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 		//
 		SubTipoProduto tipoProduto = null;
 		try {
-			 TipoProdutoController tipoProdutoController = getCategoriaProdutoController() 
-//					!(controller instanceof TipoProdutoController)
-//					? getCategoriaProdutoController()
-//					: controller
-					;
+			TipoProdutoController tipoProdutoController = getCategoriaProdutoController()
+			// !(controller instanceof TipoProdutoController)
+			// ? getCategoriaProdutoController()
+			// : controller
+			;
 			tipoProdutoController.busca(((SubTipoProduto) selectedItem).getIdTipoItem());
 			tipoProduto = (SubTipoProduto) tipoProdutoController.getItem();
 
@@ -569,11 +569,9 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 	}
 
-
-
 	public TipoProdutoController getCategoriaProdutoController() throws Exception {
 
-		return (TipoProdutoController)getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
+		return (TipoProdutoController) getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
 	}
 
 	public abstract void atualizaTableModel();
@@ -594,7 +592,8 @@ public abstract class AbstractDialog extends JDialog implements MyWindowAction {
 
 			categoriaProduto = tpController.getItem() == null ? new SubTipoProduto()
 					: (SubTipoProduto) tpController.getItem();
-			categoriaProduto.setDescricaoTipo(selectedItem.toString());
+			if (categoriaProduto.getDescricaoTipo() == null)
+				categoriaProduto.setDescricaoTipo(selectedItem.toString());
 		}
 		if (categoriaProduto.getOperador() == null)
 			categoriaProduto.setOperador(getUsuarioLogado());

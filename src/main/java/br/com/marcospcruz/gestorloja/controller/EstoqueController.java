@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
@@ -60,10 +61,16 @@ public class EstoqueController extends ControllerBase {
 
 	private void carregaItensEstoque() {
 		// if (itensEstoque == null || itensEstoque.isEmpty())
-		CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
-		itensEstoque = null;
-		itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
-//		setList(itensEstoque);
+		Map<Object, Object> cache = getCacheMap();
+		if (cache == null || cache.isEmpty()) {
+			CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
+			itensEstoque = null;
+			itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
+			setCacheMap(itensEstoque.stream()
+					.collect(Collectors.toMap(item -> ((ItemEstoque) item).getIdItemEstoque(), item -> item)));
+		} else
+			itensEstoque = new ArrayList(cache.values());
+		// setList(itensEstoque);
 
 	}
 
@@ -134,8 +141,18 @@ public class EstoqueController extends ControllerBase {
 
 	public void buscaItemPorCodigoDeBarras(String codigoProduto) {
 		try {
-			Crud<ItemEstoque> itemEstoqueDao = getDao();
-			itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo", codigoProduto);
+			buscaTodos();
+			// if(itensEstoque==)
+			// Crud<ItemEstoque> itemEstoqueDao = getDao();
+			// itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo",
+			// codigoProduto);
+			itensEstoque = new ArrayList(getCacheMap().values().stream()
+					.filter(item -> ((ItemEstoque) item).getCodigoDeBarras().equals(codigoProduto))
+
+					.collect(Collectors.toList()));
+			if (itensEstoque.size() == 1) {
+				itemEstoque = itensEstoque.get(0);
+			}
 		} catch (Exception e) {
 			itemEstoque = null;
 		}

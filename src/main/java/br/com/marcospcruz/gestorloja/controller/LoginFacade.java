@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.controller;
 import java.util.Date;
 
 import javax.persistence.NoResultException;
+import javax.swing.JDialog;
 
 import br.com.marcospcruz.gestorloja.builder.SessaoUsuario;
 import br.com.marcospcruz.gestorloja.builder.SessaoUsuarioBuilder;
@@ -16,15 +17,15 @@ import br.com.marcospcruz.gestorloja.view.PrincipalGui;
 
 public class LoginFacade {
 
-	private LoginGui loginGui;
+	private Object loginGui;
 
 	private SessaoUsuarioBuilder sessaoUsuarioBuilder;
 
 	private CrudDao<SessaoUsuario> sessaoUsuarioDao;
 
-	public LoginFacade(LoginGui loginGui) {
+	public LoginFacade(Object gui) {
 		new UsuarioBuilder();
-		this.loginGui = loginGui;
+		this.loginGui = gui;
 		sessaoUsuarioDao = new CrudDao<>();
 	}
 
@@ -35,7 +36,7 @@ public class LoginFacade {
 		buscaSessaoUsuarioAtiva(usuario);
 		criaSessaoUsuario(usuario);
 		SingletonManager.getInstance().setUsuarioLogado(getUsuarioLogado());
-		abreInterfacePrincipal();
+//		abreInterfacePrincipal();
 		closeLoginGui();
 	}
 
@@ -53,8 +54,9 @@ public class LoginFacade {
 
 	}
 
-		SessaoUsuario sessaoUsuario;
-		private SessaoUsuario buscaUsuarioLogado(Usuario usuario) {
+	SessaoUsuario sessaoUsuario;
+
+	private SessaoUsuario buscaUsuarioLogado(Usuario usuario) {
 		try {
 			sessaoUsuario = sessaoUsuarioDao.busca("sessaousuario.findSessaoAtiva", "idUsuario",
 					usuario.getIdUsuario());
@@ -82,7 +84,8 @@ public class LoginFacade {
 	}
 
 	private void closeLoginGui() {
-		loginGui.dispose();
+		if (loginGui instanceof JDialog)
+			((JDialog) loginGui).dispose();
 
 	}
 

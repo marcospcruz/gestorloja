@@ -343,7 +343,9 @@ public class ItemEstoqueDialog extends AbstractDialog {
 				cmbSubCategoriaProduto.setModel(selectModelSubTiposDeProduto(jComboBox));
 
 			} else if (arg0.getSource().equals(cmbSubCategoriaProduto)) {
-				cleanDropDownComponentModel(cmbProduto.getModel());
+				SubTipoProduto selectedItem = cmbSubCategoriaProduto.getSelectedItem();
+				cmbSubCategoriaProduto.setSelectedItem(selectedItem);
+				// cleanDropDownComponentModel(cmbProduto.getModel()); COMENTANDO PARA TESTE
 				// if (produtos != null)
 				// cmbProduto.setModel(super.selectModelProdutos(produtos));
 				// SubTipoProduto superCategoria = ((SubTipoProduto)
@@ -443,7 +445,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		EstoqueController controller = null;
 		try {
 			controller = (EstoqueController) super.getItemEstoqueController();
-
+			ProdutoController produtoController = getProdutoController();
 			ItemEstoque itemEstoque = (ItemEstoque) controller.getItem();
 			if (itemEstoque != null) {
 				Fabricante fabricante = itemEstoque.getFabricante();
@@ -451,7 +453,7 @@ public class ItemEstoqueDialog extends AbstractDialog {
 				SubTipoProduto categoria = itemEstoque.getTipoProduto();
 				SubTipoProduto superCategoria = categoria.getSuperTipoProduto();
 				cmbFabricante.setSelectedItem(fabricante);
-				cmbProduto.setSelectedItem(produto, true);
+			
 
 				// TODO
 				cmbCategoriaProduto.setSelectedItem(superCategoria);
@@ -460,6 +462,8 @@ public class ItemEstoqueDialog extends AbstractDialog {
 				cmbSubCategoriaProduto.setSelectedItem(categoria);
 				// TODO
 				cmbSubCategoriaProduto.setSelectedItem(categoria, true);
+				cmbProduto.setModel(super.selectModelProdutos(produtoController.getList()));
+				cmbProduto.setSelectedItem(produto, true);
 				// for (int i = 1; i < model.getSize(); i++) {
 				// SubTipoProduto objeto = model.getElementAt(i);
 				// if (objeto.equals(categoria)) {
@@ -538,9 +542,11 @@ public class ItemEstoqueDialog extends AbstractDialog {
 		}
 
 		SubTipoProduto subTipoProduto = (SubTipoProduto) parseCategoriaProduto(cmbSubCategoriaProduto);
-		SubTipoProduto superTipoProduto = (SubTipoProduto) parseCategoriaProduto(cmbCategoriaProduto);
-		if (!superTipoProduto.equals(subTipoProduto))
-			subTipoProduto.setSuperTipoProduto(superTipoProduto);
+		if (subTipoProduto.getSuperTipoProduto() == null) {
+			SubTipoProduto superTipoProduto = (SubTipoProduto) parseCategoriaProduto(cmbCategoriaProduto);
+			if (!superTipoProduto.equals(subTipoProduto))
+				subTipoProduto.setSuperTipoProduto(superTipoProduto);
+		}
 		// produto.setTipoProduto((SubTipoProduto) subTipoProduto);
 		// List<SubTipoProduto> tipos = produto.getTiposProduto();
 		// if (tipos == null)

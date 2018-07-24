@@ -3,6 +3,8 @@ package br.com.marcospcruz.gestorloja.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
 
@@ -231,10 +233,17 @@ public class TipoProdutoController extends ControllerBase {
 			buscaInWorkAround(parametro);
 
 		} else {
+			Map<Object, Object> cache = getCacheMap();
+			if (cache != null && !cache.isEmpty()) {
+				tiposProdutos = new ArrayList(cache.values());
+			} else {
 
-			String valor = "%" + parametro.toUpperCase() + "%";
+				String valor = "%" + parametro.toUpperCase() + "%";
 
-			tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike", "descricao", valor);
+				tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike", "descricao", valor);
+				setCacheMap((Map<Object, Object>) tiposProdutos.stream()
+						.collect(Collectors.toMap(tipo -> ((SubTipoProduto) tipo).getIdTipoItem(), tipo -> tipo)));
+			}
 
 		}
 
@@ -376,7 +385,7 @@ public class TipoProdutoController extends ControllerBase {
 	@Override
 	public void validaExistente(String text) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	// public void iniciaTipoPecaRoupa() {

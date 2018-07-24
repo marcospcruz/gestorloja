@@ -16,6 +16,12 @@
 		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
+		<!--dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.10.v20180503</version>
+		</dependency-->
 
 		<!-- dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-entitymanager</artifactId> 
 			<version>${hibernate.version}</version> </dependency> <dependency> <groupId>org.hibernate</groupId> 
@@ -202,7 +208,8 @@
 					<encoding>utf8</encoding>
 					<archive>
 						<manifest>
-							<mainClass>br.com.marcospcruz.gestorloja.App</mainClass>
+							<!--mainClass>br.com.marcospcruz.gestorloja.App</mainClass-->
+							<mainClass>br.com.marcospcruz.gestorloja.AppFx</mainClass>
 						</manifest>
 
 					</archive>

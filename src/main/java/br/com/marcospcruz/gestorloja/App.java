@@ -14,6 +14,7 @@ import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.view.LoginGui;
+import br.com.marcospcruz.gestorloja.view.fxui.LogIn;
 
 public class App {
 
@@ -31,8 +32,8 @@ public class App {
 				criaUsuario();
 				createOperacao();
 				createTipoMeioPagamento();
-//				if (args.length > 1)
-//					loadEstoqueSheet(args[1]);
+				// if (args.length > 1)
+				// loadEstoqueSheet(args[1]);
 			}
 		initApp();
 
@@ -71,28 +72,39 @@ public class App {
 
 	}
 
-//	private static void loadEstoqueSheet(String sheetString) {
-//
-//		PlanilhaHandlerFacade facade = new PlanilhaHandlerFacade();
-//
-//		try {
-//			facade.importaPlanilha(sheetString);
-//		} catch (Exception e) {
-//
-//			e.printStackTrace();
-//		}
-//
-//	}
+	// private static void loadEstoqueSheet(String sheetString) {
+	//
+	// PlanilhaHandlerFacade facade = new PlanilhaHandlerFacade();
+	//
+	// try {
+	// facade.importaPlanilha(sheetString);
+	// } catch (Exception e) {
+	//
+	// e.printStackTrace();
+	// }
+	//
+	// }
 
 	/**
 	 * s
+	 * 
+	 * @throws Exception
 	 */
-	private static void initApp() {
-
+	private static void initApp() throws Exception {
+		// Server server = new Server();
 		// new EstoquePrincipalGui("Controle de Estoque");
-		new LoginGui("Gestão Loja - Login de Usuário").setVisible(true);
-		// new UsuarioGui().setVisible(true);
+		try {
+			// server.start();
 
+			new LoginGui("Gestão Loja - Login de Usuário").setVisible(true);
+			// new UsuarioGui().setVisible(true);
+			// server.join();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			// server.stop();
+		}
 	}
 
 	private static void checkAndCreateAppHome() {

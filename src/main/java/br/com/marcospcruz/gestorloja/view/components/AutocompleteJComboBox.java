@@ -147,7 +147,7 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 						public void run() {
 
 							DefaultComboBoxModel<T> model = (DefaultComboBoxModel<T>) getModel();
-							if(tc.getText().length()<5)
+							if (tc.getText().length() < 5)
 								return;
 							// removeAllItems();
 							// reloadModel(model);
@@ -155,7 +155,7 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 							// if (keepCurrentModel)
 							// System.out.println(keepCurrentModel + " - " + getSelectedItem());
 							if (keepCurrentModel) {
-
+							
 								model.setSelectedItem(objetoSelecionado);
 								tc.setText(objetoSelecionado.toString());
 								// setSelectedItem(object);
@@ -181,10 +181,10 @@ public class AutocompleteJComboBox<T> extends JComboBox<T> {
 
 									// model.removeAllElements();
 									owner.disableActionPerformed();
-									
+
 									try {
 										removeAllItems();
-									}catch(NullPointerException e) {
+									} catch (NullPointerException e) {
 										e.printStackTrace();
 									}
 									reloadModel(model);
