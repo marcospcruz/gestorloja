@@ -312,6 +312,28 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public void busca(String tipoProduto, String produto, String fabricante) {
+		buscaTodos();
+		if (tipoProduto != null) {
+			List<ItemEstoque> itens = itensEstoque.stream()
+					.filter(item -> ((ItemEstoque) item).getTipoProduto().getSuperTipoProduto().getDescricaoTipo()
+							.equalsIgnoreCase(tipoProduto)
+							|| ((ItemEstoque) item).getTipoProduto().getDescricaoTipo().equalsIgnoreCase(tipoProduto))
+					.collect(Collectors.toList());
+			if (!itens.isEmpty() && itens != itensEstoque) {
+				itensEstoque = itens;
+				return;
+			}
+
+		} else if (fabricante != null) {
+			List<ItemEstoque> itens = itensEstoque.stream()
+					.filter(item -> ((ItemEstoque) item).getFabricante().getNome().equals(fabricante))
+					.collect(Collectors.toList());
+			if (!itens.isEmpty() && itens != itensEstoque) {
+				itensEstoque = itens;
+				return;
+			}
+		}
+
 		if (Util.isPalavraAcentuada(tipoProduto)) {
 			buscaComAcentuacao(tipoProduto);
 
@@ -320,7 +342,7 @@ public class EstoqueController extends ControllerBase {
 		String namedQuery = "itemestoque.readDescricaoTipo";
 		Map<String, String> paramsMap = new HashMap<>();
 		if (tipoProduto != null) {
-			paramsMap.put("descricaoTipo", "%" + tipoProduto.trim().toUpperCase() + "%");
+			// paramsMap.put("descricaoTipo", "%" + tipoProduto.trim().toUpperCase() + "%");
 		}
 		if (produto != null) {
 			paramsMap.put("descricaoProduto", "%" + produto.trim().toUpperCase() + "%");
@@ -366,7 +388,8 @@ public class EstoqueController extends ControllerBase {
 					objetos.add(itemEstoque);
 				}
 			}
-			setList(objetos);
+			if (!objetos.isEmpty())
+				setList(objetos);
 		}
 	}
 

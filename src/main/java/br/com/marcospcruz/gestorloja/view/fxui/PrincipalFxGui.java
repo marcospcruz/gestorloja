@@ -10,7 +10,6 @@ import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -23,9 +22,10 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class PrincipalFxGui extends Stage implements EventHandler<ActionEvent> {
+public class PrincipalFxGui extends StageBase {
 
 	private Map<String, InterfaceGrafica> interfaces;
 
@@ -66,7 +66,25 @@ public class PrincipalFxGui extends Stage implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent event) {
-		System.out.println(event.getSource());
+		String pack="br.com.marcospcruz.gestorloja.view.fxui.";
+		Button btn = (Button) event.getSource();
+		InterfaceGrafica gui = interfaces.get(btn.getText());
+		
+		try {
+			Stage stage = StageFactory.createStage(gui.getClassName());
+			stage.initOwner(this);
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.showAndWait();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

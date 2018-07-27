@@ -12,6 +12,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
@@ -23,7 +25,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 		@NamedQuery(name = "tipoProduto.readParametroLike", query = "select distinct t from SubTipoProduto t LEFT JOIN FETCH t.subTiposProduto where UPPER(t.descricaoTipo) like :descricao "
 		// + "and t.superTipoProduto is null"
 		) })
-public class SubTipoProduto extends TipoProduto {
+public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoProduto> {
 
 	/**
 	 * 
@@ -112,5 +114,13 @@ public class SubTipoProduto extends TipoProduto {
 		return getDescricaoTipo();
 
 	}
+
+	@Override
+	public int compareTo(SubTipoProduto o) {
+		
+		int result=o.getIdTipoItem()-getIdTipoItem();
+		return result;
+	}
+	
 
 }
