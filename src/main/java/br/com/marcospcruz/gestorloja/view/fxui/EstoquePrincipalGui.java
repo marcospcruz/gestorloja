@@ -1,13 +1,13 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
-import java.awt.Dimension;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
-import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
+import br.com.marcospcruz.gestorloja.controller.FabricanteController;
+import br.com.marcospcruz.gestorloja.facade.ImportadorArquivo;
+import br.com.marcospcruz.gestorloja.facade.ImportadorArquivoCsv;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
@@ -15,116 +15,209 @@ import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.model.ItemEstoqueModel;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
+import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-public class EstoquePrincipalGui extends StageBase {
-
+public class EstoquePrincipalGui extends StageBase  {
+//@formatter:off
 	private static final Object[] COLUNAS_JTABLE = {
 			// ConstantesEnum.CODIGO_LABEL.getValue().toString(),
-			"cod", "fabricante", // ConstantesEnum.CATEGORIA_LABEL.getValue().toString(),
+			"cod", 
+			"fabricante", // ConstantesEnum.CATEGORIA_LABEL.getValue().toString(),
 									// ConstantesEnum.TIPO_ITEM_LABEL.getValue().toString(),
 			"categoria", // ConstantesEnum.DESCRICAO_ITEM_LABEL.getValue().toString(),
 			// ConstantesEnum.CODIGO_DE_BARRAS.getValue().toString(),
 			"subCategoria", // ConstantesEnum.QUANTIDADE_LABEL.getValue().toString(),
 			"produto", // ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString(),
 			"qt", // ConstantesEnum.VALOR_TOTAL_LABEL.getValue().toString()
-			"vlUnitario", "vlTotal" };
-	private EstoqueController controller;
-	private ObservableList<ItemEstoqueModel> dadosEstoque;
-	private VBox vBox;
-	private Scene scene;
+			"vlUnitario", 
+			"vlTotal" };//@formatter:on
+
+	// private ObservableList<ItemEstoqueModel> dadosEstoque;
+
+	private AutoCompleteTextField<Fabricante> comboFabricantes;
+	private AutoCompleteTextField<TipoProduto> categoriaProduto;
+	// private TableView<ItemEstoqueModel> table;
+
+	private AutoCompleteTextField<SubTipoProduto> subCategoriaProduto;
 
 	public EstoquePrincipalGui() throws Exception {
+		super();
+		super.setLabelColunas(COLUNAS_JTABLE);
 		controller = getEstoqueController();
 		controller.buscaTodos();
-		Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-		super.width = screenSize.getWidth() - (screenSize.getWidth() * DEZ_PORCENTO);
-		super.height = screenSize.getHeight() - (screenSize.getHeight() * DEZ_PORCENTO);
-		super.systemOut(width, height);
-		scene = new Scene(new Group(), width, height);
-		GridPane gridPane = new GridPane();
-		vBox = new VBox();
-		vBox.setSpacing(5);
-		vBox.setPadding(new Insets(10, 0, 0, 10));
 
+		double layoutsMaxWidth = scene.widthProperty().get();
+		layoutsMaxWidth -= layoutsMaxWidth * (5d / 100d);
+//		super.setLayoutsMaxWidth(layoutsMaxWidth);
+		super.setLayoutsMaxWidth(scene.widthProperty().get());
 		TitledPane pesquisaPane = criaPesquisaPanel();
 		TitledPane cadastroPane = criaCadastroPanel();
-		vBox.getChildren().addAll(cadastroPane, pesquisaPane);
-		((Group) scene.getRoot()).getChildren().add(vBox);
-		criaTableView();
+		TitledPane operacoes = criaOperacoesPanel();
+		TitledPane tablePane = super.criaTablePane("Estoque de Produtos");
+		getvBox().getChildren().addAll(cadastroPane, pesquisaPane, tablePane);
+		getvBox().getChildren().add(operacoes);
 
-		setScene(scene);
 	}
 
-	private void abreTelaCadastro(Stage stage) {
-		stage.initOwner(this);
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.showAndWait();
-		reloadTableView();
+	@Override
+	protected void handleTableClick(Event event) {
+		super.handleTableClick(event);
+		ItemEstoque item = (ItemEstoque) controller.getItem();
+		System.out.println(item);
+		try {
+			abreTelaCadastro(new ItemEstoqueCadastro());
+
+			reloadForm();
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	private void reloadComboCategoria() throws Exception {
+		ObservableList<TipoProduto> items = categoriaProduto.getItems();
+		super.criaObservableList(items, getTipoProdutoController());
+		categoriaProduto.setItems(items);
+		ObservableList<SubTipoProduto> subItems = subCategoriaProduto.getItems();
+		subItems.removeAll(subItems);
+	}
+
+	private void reloadComboFabricantes() throws Exception {
+		FabricanteController controller = getFabricanteController();
+		controller.setList(null);
+		controller.buscaTodos();
+		ObservableList<Fabricante> items = comboFabricantes.getItems();
+		items.removeAll(items);
+		// controller.buscaTodos();
+		items.addAll(controller.getList());
+	}
+
+	private TitledPane criaOperacoesPanel() {
+		TitledPane pane = new TitledPane("Operação", new Button());
+		pane.setCollapsible(false);
+		FlowPane content = new FlowPane(Orientation.HORIZONTAL);
+		Button btn = new Button("Importar Dados de Estoque");
+		btn.setOnAction(this::importaDadosEstoque);
+		content.getChildren().add(btn);
+		pane.setContent(content);
+		return pane;
+	}
+
+	private void importaDadosEstoque(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Escolha o arquivo");
+		fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Planilha Excel", ".xlsx"));
+
+		File planilha = fileChooser.showOpenDialog(this);
+
+		ImportadorArquivo importador = new ImportadorArquivoCsv(planilha);
+		try {
+			importador.carregaDados();
+			showMensagemSucesso(importador.getMensagemRetorno());
+			reloadForm();
+		} catch (Exception e) {
+			showErrorMessage(e.getMessage());
+			e.printStackTrace();
+		}
+
 	}
 
 	private TitledPane criaCadastroPanel() {
 
-		FlowPane flowPane = new FlowPane(Orientation.HORIZONTAL);
-		flowPane.setHgap(10);
-		TitledPane pane = new TitledPane("Cadastros", new Button(""));
-		pane.setCollapsible(false);
+		FlowPane flowPane = createHorizontalFlowPane();
+		TitledPane pane = criaTitledPane("Cadastros");
 		//
-		Button itemEstoqueCadastro = new Button("Novo Item Estoque");
-		itemEstoqueCadastro.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event) {
-				Stage stage = new ItemEstoqueCadastro();
-				abreTelaCadastro(stage);
-			}
-
-		});
-		flowPane.getChildren().add(itemEstoqueCadastro);
+		Button itemEstoqueCadastro = criaButton("Novo Item Estoque");
+		Button fabricantesCadBtn = criaButton("Fabricantes / Marca");
+		Button categoriaProduto = criaButton("Categoria Produto");
+		Button produto = criaButton("Produto");
+		flowPane.getChildren().addAll(fabricantesCadBtn, categoriaProduto, produto, itemEstoqueCadastro);
 
 		//
 		pane.setContent(flowPane);
-		double teste = scene.widthProperty().get();
-		flowPane.prefWidthProperty().bind(new SimpleDoubleProperty(teste).subtract(teste * (26.8d / 100d)));
+
+		pane.setMaxWidth(getLayoutsMaxWidth());
 		return pane;
 	}
 
+	protected Button criaButton(String title) {
+		Button itemEstoqueCadastro = new Button(title);
+		itemEstoqueCadastro.setOnAction(this::handleAbreCadastro);
+		return itemEstoqueCadastro;
+	}
+
+	private void handleAbreCadastro(ActionEvent actionEvent) {
+
+		try {
+			Stage stage = null;
+			Button source = (Button) actionEvent.getSource();
+			String buttonTitle = source.getText();
+			switch (buttonTitle) {
+			case "Fabricantes / Marca":
+				stage = new FabricantesCadastro();
+				break;
+			case "Categoria Produto":
+				stage = new CategoriaProdutoCadastro();
+				break;
+			case "Produto":
+				stage = new ProdutoCadastro();
+				break;
+			default:
+				stage = new ItemEstoqueCadastro();
+			}
+			abreTelaCadastro(stage);
+
+			reloadForm();
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			showErrorMessage(e.getMessage());
+		}
+
+	}
+
+	void reloadForm() throws Exception {
+		comboFabricantes.getEditor().setText("");
+		categoriaProduto.getEditor().setText("");
+		subCategoriaProduto.getEditor().setText("");
+		reloadComboFabricantes();
+		reloadComboCategoria();
+		controller.setCacheMap(null);
+		controller.buscaTodos();
+		reloadTableView();
+		controller.setItem(null);
+	}
+
 	private TitledPane criaPesquisaPanel() throws Exception {
-		FlowPane flowPane = new FlowPane(Orientation.HORIZONTAL);
-		flowPane.setHgap(10);
+		FlowPane flowPane = createHorizontalFlowPane();
 		TitledPane pane = new TitledPane("Pesquisa de Produto", new Button(""));
 		pane.setCollapsible(false);
 
-		ComboBox<TipoProduto> categoriaProduto = super.createCategoriaProdutoComboBox();
-		// categoriaProduto.setEditable(true);
-		TipoProdutoController tipoProdutoController = super.getTipoProdutoController();
-		AutoCompleteTextField<SubTipoProduto> subCategoriaProduto = new AutoCompleteTextField<>();
+		categoriaProduto = super.createCategoriaProdutoAutotextFieldBox();
+		subCategoriaProduto = new AutoCompleteTextField<>();
 		categoriaProduto.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
 				// ((TextField)subCategoriaProduto.getEditor()).setText("");
+				if (!(categoriaProduto.getValue() instanceof TipoProduto))
+					return;
 				TipoProduto categoria = categoriaProduto.getValue();
 				List<SubTipoProduto> subCategorias = (List<SubTipoProduto>) categoria.getSubTiposProduto();
 				subCategoriaProduto.setItems(subCategorias);
@@ -160,18 +253,27 @@ public class EstoquePrincipalGui extends StageBase {
 				}
 			}
 		});
-		AutoCompleteTextField<Fabricante> comboFabricantes = super.criaFabricanteComboBox(true);
+		comboFabricantes = super.criaFabricanteComboBox(true);
 		comboFabricantes.setOnAction(new EventHandler<ActionEvent>() {
+
+			private boolean showAlert = true;
 
 			@Override
 			public void handle(ActionEvent event) {
 				try {
 					EstoqueController controller = getEstoqueController();
+					if (!(comboFabricantes.getValue() instanceof Fabricante))
+						return;
+					showAlert = true;
 					Fabricante fabricante = comboFabricantes.getValue();
 					controller.busca(null, null, fabricante.getNome());
 					reloadTableView();
+					// carregaDadosTable(table);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					if (showAlert) {
+						showErrorMessage("Dados não encontrados.");
+						showAlert = false;
+					}
 					e.printStackTrace();
 				}
 
@@ -181,17 +283,13 @@ public class EstoquePrincipalGui extends StageBase {
 		flowPane.getChildren().addAll(new Label("Fabricante"), comboFabricantes, new Label("Categoria:"),
 				categoriaProduto, new Label("Sub-Categoria:"), subCategoriaProduto);
 		pane.setContent(flowPane);
-		double teste = scene.widthProperty().get();
-		flowPane.prefWidthProperty().bind(new SimpleDoubleProperty(teste).subtract(teste * (26.8d / 100d)));
-		return pane;
-	}
 
-	private void reloadTableView() {
-		TableView<ItemEstoqueModel> table = (TableView<ItemEstoqueModel>) vBox.getChildren().stream()
-				.filter(t -> t instanceof TableView).findFirst().orElse(null);
-		if (table != null)
-			vBox.getChildren().remove(table);
-		criaTableView();
+		// flowPane.prefWidthProperty().bind(new
+		// SimpleDoubleProperty(teste).subtract(teste * (50d / 100d)));
+		// flowPane.prefWidthProperty().bind(new SimpleDoubleProperty(teste));
+		pane.setMinWidth(getLayoutsMaxWidth());
+		pane.setMaxWidth(getLayoutsMaxWidth());
+		return pane;
 	}
 
 	private void reloadDadosEstoque(TipoProduto categoria) throws Exception {
@@ -199,95 +297,94 @@ public class EstoquePrincipalGui extends StageBase {
 
 		estoqueController.busca(categoria.getDescricaoTipo(), null, null);
 		reloadTableView();
+
 	}
 
-	private TableView<ItemEstoqueModel> criaTableView() {
-		TableView<ItemEstoqueModel> table = null;
-		try {
-
-			table = new TableView<>();
-
-			table.setColumnResizePolicy((param) -> true);
-
-			// table
-			carregaDadosTable(table);
-
-			carregaTableView(table);
-
-			//
-			double teste = scene.widthProperty().get();
-
-			table.prefWidthProperty().bind(new SimpleDoubleProperty(teste).subtract(teste * (26.8d / 100d)));
-			ObservableList<Node> children = vBox.getChildren();
-			children.add(table);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			if (table != null)
-				customResize(table);
-		}
-		return table;
-	}
-
-	private void carregaTableView(TableView<ItemEstoqueModel> table) {
-		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		Arrays.asList(COLUNAS_JTABLE).stream().forEach(columnName -> {
-			TableColumn<ItemEstoqueModel, String> tableColumn = new TableColumn<>(columnName.toString());
-			tableColumn.setCellValueFactory(new PropertyValueFactory<ItemEstoqueModel, String>(columnName.toString()));
-			// tableColumn.setResizable(false);
-
-			table.getColumns().add(tableColumn);
-
-		});
-	}
-
-	private void customResize(TableView<?> table) {
-
-		new Runnable() {
-
-			@Override
-			public void run() {
-				AtomicLong width = new AtomicLong();
-				table.getColumns().forEach(col -> {
-					width.addAndGet((long) col.getWidth());
-				});
-				double tableWidth = table.getWidth();
-
-				if (tableWidth > width.get()) {
-					table.getColumns().forEach(col -> {
-						col.setPrefWidth(col.getWidth() + ((tableWidth - width.get()) / table.getColumns().size()));
-					});
-				}
-
-			}
-		};
-	}
-
-	private void carregaDadosTable(TableView<ItemEstoqueModel> table) throws Exception {
+	@Override
+	protected void carregaDadosTable(TableView table) throws Exception {
 
 		List<ItemEstoqueModel> estoque = new ArrayList<>();
+		if (controller.getList().isEmpty())
+			controller.buscaTodos();
 
 		controller.getList().stream().forEach(item -> {
 			ItemEstoque itemEstoque = (ItemEstoque) item;
-			//@formatter:off
-			estoque.add(new ItemEstoqueModel(
-					itemEstoque.getCodigoDeBarras(), 
-					itemEstoque.getFabricante().getNome(),
-					itemEstoque.getTipoProduto().getSuperTipoProduto().getDescricaoTipo(),
-					itemEstoque.getTipoProduto().getDescricaoTipo(),
-					itemEstoque.getProduto().getDescricaoProduto(),
-					itemEstoque.getQuantidade().toString(),
-					Util.formataMoeda(itemEstoque.getValorUnitario()),
-					Util.formataMoeda(itemEstoque.getQuantidade()*itemEstoque.getValorUnitario())));
-			//@formatter:on
+			try {
+				//@formatter:off
+				estoque.add(new ItemEstoqueModel(estoque.size(),
+						itemEstoque.getCodigoDeBarras(), 
+						itemEstoque.getFabricante().getNome(),
+						itemEstoque.getTipoProduto().getSuperTipoProduto().getDescricaoTipo(),
+						itemEstoque.getTipoProduto().getDescricaoTipo(),
+						itemEstoque.getProduto().getDescricaoProduto(),
+						itemEstoque.getQuantidade().toString(),
+						Util.formataMoeda(itemEstoque.getValorUnitario()),
+						Util.formataMoeda(itemEstoque.getQuantidade()*itemEstoque.getValorUnitario())));
+				//@formatter:on
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			}
 		});
-		dadosEstoque = FXCollections.observableArrayList(estoque);
+
+		ObservableList dadosEstoque = FXCollections.observableArrayList(estoque);
+		// FilteredList<ItemEstoqueModel> sorteredDados=new
+		// FilteredList<>(dadosEstoque,estoqueModel->estoqueModel.getIndexOf()<maxValues);
 		table.setItems(dadosEstoque);
+		table.refresh();
 	}
 
 	@Override
 	public void handle(ActionEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void salvaDados(ActionEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void excluiDados(ActionEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
+	protected void reloadTableView() throws Exception {
+		//
+		ObservableList<Node> children = getvBox().getChildren();
+		TitledPane pane = (TitledPane) children.stream()
+				.filter(t -> ((TitledPane) t).getText().equals("Estoque de Produtos")).findFirst().orElse(null);
+		Node teste = null;
+		if (pane != null)
+			teste = pane.getContent();
+		TableView<ItemEstoqueModel> table = (TableView<ItemEstoqueModel>) ((Pane) teste).getChildren().get(0);
+
+		// children.stream().forEach(t -> {
+		// System.out.println(((TitledPane) t).getText().equals("Estoque de Produtos"));
+		// });
+
+		// int indexOfTable = getvBox().getChildren().indexOf(table);
+		// if (table != null)
+		// vBox.getChildren().remove(table);
+		ObservableList<ItemEstoqueModel> items = table.getItems();
+		items.removeAll(items);
+		carregaDadosTable(table);
+		// vBox.getChildren().add(indexOfTable, table);
+		// if(vBox.getChildren().contains(this.table)) {
+		// vBox.getChildren().
+		// }
+	}
+
+	@Override
+	void populaForm() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void pesquisaItem(ActionEvent event) {
 		// TODO Auto-generated method stub
 
 	}

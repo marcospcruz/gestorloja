@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -52,6 +53,7 @@ import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
+import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.FontMapper;
@@ -517,7 +519,7 @@ public class PDV extends AbstractDialog {
 						meiosPagamentosSelecionadosList.add(jCheckBox);
 				} else
 					meiosPagamentosSelecionadosList.remove(jCheckBox);
-				 System.out.println(meiosPagamentosSelecionadosList.size());
+				System.out.println(meiosPagamentosSelecionadosList.size());
 				// System.out.println(pagamentoComponentsMap.get(jCheckBox));
 				List<Component> componentes = pagamentoComponentsMap.get(jCheckBox);
 				componentes.stream().forEach(componente -> {
@@ -590,7 +592,8 @@ public class PDV extends AbstractDialog {
 	}
 
 	private JPanel createPesquisaProdutoPanel() throws Exception {
-		boolean isSuperUser = SingletonManager.getInstance().getUsuarioLogado().getIdUsuario() == 1;
+		Usuario usuario = SingletonManager.getInstance().getUsuarioLogado();
+		boolean isSuperUser = usuario != null ? usuario.getIdUsuario() == 1 : false;
 		JPanel panel = new JPanel(new BorderLayout(25, 100));
 		int colunas = isSuperUser ? 3 : 2;
 		JPanel centerPanel = new JPanel(new GridLayout(1, colunas));
@@ -859,7 +862,7 @@ public class PDV extends AbstractDialog {
 					}
 					if (!codigoDeBarras.isEmpty() && !codigoDeBarras.equals("Selecione uma Opção.")) {
 						populaFormulario = true;
-						vendaController.populaItemEstoque(produto);
+//						vendaController.populaItemEstoque(produto);
 						btnAdicionarVenda.setEnabled(true);
 					}
 				}
@@ -873,7 +876,7 @@ public class PDV extends AbstractDialog {
 					throw new ClassCastException(VendaController.PRODUTO_INVALIDO);
 				}
 				populaFormulario = true;
-				vendaController.populaItemEstoque(produto);
+//				vendaController.populaItemEstoque(produto);
 				btnAdicionarVenda.setEnabled(true);
 				// atualizaTableModel(produto);
 			} else if (actionCommand.equals("Adicionar")) {
@@ -906,7 +909,7 @@ public class PDV extends AbstractDialog {
 				meiosPagamentosSelecionadosList = new ArrayList<>();
 				txtTotalVenda.setText(Util.formataMoeda(0f));
 				lblValorTroco.setText(Util.formataMoeda(0f));
-//				super.removeController(vendaController);
+				// super.removeController(vendaController);
 				btnFinalizar.setEnabled(false);
 			}
 
@@ -951,7 +954,7 @@ public class PDV extends AbstractDialog {
 
 	private void finalizaVenda() throws Exception {
 
-		venda.setPorcentagemDesconto(Util.stringDecimaisToFloat(txtDesconto.getText()));
+//		venda.setPorcentagemDesconto(Util.stringDecimaisToFloat(txtDesconto.getText()));
 		// Pagamento pagamento = venda.getPagamento();
 		float troco = Util.parseStringDecimalToFloat(lblValorTroco.getText().substring(3));
 
@@ -1096,7 +1099,7 @@ public class PDV extends AbstractDialog {
 
 	@Override
 	protected void excluiItem() throws Exception {
-		vendaController.devolveProduto();
+//		vendaController.devolveProduto();
 		calculaTotalVenda();
 		btnRemoverVenda.setEnabled(false);
 		btnAdicionarVenda.setEnabled(false);
@@ -1187,6 +1190,10 @@ public class PDV extends AbstractDialog {
 		}
 		lblValorTroco.setText(Util.formataMoeda(troco));
 		repaint();
+	}
+
+	public static void main(String args[]) throws HeadlessException, Exception {
+		PDV pdv = new PDV("TESTE", new JFrame());
 	}
 
 }

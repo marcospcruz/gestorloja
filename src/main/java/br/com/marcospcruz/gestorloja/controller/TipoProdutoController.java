@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
@@ -165,7 +166,7 @@ public class TipoProdutoController extends ControllerBase {
 
 		// if (tiposProdutos == null || tiposProdutos.size() < 1)
 		//
-		carregaTiposProdutos();
+		// carregaTiposProdutos();
 
 		return tiposProdutos;
 
@@ -176,13 +177,14 @@ public class TipoProdutoController extends ControllerBase {
 	}
 
 	public void setItem(Object tipoProduto) {
-		if (tipoProduto != null && !(tipoProduto instanceof TipoProduto)) {
-			tipoProduto = new SubTipoProduto(tipoProduto.toString(), getUsuarioLogado());
-		}
-		this.tipoProduto = (SubTipoProduto) tipoProduto;
-		// implementação para AutocompleteComboBox
-		if (tipoProduto != null)
-			setList((List) ((SubTipoProduto) tipoProduto).getSubTiposProduto());
+		// if (tipoProduto != null && !(tipoProduto instanceof TipoProduto)) {
+		// tipoProduto = new SubTipoProduto(tipoProduto.toString(), getUsuarioLogado());
+		// }
+		// this.tipoProduto = (SubTipoProduto) tipoProduto;
+		// // implementação para AutocompleteComboBox
+		// if (tipoProduto != null)
+		// setList((List) ((SubTipoProduto) tipoProduto).getSubTiposProduto());
+		this.tipoProduto = (SubTipoProduto)tipoProduto;
 	}
 
 	public void carregaTiposProdutos() {
@@ -236,17 +238,23 @@ public class TipoProdutoController extends ControllerBase {
 			Map<Object, Object> cache = getCacheMap();
 			if (cache != null && !cache.isEmpty()) {
 				tiposProdutos = new ArrayList(cache.values());
-			} else {
-
-				String valor = "%" + parametro.toUpperCase() + "%";
-
-				tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike", "descricao", valor);
-				setCacheMap((Map<Object, Object>) tiposProdutos.stream()
-						.collect(Collectors.toMap(tipo -> ((SubTipoProduto) tipo).getIdTipoItem(), tipo -> tipo)));
 			}
 
 		}
+		if (tiposProdutos != null)
+			tiposProdutos = (List) tiposProdutos.stream()
+					.filter(tp -> ((SubTipoProduto) tp).getDescricaoTipo().equalsIgnoreCase(parametro))
+					.collect(Collectors.toList());
+		// if (tiposProdutos.isEmpty())
+		else {
+			String valor = "%" + parametro.toUpperCase() + "%";
 
+			tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike", "descricao", valor);
+			// setCacheMap((Map<Object, Object>) tiposProdutos.stream()
+			// .collect(Collectors.toMap(tipo -> ((SubTipoProduto) tipo).getIdTipoItem(),
+			// tipo -> tipo)));
+
+		}
 		if (!tiposProdutos.isEmpty())
 
 			tipoProduto = (SubTipoProduto) tiposProdutos.get(0);
@@ -269,9 +277,9 @@ public class TipoProdutoController extends ControllerBase {
 
 		for (SubTipoProduto peca : tmp) {
 
-			String descricao = peca.getDescricaoTipo().toLowerCase();
+			String descricao = peca.getDescricaoTipo();
 
-			if (descricao.contains(parametro.toLowerCase())) {
+			if (descricao.contains(parametro)) {
 
 				tiposProdutos.add(peca);
 
@@ -372,8 +380,7 @@ public class TipoProdutoController extends ControllerBase {
 
 	@Override
 	public void salva() throws Exception {
-		// TODO Auto-generated method stub
-
+		tipoProdutoDao.update(tipoProduto);
 	}
 
 	@Override
@@ -385,6 +392,19 @@ public class TipoProdutoController extends ControllerBase {
 	@Override
 	public void validaExistente(String text) throws Exception {
 		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void novo() {
+		tipoProduto = new SubTipoProduto();
+
+	}
+
+	public TipoProduto buscaSuperCategoria(String string) {
+		buscaTodos();
+		return (TipoProduto) tiposProdutos.stream().filter(t -> ((TipoProduto) t).getDescricaoTipo().equals(string))
+				.findFirst().orElse(null);
 
 	}
 

@@ -4,15 +4,12 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
@@ -36,7 +33,7 @@ public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoPro
 	@JoinColumn(name = "idSuperTipoProduto")
 	private SubTipoProduto superTipoProduto;
 
-	@OneToMany(mappedBy="tipoProduto")
+	@OneToMany(mappedBy = "tipoProduto")
 	// @Fetch(FetchMode.JOIN)
 	private List<ItemEstoque> itensEstoque;
 
@@ -56,6 +53,11 @@ public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoPro
 
 	}
 
+	public SubTipoProduto(String string) {
+		this();
+		setDescricaoTipo(string);
+	}
+
 	public String getSexo() {
 		return sexo;
 	}
@@ -70,6 +72,14 @@ public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoPro
 
 	public void setSuperTipoProduto(SubTipoProduto superTipoProduto) {
 		this.superTipoProduto = superTipoProduto;
+	}
+
+	public List<ItemEstoque> getItensEstoque() {
+		return itensEstoque;
+	}
+
+	public void setItensEstoque(List<ItemEstoque> itensEstoque) {
+		this.itensEstoque = itensEstoque;
 	}
 
 	@Override
@@ -109,18 +119,16 @@ public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoPro
 		return true;
 	}
 
+	@Override
 	public String toString() {
-
 		return getDescricaoTipo();
-
 	}
 
 	@Override
 	public int compareTo(SubTipoProduto o) {
-		
-		int result=o.getIdTipoItem()-getIdTipoItem();
+
+		int result = o.getIdTipoItem() - getIdTipoItem();
 		return result;
 	}
-	
 
 }

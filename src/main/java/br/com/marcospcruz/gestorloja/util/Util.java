@@ -18,7 +18,7 @@ public class Util {
 
 	public static String formataDataAtual() {
 
-		return formataData(SingletonManager.getInstance().getData());
+		return formataDataHora(SingletonManager.getInstance().getData());
 	}
 
 	public static String formataMoeda(Float valorMoeda) {
@@ -26,9 +26,9 @@ public class Util {
 		return NumberFormat.getCurrencyInstance(CURRENT_LOCALE).format(valorMoeda);
 	}
 
-	public static String formataData(Date data) {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		return sdf.format(data);
+	public static String formataDataHora(Date data) {
+		
+		return formataDataHora(data, "dd/MM/yyyy HH:mm:ss");
 
 	}
 
@@ -63,7 +63,7 @@ public class Util {
 					temp.append(i);
 			text = temp.toString();
 		}
-		String valor = text.replace(VIRGULA, PONTO);
+		String valor = text.trim().replace(VIRGULA, PONTO);
 		return Float.valueOf(valor);
 	}
 
@@ -92,20 +92,41 @@ public class Util {
 	}
 
 	public static LocalDate parseDate(String text) {
-		if(text.isEmpty()) {
+		if (text.isEmpty()) {
 			return null;
 		}
 		String[] data = text.split("/");
-		
-		int ano=Integer.parseInt(data[2]);
-		int mes=Integer.parseInt(data[1]);
-		int diaMes=Integer.parseInt(data[0]);
+
+		int ano = Integer.parseInt(data[2]);
+		int mes = Integer.parseInt(data[1]);
+		int diaMes = Integer.parseInt(data[0]);
 		return LocalDate.of(ano, mes, diaMes);
 	}
 
-	public static float stringDecimaisToFloat(String text) {
-		if(!text.isEmpty())
-			return Float.parseFloat(text);
-		return 0;
+	public static String[] aumentaArray(String[] array) {
+		String[] backup = new String[array.length + 1];
+		for (int i = 0; i < array.length; i++) {
+			backup[i] = array[i];
+		}
+		return backup;
+	}
+
+	public static String[] diminueArray(String[] array) {
+
+		String[] backup = new String[array.length];
+		for (int i = 0; i < array.length - 1; i++) {
+			backup[i] = array[i];
+		}
+		return backup;
+	}
+
+	public static String formataData(Date data) {
+
+		return formataDataHora(data, "dd/MM/yyyy");
+	}
+
+	private static String formataDataHora(Date data, String string) {
+		SimpleDateFormat sdf = new SimpleDateFormat(string);
+		return sdf.format(data);
 	}
 }

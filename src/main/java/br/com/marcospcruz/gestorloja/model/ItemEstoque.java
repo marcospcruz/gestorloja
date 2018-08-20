@@ -15,6 +15,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 //@formatter:off
 @Entity
 @Table(name = "Estoque")
@@ -63,7 +65,8 @@ import javax.persistence.Table;
 				+"JOIN ie.tipoProduto t "
 				+ "JOIN ie.fabricante f "
 				+ "WHERE p.idProduto=:idProduto "
-				+ "AND f.idFabricante=:idFabricante"),
+				+ "AND f.idFabricante=:idFabricante "
+				+ "AND t.idTipoItem=:idTipoProduto"),
 		
 		@NamedQuery(name = "itemestoque.readTipoFabricante", query = "select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
@@ -102,6 +105,7 @@ public class ItemEstoque implements Serializable {
 	// @JoinColumn(name = "idItemEstoque") }, inverseJoinColumns = {
 	// @JoinColumn(name = "idFabricante") })
 	private Fabricante fabricante;
+	
 	private Integer quantidade;
 	@Column(unique = true)
 	private String codigoDeBarras;
@@ -114,7 +118,9 @@ public class ItemEstoque implements Serializable {
 	private float valorCusto;
 
 	public ItemEstoque() {
-		// setDataContagem(SingletonManager.getInstance().getData());
+		setDataContagem(SingletonManager.getInstance().getData());
+		setEstoqueDedutivel(Boolean.TRUE);
+		setQuantidade(0);
 		// setOperador(SingletonManager.getInstance().getUsuarioLogado());
 	}
 

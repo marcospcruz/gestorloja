@@ -33,9 +33,9 @@ public interface Crud<T> {
 
 	public List<T> buscaList(String query, String parametro, String valor);
 
-	public T busca(String namedQuery, String param1, String paramValue1, String param2, String paramValue2);
+//	public T busca(String namedQuery, String param1, String paramValue1, String param2, String paramValue2);
 
-	public T busca(String namedQuery, String param1, Integer paramValue, String param2, Integer paramValue2);
+	public T busca(String namedQuery, Object... params);
 
 	List<T> buscaList(String namedQuery, String... params);
 

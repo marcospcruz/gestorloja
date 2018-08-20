@@ -10,20 +10,31 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 public class AutoCompleteTextField<T> extends ComboBox<T> {
-	protected static final List<KeyCode> SKIP_THOSE = Arrays.asList(KeyCode.LEFT, KeyCode.HOME, KeyCode.END, KeyCode.UP,
-			KeyCode.DOWN, KeyCode.RIGHT, KeyCode.ALT, KeyCode.CONTROL);
+	//@formatter:off
+	protected static final List<KeyCode> SKIP_THOSE = Arrays.asList(
+			KeyCode.LEFT, 
+			KeyCode.HOME, 
+			KeyCode.END, 
+			KeyCode.UP,
+			KeyCode.DOWN, 
+			KeyCode.RIGHT, 
+			KeyCode.ALT, 
+			KeyCode.CONTROL, 
+			KeyCode.TAB,
+			KeyCode.SHIFT);
+	//@formatter:on
 	private List<T> backup;
-	private String teste;
+
 	private String old;
 	private int caretPosition;
 	private KeyCode keyCode;
+	private T value;
 
 	public AutoCompleteTextField() {
 		this(true);
@@ -66,16 +77,19 @@ public class AutoCompleteTextField<T> extends ComboBox<T> {
 			public void handle(KeyEvent event) {
 				old = textComponent.getText();
 				keyCode = event.getCode();
-				System.out.println(keyCode);
+				// System.out.println(keyCode);
+				if (keyCode.equals(KeyCode.TAB)) {
+					hide();
+				}
 				if (SKIP_THOSE.contains(keyCode)) {
 					return;
 				}
 				TextField source = (TextField) event.getSource();
 				TextField target = (TextField) event.getTarget();
 				caretPosition = target.getCaretPosition();
-				System.out.print(textComponent.getText() + " - ");
-				System.out.print(source.getText());
-				System.out.println(" - " + target.getText());
+				// System.out.print(textComponent.getText() + " - ");
+				// System.out.print(source.getText());
+				// System.out.println(" - " + target.getText());
 				// String oldValue = textComponent.getText();
 				Platform.runLater(() -> update(target.getText(), null));
 
@@ -84,9 +98,8 @@ public class AutoCompleteTextField<T> extends ComboBox<T> {
 
 	}
 
-	public void update(String oldValue, String newValue) {
-		ObservableList<T> items = getItems();
-		System.out.println(old + ": " + caretPosition);
+	public void update(String oldValue, String newValue) {		ObservableList<T> items = getItems();
+//		System.out.println(old + ": " + caretPosition);
 		// if (newValue.length() == 1)
 		// teste = newValue.toUpperCase();
 		// else if (newValue.length() >= 1)
@@ -113,6 +126,7 @@ public class AutoCompleteTextField<T> extends ComboBox<T> {
 		if (backup == null) {
 			backup = new ArrayList<>(items);
 		}
+		// }
 		// if (items.size() == 1) {
 		// T t = items.get(0);
 		// if (t.toString().equals(value)) {
@@ -124,7 +138,9 @@ public class AutoCompleteTextField<T> extends ComboBox<T> {
 
 		items.removeAll(items);
 		items.addAll(backup);
-		if (value.isEmpty()) {
+		if (value.isEmpty())
+
+		{
 			show();
 			setValue(null);
 			getOnAction();
@@ -154,7 +170,7 @@ public class AutoCompleteTextField<T> extends ComboBox<T> {
 		// getEditor().getText().isEmpty()) {
 		// getEditor().setText(value);
 		// }
-		System.out.println(getValue());
+//		System.out.println(getValue());
 		boolean condicao = (!keyCode.equals(KeyCode.DELETE) || !keyCode.equals(KeyCode.BACK_SPACE))
 		// && getValue() == null
 		;

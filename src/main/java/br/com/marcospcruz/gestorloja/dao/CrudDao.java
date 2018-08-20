@@ -65,7 +65,7 @@ public class CrudDao<T> implements Crud<T> {
 			e.printStackTrace();
 
 			throw e;
-			
+
 		} finally {
 
 			closeEntityManager();
@@ -81,13 +81,22 @@ public class CrudDao<T> implements Crud<T> {
 		if (!entityManager.isOpen())
 			inicializaEntityManager();
 
-		entityManager.getTransaction().begin();
+		try {
+			entityManager.getTransaction().begin();
 
-		entityManager.remove(entity);
+			entityManager.remove(entity);
 
-		entityManager.getTransaction().commit();
+			entityManager.getTransaction().commit();
+		} catch (Exception e) {
+		
+			e.printStackTrace();
+			
+			throw e;
+		
+		} finally {
 
-		closeEntityManager();
+			closeEntityManager();
+		}
 
 	}
 
@@ -148,11 +157,12 @@ public class CrudDao<T> implements Crud<T> {
 	}
 
 	@Override
-	public T busca(String namedQuery, String param1, String paramValue1, String param2, String paramValue2) {
+	public T busca(String namedQuery, Object... params) {
 		inicializaEntityManager();
 		Query query = createQuery(namedQuery);
-		query.setParameter(param1, paramValue1);
-		query.setParameter(param2, paramValue2);
+		for (int i = 0; i < params.length;)
+			query.setParameter(params[i++].toString(), params[i++]);
+		// query.setParameter(params[2].toString(), params[3].toString());
 
 		T entity = (T) query.getSingleResult();
 		// closeEntityManager();
@@ -162,19 +172,6 @@ public class CrudDao<T> implements Crud<T> {
 	private Query createQuery(String namedQuery) {
 
 		return entityManager.createNamedQuery(namedQuery);
-	}
-
-	@Override
-	public T busca(String namedQuery, String param1, Integer paramValue, String param2, Integer paramValue2) {
-
-		inicializaEntityManager();
-		Query query = createQuery(namedQuery);
-		query.setParameter(param1, paramValue);
-		query.setParameter(param2, paramValue2);
-
-		T entity = (T) query.getSingleResult();
-		// closeEntityManager();
-		return entity;
 	}
 
 	@Override

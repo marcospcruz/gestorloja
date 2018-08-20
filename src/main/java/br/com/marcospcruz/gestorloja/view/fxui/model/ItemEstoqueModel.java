@@ -11,9 +11,11 @@ public class ItemEstoqueModel {
 	private SimpleStringProperty qt;
 	private SimpleStringProperty vlUnitario;
 	private SimpleStringProperty vlTotal;
-	
-	public ItemEstoqueModel(String codigoProduto, String fabricante, String categoria, String subCategoria,
-			String descricaoProduto, String quantidade, String precoFinal,String valorTotal) {
+	private int indexOf;
+
+	public ItemEstoqueModel(int indexOf, String codigoProduto, String fabricante, String categoria, String subCategoria,
+			String descricaoProduto, String quantidade, String precoFinal, String valorTotal) {
+		setIndexOf(indexOf);
 		setCod(codigoProduto);
 		setFabricante(fabricante);
 		setCategoria(categoria);
@@ -22,6 +24,15 @@ public class ItemEstoqueModel {
 		setQt(quantidade);
 		setVlUnitario(precoFinal);
 		setVlTotal(valorTotal);
+	}
+
+	private void setIndexOf(int indexOf) {
+		this.indexOf = indexOf;
+
+	}
+
+	public int getIndexOf() {
+		return indexOf;
 	}
 
 	public String getCod() {
@@ -106,7 +117,7 @@ public class ItemEstoqueModel {
 	}
 
 	public void setVlTotal(String precoFinal) {
-		if (this.vlTotal== null)
+		if (this.vlTotal == null)
 			this.vlTotal = new SimpleStringProperty(precoFinal);
 		else
 			this.vlTotal.set(precoFinal);

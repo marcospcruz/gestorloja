@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 @Entity
 @Table(name = "itemVenda")
 public class ItemVenda implements Serializable {
@@ -36,6 +38,12 @@ public class ItemVenda implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idVenda")
 	private Venda venda;
+
+	public ItemVenda() {
+		dataVenda = SingletonManager.getInstance().getData();
+		operador = SingletonManager.getInstance().getUsuarioLogado();
+		quantidade = 0;
+	}
 
 	public void setItemEstoque(ItemEstoque itemEstoque) {
 		this.itemEstoque = itemEstoque;

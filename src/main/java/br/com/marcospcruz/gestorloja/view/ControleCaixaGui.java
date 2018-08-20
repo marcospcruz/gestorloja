@@ -226,12 +226,12 @@ public class ControleCaixaGui extends AbstractDialog implements WindowListener {
 		String nomeCompletoUsuarioFechamento = usuarioFechamento != null ? usuarioFechamento.getNomeCompleto() : "";
 		String totalVendido=Util.formataMoeda(calculaTotalVendido(linha));
 		return new Object[] { 
-				Util.formataData(linha.getDataAbertura()), 
+				Util.formataDataHora(linha.getDataAbertura()), 
 				nomeCompletoUsuarioAbertura, 
 				Util.formataMoeda(linha.getSaldoInicial()),
 				totalVendido,
 				Util.formataMoeda(linha.getSaldoFinal()), 
-				linha.getDataFechamento() == null ? "" : Util.formataData(linha.getDataFechamento()),
+				linha.getDataFechamento() == null ? "" : Util.formataDataHora(linha.getDataFechamento()),
 				nomeCompletoUsuarioFechamento,
 				(linha.getDataFechamento()==null)?"Aberto":"Fechado"
 

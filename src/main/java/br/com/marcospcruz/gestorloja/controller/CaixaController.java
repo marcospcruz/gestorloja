@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -59,14 +60,20 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public List getList() {
-		return buscaTodos();
+		return caixaList;
 
 	}
 
 	@Override
 	public void busca(String query) throws Exception {
-		Crud<Caixa> dao = getDao();
-		caixaList = dao.busca(query);
+		// Crud<Caixa> dao = getDao();
+		// caixaList = dao.busca(query);
+		caixa = caixaList.stream().filter(c -> {
+			Date data = c.getDataAbertura();
+			String formattedDate = Util.formataDataHora(data);
+			return data.equals(query);
+
+		}).findFirst().orElse(null);
 	}
 
 	@Override
@@ -74,8 +81,9 @@ public class CaixaController extends ControllerBase {
 
 		try {
 			if (caixa == null) {
-				busca(BUSCA_CAIXA_ABERTO);
-				caixa = caixaList.get(0);
+				// busca(BUSCA_CAIXA_ABERTO);
+				if (!caixaList.isEmpty())
+					caixa = caixaList.get(0);
 			}
 		} catch (Exception e) {
 
@@ -127,10 +135,10 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public void validateCaixaAberto() throws Exception {
+		int size = caixaList.stream().filter(caixa -> caixa.getDataFechamento() == null).collect(Collectors.toList())
+				.size();
 
-		busca(BUSCA_CAIXA_ABERTO);
-
-		if (caixaList != null && !caixaList.isEmpty()) {
+		if (size > 0) {
 			throw new Exception("Há caixa aberto.");
 		}
 	}
@@ -276,6 +284,12 @@ public class CaixaController extends ControllerBase {
 				}
 			}
 		return false;
+	}
+
+	@Override
+	public void novo() {
+		caixa = new Caixa();
+
 	}
 
 }

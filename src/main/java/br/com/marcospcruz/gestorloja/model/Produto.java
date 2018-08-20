@@ -64,16 +64,20 @@ public class Produto implements Serializable {
 	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida) {
 		// setTipoProduto(subTipoProduto);
 		// getTipoProduto().setSuperTipoProduto((SubTipoProduto) tipoProduto);
+		this();
 		setDescricaoProduto(descricao);
 		setUnidadeMedida(unidadeMedida);
 
 	}
 
 	public Produto() {
-		setDataInsercao(SingletonManager.getInstance().getData());
+		SingletonManager instance = SingletonManager.getInstance();
+		setDataInsercao(instance.getData());
+		setOperador(instance.getUsuarioLogado());
 	}
 
 	public Produto(String string) {
+		this();
 		this.descricaoProduto = string;
 	}
 

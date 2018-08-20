@@ -167,7 +167,7 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 			case "Visualizar Vendas":
 				try {
 					new VendasDiaDialog(this, "Vendas realizadas em "
-							+ Util.formataData(caixaController.getUltimoCaixa().getDataAbertura()), true);
+							+ Util.formataDataHora(caixaController.getUltimoCaixa().getDataAbertura()), true);
 				} catch (Exception e1) {
 
 					showErrorMessage(this, e1.getMessage());
@@ -291,7 +291,7 @@ public class FormFechamentoCaixaDialog extends AbstractDialog {
 	@Override
 	protected void populaFormulario() {
 		Caixa caixa = (Caixa) caixaController.getItem();
-		dataAberturaLbl.setText(Util.formataData(caixa.getDataAbertura()));
+		dataAberturaLbl.setText(Util.formataDataHora(caixa.getDataAbertura()));
 		lblSaldoDoCaixa.setText(Util.formataMoeda(caixa.getSaldoInicial()));
 		lblSaldoAtualDoCaixa.setText(Util.formataMoeda(caixa.getSaldoFinal()));
 	}

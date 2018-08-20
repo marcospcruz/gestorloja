@@ -1,7 +1,6 @@
 package br.com.marcospcruz.gestorloja.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
@@ -9,10 +8,7 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Produto;
-import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
-import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
-import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 
 public class ProdutoController extends ControllerBase {
 
@@ -161,7 +157,6 @@ public class ProdutoController extends ControllerBase {
 
 		produtoDao.delete(produto);
 
-		produto = new Produto();
 	}
 
 	@Override
@@ -204,6 +199,11 @@ public class ProdutoController extends ControllerBase {
 		}
 		if (produto.getIdProduto() == null && novo != null)
 			throw new Exception("Produto já cadastrado.");
+	}
+
+	@Override
+	public void novo() {
+		produto = new Produto();
 	}
 
 }

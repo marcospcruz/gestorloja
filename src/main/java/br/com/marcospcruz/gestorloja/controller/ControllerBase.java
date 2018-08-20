@@ -54,7 +54,7 @@ public abstract class ControllerBase {
 
 		for (char caractere : pattern.toCharArray())
 
-			for (char c : parametro.toCharArray())
+			for (char c : parametro.toLowerCase().toCharArray())
 
 				if (c == caractere)
 
@@ -97,5 +97,7 @@ public abstract class ControllerBase {
 	public abstract void registraHistoricoOperacao(Operacao operacao);
 
 	public abstract void validaExistente(String text) throws Exception;
+
+	public abstract void novo();
 
 }

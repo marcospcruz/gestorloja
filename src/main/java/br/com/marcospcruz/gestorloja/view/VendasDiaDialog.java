@@ -157,7 +157,7 @@ public class VendasDiaDialog extends AbstractDialog {
 			linhas.add(new Object[] {
 				i+1,
 				venda.getIdVenda(),
-				Util.formataData(venda.getDataVenda()),
+				Util.formataDataHora(venda.getDataVenda()),
 				Util.formataMoeda(venda.getTotalVendido()),
 				Util.formataMoeda(venda.getPagamento().getValorPagamento()),
 				Util.formataStringDecimais(venda.getPorcentagemDesconto())+"%"

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.persistence.NoResultException;
+
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -21,7 +23,7 @@ import br.com.marcospcruz.gestorloja.util.Util;
 
 public class EstoqueController extends ControllerBase {
 
-	private static final String MESSAGE_QT_INVALIDA_EXCEPTION = "Quantidade informada Invï¿½lida!";
+	private static final String MESSAGE_QT_INVALIDA_EXCEPTION = "Quantidade informada Inválida!";
 
 	private ItemEstoque itemEstoque;
 
@@ -32,6 +34,8 @@ public class EstoqueController extends ControllerBase {
 	private ProdutoController produtoController;
 
 	private List<ItemEstoque> consultaEstoque;
+
+	// private CrudDao<ItemEstoque> itemEstoqueDao;
 
 	public EstoqueController() throws Exception {
 
@@ -63,8 +67,9 @@ public class EstoqueController extends ControllerBase {
 		// if (itensEstoque == null || itensEstoque.isEmpty())
 		Map<Object, Object> cache = getCacheMap();
 		if (cache == null || cache.isEmpty()) {
-			CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
+
 			itensEstoque = null;
+			Crud<ItemEstoque> itemEstoqueDao = new CrudDao<>();
 			itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
 			setCacheMap(itensEstoque.stream()
 					.collect(Collectors.toMap(item -> ((ItemEstoque) item).getIdItemEstoque(), item -> item)));
@@ -190,12 +195,23 @@ public class EstoqueController extends ControllerBase {
 
 		if (itemEstoque == null) {
 
-			throw new Exception("Exclusï¿½o invï¿½lida!");
+			throw new Exception("Exclusão inválida!");
 
 		}
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
-		itemEstoqueDao.delete(itemEstoque);
 
+		Crud<ItemEstoque> itemEstoqueDao = getDao();
+		try {
+			itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
+					itemEstoque.getProduto().getIdProduto(), "idFabricante",
+					itemEstoque.getFabricante().getIdFabricante(), "idTipoProduto",
+					itemEstoque.getTipoProduto().getIdTipoItem());
+			itemEstoqueDao.delete(itemEstoque);
+			getCacheMap().remove(itemEstoque.getIdItemEstoque());
+		} catch (NoResultException e) {
+			e.printStackTrace();
+		} finally {
+
+		}
 		anulaAtributos();
 
 	}
@@ -255,8 +271,17 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void busca(String text) throws Exception {
 		// busca(text, null, null);
-		Crud<ItemEstoque> dao = getDao();
-		itemEstoque = dao.busca("itemestoque.readCodigo", "codigo", text);
+		itemEstoque = itensEstoque.stream()
+				.filter(item -> ((ItemEstoque) item).getCodigoDeBarras().equalsIgnoreCase(text)).findFirst()
+				.orElse(null);
+		if (itemEstoque == null) {
+			Crud<ItemEstoque> dao = getDao();
+			try {
+				itemEstoque = dao.busca("itemestoque.readCodigo", "codigo", text);
+			}catch(NoResultException e) {
+				throw new Exception("Ítem código "+text+" não encontrado no estoque.");
+			}
+		}
 	}
 
 	@Override
@@ -334,7 +359,7 @@ public class EstoqueController extends ControllerBase {
 			}
 		}
 
-		if (Util.isPalavraAcentuada(tipoProduto)) {
+		if (tipoProduto != null && Util.isPalavraAcentuada(tipoProduto)) {
 			buscaComAcentuacao(tipoProduto);
 
 			return;
@@ -354,7 +379,7 @@ public class EstoqueController extends ControllerBase {
 			namedQuery = "itemestoque.readTipoFabricante";
 		}
 
-		CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
+		Crud<ItemEstoque> itemEstoqueDao = new CrudDao<>();
 		itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
 		consultaEstoque = itensEstoque;
 	}
@@ -402,9 +427,9 @@ public class EstoqueController extends ControllerBase {
 		itemEstoque.setOperador(getUsuarioLogado());
 		itemEstoque.setDataContagem(SingletonManager.getInstance().getData());
 
-		CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
+		Crud<ItemEstoque> itemEstoqueDao = new CrudDao<>();
 		itemEstoque = itemEstoqueDao.update(itemEstoque);
-
+		getCacheMap().put(itemEstoque.getIdItemEstoque(), itemEstoque);
 	}
 
 	@Override
@@ -422,6 +447,12 @@ public class EstoqueController extends ControllerBase {
 	public void validaExistente(String text) throws Exception {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void novo() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

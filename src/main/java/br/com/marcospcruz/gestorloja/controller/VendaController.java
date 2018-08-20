@@ -8,8 +8,6 @@ import java.util.Map;
 
 import javax.persistence.NoResultException;
 
-import org.eclipse.jdt.core.compiler.ITerminalSymbols;
-
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -82,11 +80,11 @@ public class VendaController extends ControllerBase {
 
 		if (itemEstoque.getQuantidade() < 0) {
 
-			devolveProduto();
+			devolveProduto(itemEstoque.getCodigoDeBarras());
 
 			throw new EstoqueInsuficienteException("Quantidade de ítens no estoque é insuficiente para a venda!");
 		}
-
+		itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidadeVenda);
 		estoqueController.setItemEstoque(itemEstoque);
 
 		estoqueController.salva();
@@ -121,13 +119,6 @@ public class VendaController extends ControllerBase {
 
 	@Override
 	public void busca(String text) throws Exception {
-		String[] valueArray = text.split(" - ");
-		String tipoProduto = valueArray[0];
-
-		String produto = valueArray.length > 1 ? valueArray[1] : null;
-
-		String fabricante = valueArray.length > 2 ? valueArray[2] : null;
-		estoqueController.busca(tipoProduto, produto, fabricante);
 
 	}
 
@@ -161,6 +152,10 @@ public class VendaController extends ControllerBase {
 
 	}
 
+	public ItemVenda getItemVenda(String codigoBarras) {
+		return itemVendaMap.get(codigoBarras);
+	}
+
 	public ItemVenda getItemVenda() {
 		try {
 			String key = estoqueController.getItemEstoque().getCodigoDeBarras();
@@ -185,8 +180,9 @@ public class VendaController extends ControllerBase {
 
 	}
 
-	public void devolveProduto() throws Exception {
-		ItemVenda itemVenda = getItemVenda();
+	public void devolveProduto(String selectedCodigoBarra) throws Exception {
+		// ItemVenda itemVenda = getItemVenda();
+		ItemVenda itemVenda = itemVendaMap.get(selectedCodigoBarra);
 		ItemEstoque itemEstoque = itemVenda.getItemEstoque();
 		// if (!itemEstoque.isEstoqueDedutivel())
 		// return;
@@ -318,9 +314,10 @@ public class VendaController extends ControllerBase {
 
 	}
 
-	public void populaItemEstoque(ItemEstoque itemEstoque) throws ProdutoNaListaException {
+	public void populaItemEstoque(ItemEstoque itemEstoque, int quantidade) throws ProdutoNaListaException {
 		String key = itemEstoque.getCodigoDeBarras();
 		estoqueController.setItem(itemEstoque);
+		ItemVenda itemVenda = itemVendaMap.get(key);
 		// if (venda.getItensVenda() != null &&
 		// venda.getItensVenda().contains(itemEstoque.getCodigoDeBarras())) {
 		// estoqueController.anulaAtributos();
@@ -328,12 +325,17 @@ public class VendaController extends ControllerBase {
 		// vendas.");
 		//
 		// }
-		ItemVenda itemVenda = new ItemVenda();
-		itemVenda.setItemEstoque(itemEstoque);
-		itemVenda.setQuantidade(1);
 
-		itemVenda.getItemEstoque()
-				.setQuantidade(itemVenda.getItemEstoque().getQuantidade() - itemVenda.getQuantidade());
+		if (itemVenda == null) {
+			itemVenda = new ItemVenda();
+			itemVenda.setItemEstoque(itemEstoque);
+
+		} 
+//		else if (itemVenda.getQuantidade() == quantidade) {
+//			throw new ProdutoNaListaException("Produto já presente na lista com a quantidade informada.");
+//		}
+		itemVenda.setQuantidade(quantidade + itemVenda.getQuantidade());
+
 		itemVenda.setValorVendido(itemEstoque.getValorUnitario());
 		if (itemVendaMap == null)
 			itemVendaMap = new HashMap<>();
@@ -626,6 +628,16 @@ public class VendaController extends ControllerBase {
 	public void buscaVenda(Venda venda) {
 		Crud<Venda> dao = new CrudDao<>();
 		this.venda = dao.busca(Venda.class, venda.getIdVenda());
+
+	}
+
+	public Map<String, ItemVenda> getItemVendaMap() {
+		return itemVendaMap;
+	}
+
+	@Override
+	public void novo() {
+		// TODO Auto-generated method stub
 
 	}
 

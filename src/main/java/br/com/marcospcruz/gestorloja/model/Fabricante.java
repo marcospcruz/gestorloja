@@ -2,6 +2,7 @@ package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,14 +12,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "fabricante.buscaTodos", query = "select f from Fabricante f order by f.nome"),
-		@NamedQuery(name = "fabricante.readParametroLike", query = "select f from Fabricante f where UPPER(f.nome) like :nome") })
+//@formatter:off
+@NamedQueries({ 
+	@NamedQuery(name = "fabricante.buscaTodos", query = "select f from Fabricante f order by f.nome"),
+	@NamedQuery(name = "fabricante.readParametroLike", query = "select f from Fabricante f where UPPER(f.nome) like :nome"), 
+	@NamedQuery(name="fabricante.readNome",query="select f from Fabricante f where UPPER(f.nome) = :nome")
+	})
+//@formatter:on
 public class Fabricante implements Serializable {
 
 	/**
@@ -38,11 +45,24 @@ public class Fabricante implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date dataInsercao;
 
-//	@OneToMany(mappedBy="fabricante")
-//	private List<Produto> produtos;
+	@OneToMany(mappedBy = "fabricante")
+	private List<ItemEstoque> itensEstoque;
 
 	public Fabricante() {
 		dataInsercao = SingletonManager.getInstance().getData();
+	}
+
+	public Fabricante(String string) {
+		this();
+		setNome(string);
+	}
+
+	public List<ItemEstoque> getItensEstoque() {
+		return itensEstoque;
+	}
+
+	public void setItensEstoque(List<ItemEstoque> itensEstoque) {
+		this.itensEstoque = itensEstoque;
 	}
 
 	public Integer getIdFabricante() {
@@ -78,15 +98,13 @@ public class Fabricante implements Serializable {
 		this.dataInsercao = dataInsercao;
 	}
 
-//	public List<Produto> getProdutos() {
-//		return produtos;
-//	}
-//
-//	public void setProdutos(List<Produto> produtos) {
-//		this.produtos = produtos;
-//	}
-
-
+	// public List<Produto> getProdutos() {
+	// return produtos;
+	// }
+	//
+	// public void setProdutos(List<Produto> produtos) {
+	// this.produtos = produtos;
+	// }
 
 	@Override
 	public String toString() {
@@ -131,8 +149,7 @@ public class Fabricante implements Serializable {
 		if (operador == null) {
 			if (other.operador != null)
 				return false;
-		} 
-		else if (!operador.equals(other.operador))
+		} else if (!operador.equals(other.operador))
 			return false;
 		return true;
 	}
