@@ -16,3 +16,5 @@ rem * * * git push origin master
 git push https://github.com/marcospcruz/gestorloja.git
 
 call mvn eclipse:eclipse
+
+rem * * * fim
