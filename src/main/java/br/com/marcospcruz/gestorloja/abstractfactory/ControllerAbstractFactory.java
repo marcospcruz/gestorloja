@@ -1,11 +1,6 @@
 package br.com.marcospcruz.gestorloja.abstractfactory;
 
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.JFrame;
-
 import br.com.marcospcruz.gestorloja.controller.ControllerBase;
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
 
 public class ControllerAbstractFactory {
 

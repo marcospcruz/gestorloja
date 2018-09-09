@@ -70,10 +70,13 @@ public class CaixaController extends ControllerBase {
 		// caixaList = dao.busca(query);
 		caixa = caixaList.stream().filter(c -> {
 			Date data = c.getDataAbertura();
+
 			String formattedDate = Util.formataDataHora(data);
-			return data.equals(query);
+			boolean mesmaDataAbertura = query.equals(formattedDate);
+			return mesmaDataAbertura;
 
 		}).findFirst().orElse(null);
+
 	}
 
 	@Override
@@ -135,11 +138,14 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public void validateCaixaAberto() throws Exception {
-		int size = caixaList.stream().filter(caixa -> caixa.getDataFechamento() == null).collect(Collectors.toList())
+		//@formatter:off
+		int size = caixaList.stream()
+				.filter(caixa -> caixa.getDataFechamento() == null)
+				.collect(Collectors.toList())
 				.size();
-
+		//@formatter:on
 		if (size > 0) {
-			throw new Exception("Há caixa aberto.");
+			throw new Exception("Caixa já aberto.");
 		}
 	}
 
@@ -290,6 +296,48 @@ public class CaixaController extends ControllerBase {
 	public void novo() {
 		caixa = new Caixa();
 
+	}
+
+	public Float getTotalRecebidoCaixa() {
+
+		float totalRecebido = 0;
+		for (Venda venda : caixa.getVendas()) {
+			Pagamento pagamento = venda.getPagamento();
+			for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+				totalRecebido += meioPagamento.getValorPago();
+
+			}
+			totalRecebido -= pagamento.getTrocoPagamento();
+		}
+		return totalRecebido;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<String, Float> getSubTotaisMeiosPagamentoRecebidos() {
+		Map<String, Float> subTotais = inicializaSubTotaisMap();
+
+		Set<Venda> vendas = caixa.getVendas();
+		for (Venda venda : vendas) {
+			for (MeioPagamento meioPagamento : venda.getPagamento().getMeiosPagamento()) {
+				String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
+				float value = subTotais.get(key) + meioPagamento.getValorPago();
+
+				subTotais.put(key, value);
+			}
+		}
+		return subTotais;
+	}
+
+	private Map<String, Float> inicializaSubTotaisMap() {
+		Map<String, Float> map = new HashMap<>();
+		Crud<TipoMeioPagamento> dao = new CrudDao<>();
+		for (TipoMeioPagamento tipo : dao.busca("tipoMeioPagamento.buscaTodos")) {
+			map.put(tipo.getDescricaoTipoMeioPagamento(), 0f);
+		}
+		return map;
 	}
 
 }

@@ -1,7 +1,5 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
-import java.awt.Dimension;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,12 +29,12 @@ import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
@@ -47,13 +45,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public abstract class StageBase extends Stage implements EventHandler<ActionEvent> {
 
-	protected static final double DEZ_PORCENTO = 10d / 100d;
 	protected double width;
 	protected double height;
 	protected Scene scene;
@@ -64,10 +63,13 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	protected ControllerBase controller;
 
 	public StageBase() {
-		Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-		width = screenSize.getWidth() - (screenSize.getWidth() * DEZ_PORCENTO);
-		height = screenSize.getHeight() - (screenSize.getHeight() * DEZ_PORCENTO);
-
+		SingletonManager singletonManager = SingletonManager.getInstance();
+		// width = singletonManager.getScreenSize().getWidth() -
+		// (singletonManager.getScreenSize().getWidth());
+		// height = singletonManager.getScreenSize().getHeight() -
+		// (singletonManager.getScreenSize().getHeight());
+		width = singletonManager.getScreenWidth();
+		height = singletonManager.getScreenHeight();
 		vBox = new VBox();
 		getvBox().setSpacing(5);
 		scene = new Scene(new Group(), width, height);
@@ -75,6 +77,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		((Group) scene.getRoot()).getChildren().add(getvBox());
 		scene.addEventFilter(MouseEvent.MOUSE_CLICKED, this::tableViewEventFilter);
 		setScene(scene);
+		setResizable(false);
 
 	}
 
@@ -169,7 +172,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	}
 
 	protected String getTableViewSelectedValueId(Event event) {
-		
+
 		TableView<ItemEstoqueModel> table = (TableView<ItemEstoqueModel>) event.getSource();
 
 		TablePosition tablePos = (TablePosition) table.getSelectionModel().getSelectedCells().get(0);
@@ -185,6 +188,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		stage.initOwner(this);
 		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.showAndWait();
+		
 	}
 
 	/**
@@ -463,7 +467,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	/**
 	 * @return the layoutsMaxWidth
 	 */
-	public double getLayoutsMaxWidth() {
+	protected double getLayoutsMaxWidth() {
 		return layoutsMaxWidth;
 	}
 
@@ -473,7 +477,14 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		Button btnNovo = new Button("Novo");
 		btnNovo.setOnAction(this::novo);
 		Button btnSave = new Button("Salvar");
-		btnSave.setOnAction(this::salvaDados);
+		btnSave.setOnAction(arg0 -> {
+			try {
+				salvaDados(arg0);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 
 		btnExcluir = new Button("Excluir");
 		btnExcluir.setDisable(true);
@@ -498,7 +509,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	abstract void populaForm();
 
-	protected abstract void salvaDados(ActionEvent event);
+	protected abstract void salvaDados(ActionEvent event) throws Exception;
 
 	protected abstract void excluiDados(ActionEvent event) throws Exception;
 
@@ -507,6 +518,25 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	public VendaController getVendaController() throws Exception {
 
 		return (VendaController) getController(ControllerAbstractFactory.CONTROLE_VENDA);
+	}
+
+	private Label criaLabel(String string, boolean setBold) {
+		Label label = new Label(string);
+		if (setBold)
+			label.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+		else
+			label.setFont(Font.font("Verdana", 12));
+
+		return label;
+
+	}
+
+	protected Label criaLabelBold(String string) {
+		return criaLabel(string, true);
+	}
+
+	protected Label criaLabelNormal(String string) {
+		return criaLabel(string, false);
 	}
 
 }

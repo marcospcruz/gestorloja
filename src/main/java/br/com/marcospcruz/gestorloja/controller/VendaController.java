@@ -68,28 +68,33 @@ public class VendaController extends ControllerBase {
 
 	}
 
-	public void subtraiEstoque(ItemVenda venda) throws Exception {
+	public void subtraiEstoque(int quantidade) throws Exception {
 
 		ItemEstoque itemEstoque =
 				// estoqueController.getItemEstoque() != null ?
 				// estoqueController.getItemEstoque()
-				venda.getItemEstoque();
+				estoqueController.getItemEstoque();
 		if (!itemEstoque.isEstoqueDedutivel())
 			return;
-		Integer quantidadeVenda = venda.getQuantidade();
 
-		if (itemEstoque.getQuantidade() < 0) {
+		boolean permiteVendaSemControlarEstoque = SingletonManager.getInstance().isPermiteVendaSemControlarEstoque();
+		if (itemEstoque.getQuantidade() < quantidade && !permiteVendaSemControlarEstoque) {
 
-			devolveProduto(itemEstoque.getCodigoDeBarras());
+			// devolveProduto(itemEstoque.getCodigoDeBarras(), quantidade);
 
-			throw new EstoqueInsuficienteException("Quantidade de ítens no estoque é insuficiente para a venda!");
+			throw new EstoqueInsuficienteException(
+					"Quantidade de ítens no estoque é insuficiente para a venda! Total em estoque: "
+							+ itemEstoque.getQuantidade());
 		}
-		itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidadeVenda);
-		estoqueController.setItemEstoque(itemEstoque);
+		itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidade);
+		if (!permiteVendaSemControlarEstoque) {
+			estoqueController.setItemEstoque(itemEstoque);
 
-		estoqueController.salva();
-		venda.setItemEstoque(itemEstoque);
+			estoqueController.salva();
+		}
+		// venda.setItemEstoque(itemEstoque);
 		estoqueController.anulaAtributos();
+
 	}
 
 	@Override
@@ -176,46 +181,52 @@ public class VendaController extends ControllerBase {
 		// itemVenda.setOperador(getUsuarioLogado());
 		estoqueController.setItemEstoque(null);
 		itemVendaBackup = null;
-		// itemVendaMap = new HashMap<>();
+		itemVendaMap = new HashMap<>();
 
 	}
 
-	public void devolveProduto(String selectedCodigoBarra) throws Exception {
+	public void devolveProduto(String selectedCodigoBarra, int quantidade) throws Exception {
 		// ItemVenda itemVenda = getItemVenda();
 		ItemVenda itemVenda = itemVendaMap.get(selectedCodigoBarra);
-		ItemEstoque itemEstoque = itemVenda.getItemEstoque();
-		// if (!itemEstoque.isEstoqueDedutivel())
-		// return;
-		if (itemEstoque == null) {
-			throw new Exception("Selecione um ítem na lista.");
+		if (itemVenda != null) {
+
+			itemVenda.setQuantidade(itemVenda.getQuantidade() - quantidade);
+			ItemEstoque itemEstoque = itemVenda.getItemEstoque();
+
+			// if (!itemEstoque.isEstoqueDedutivel())
+			// return;
+			if (itemEstoque == null) {
+				throw new Exception("Selecione um ítem na lista.");
+			}
+			// try {
+			//// if (itemVenda.getItemEstoque() != null)
+			//// estoqueController.busca(itemVenda.getItemEstoque());
+			// } catch (NullPointerException e) {
+			//
+			// throw new Exception();
+			// }
+			estoqueController.setItemEstoque(itemEstoque);
+
+			estoqueController.incrementaItem(quantidade);
+
+			// float valorTotal = venda.getTotalVendido() - (item.getQuantidade() *
+			// item.getItemEstoque().getValorUnitario());
+			// venda.setTotalVendido(valorTotal);
+
+			// resetItemVenda();
+
+			List<ItemVenda> itensVenda = venda.getItensVenda();
+			String codigoDeBarras = itemEstoque.getCodigoDeBarras();
+			if (itemVendaBackup != null)
+				itensVenda.add(itemVendaBackup);
+			else {
+				if (itemVenda.getQuantidade() == 0)
+					itemVendaMap.remove(codigoDeBarras);
+				venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
+			}
+			calculaValorTotalVenda();
+
 		}
-		// try {
-		//// if (itemVenda.getItemEstoque() != null)
-		//// estoqueController.busca(itemVenda.getItemEstoque());
-		// } catch (NullPointerException e) {
-		//
-		// throw new Exception();
-		// }
-		estoqueController.setItemEstoque(itemEstoque);
-
-		if (itemEstoque.isEstoqueDedutivel())
-			estoqueController.incrementaItem(itemVenda.getQuantidade());
-
-		// float valorTotal = venda.getTotalVendido() - (item.getQuantidade() *
-		// item.getItemEstoque().getValorUnitario());
-		// venda.setTotalVendido(valorTotal);
-
-		// resetItemVenda();
-
-		List<ItemVenda> itensVenda = venda.getItensVenda();
-		String codigoDeBarras = itemEstoque.getCodigoDeBarras();
-		if (itemVendaBackup != null)
-			itensVenda.add(itemVendaBackup);
-		else {
-			itemVendaMap.remove(codigoDeBarras);
-			venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
-		}
-		calculaValorTotalVenda();
 	}
 
 	@Override
@@ -224,66 +235,17 @@ public class VendaController extends ControllerBase {
 
 	}
 
-	public void adicionaProdutoLista() throws Exception {
-		fazBackup = true;
-		ItemVenda itemVenda = getItemVenda();
-		if (itemVenda == null || itemVenda.getItemEstoque() == null) {
-			resetItemVenda();
-			throw new NullPointerException(PRODUTO_INVALIDO);
-
-		}
-		if (itemVenda.getQuantidade() < 1)
-			throw new Exception("Quantidade inválida.");
-		try {
-			if (venda.getItensVenda() != null && venda.getItensVenda().contains(itemVenda)) {
-
-				// ItemVenda item = procuraProdutoLista(itemVenda);
-				// if (itensVenda.remove(itemVenda))
-				// if (itemVendaBackup != null &&
-				// itemVendaBackup.getItemEstoque().equals(itemVenda.getItemEstoque())
-				// // && itemVendaBackup.getQuantidade() != itemVenda.getQuantidade()
-				// ) {
-				// estoqueController.incrementaItem(itemVendaBackup.getQuantidade());
-				// itemVenda.setItemEstoque(estoqueController.getItemEstoque());
-				// } else {
-				// resetItemVenda();
-				// return;
-				// }
-			}
-			// if (venda.getItensVenda() != null && getElementList(itemVenda) != null
-			// && getElementList(itemVenda).getQuantidade() != itemVenda.getQuantidade())
-			subtraiEstoque(itemVenda);
-
-		} catch (EstoqueInsuficienteException e) {
-
-			itemVenda = itemVendaBackup != null ? itemVendaBackup : new ItemVenda();
-
-			throw new EstoqueInsuficienteException(e.getMessage());
-		} finally {
-
-			if (venda.getItensVenda() == null)
-				venda.setItensVenda(new ArrayList<>());
-
-			// itensVenda.add(itemVenda); alterar
-			if (itemVenda.getItemEstoque() != null) {
-				// venda.getItensVenda().add(itemVenda);
-				itemVenda.setVenda(venda);
-				itemVendaMap.put(itemVenda.getItemEstoque().getCodigoDeBarras(), itemVenda);
-				venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
-				calculaValorTotalVenda();
-				resetItemVenda();
-			}
-
-		}
-
-	}
-
 	public void calculaValorTotalVenda() {
 		float valorTotal = 0f;
 		for (ItemVenda item : venda.getItensVenda()) {
-			valorTotal += item.getQuantidade() * item.getItemEstoque().getValorUnitario();
+			float valorItemVenda = item.getItemEstoque().getValorUnitario();
+			// valorTotal += valorItemVenda;
 
-			valorTotal -= valorTotal * venda.getPorcentagemDesconto() / 100;
+			float desconto = Float.isNaN(venda.getPorcentagemDesconto()) ? 0 : (venda.getPorcentagemDesconto() / 100f);
+			float tmp = valorItemVenda * desconto;
+			valorItemVenda -= tmp;
+			item.setValorVendido(valorItemVenda);
+			valorTotal += item.getQuantidade() * valorItemVenda;
 		}
 		venda.setTotalVendido(valorTotal);
 	}
@@ -314,10 +276,13 @@ public class VendaController extends ControllerBase {
 
 	}
 
-	public void populaItemEstoque(ItemEstoque itemEstoque, int quantidade) throws ProdutoNaListaException {
+	public void populaItemEstoque(ItemEstoque itemEstoque, int quantidade) throws Exception {
 		String key = itemEstoque.getCodigoDeBarras();
 		estoqueController.setItem(itemEstoque);
+		if (itemVendaMap == null)
+			resetItemVenda();
 		ItemVenda itemVenda = itemVendaMap.get(key);
+		//////////////////////////////////
 		// if (venda.getItensVenda() != null &&
 		// venda.getItensVenda().contains(itemEstoque.getCodigoDeBarras())) {
 		// estoqueController.anulaAtributos();
@@ -326,21 +291,29 @@ public class VendaController extends ControllerBase {
 		//
 		// }
 
-		if (itemVenda == null) {
+		// if (itemVenda == null) {
+		// itemVenda = new ItemVenda();
+		// itemVenda.setItemEstoque(itemEstoque);
+		// }
+		// else if (itemVenda.getQuantidade() == quantidade) {
+		// throw new ProdutoNaListaException("Produto já presente na lista com a
+		// quantidade informada.");
+		// }
+		if (itemVenda == null)
 			itemVenda = new ItemVenda();
-			itemVenda.setItemEstoque(itemEstoque);
-
-		} 
-//		else if (itemVenda.getQuantidade() == quantidade) {
-//			throw new ProdutoNaListaException("Produto já presente na lista com a quantidade informada.");
-//		}
+		itemVenda.setItemEstoque(itemEstoque);
+		itemVenda.setVenda(venda);
 		itemVenda.setQuantidade(quantidade + itemVenda.getQuantidade());
+		itemVenda.setVenda(venda);
+		subtraiEstoque(quantidade);
 
 		itemVenda.setValorVendido(itemEstoque.getValorUnitario());
-		if (itemVendaMap == null)
-			itemVendaMap = new HashMap<>();
-		itemVendaMap.put(key, itemVenda);
 
+		if (itemVenda.getQuantidade() > 0)
+			itemVendaMap.put(key, itemVenda);
+
+		venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
+		calculaValorTotalVenda();
 	}
 
 	public void deduzEstoqueProduto(int quantidadeItem) throws Exception {
@@ -382,7 +355,8 @@ public class VendaController extends ControllerBase {
 		if (venda.getItensVenda().isEmpty()) {
 			throw new Exception("Lista de Produtos vazia!");
 		}
-		venda.setDataVenda(SingletonManager.getInstance().getData());
+
+		// venda.setDataVenda(SingletonManager.getInstance().getData());
 		venda.setOperador(getUsuarioLogado());
 		// venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
 		recebePagamento();
@@ -422,12 +396,18 @@ public class VendaController extends ControllerBase {
 	private void recebePagamento() throws Exception {
 		// TODO BUSCAR TIPOMEIOPAGAMENTO NO BANCO
 		Pagamento pagamento = venda.getPagamento();
+		if (pagamento == null) {
+			throw new NullPointerException("Pagamento não informado para finalizar a Venda.");
+		}
 		Date dataVenda = venda.getDataVenda();
-		pagamento.setdataVenda(dataVenda);
+		pagamento.setDataVenda(dataVenda);
 		Usuario operador = venda.getOperador();
 		pagamento.setUsuarioLogado(operador);
+
 		// caixaController.recebePagamento(pagamento);
 		Caixa caixa = venda.getCaixa() == null ? (Caixa) caixaController.getItem() : venda.getCaixa();
+		if (pagamento.getMeiosPagamento() == null || pagamento.getMeiosPagamento().isEmpty())
+			throw new Exception("Cobrar a venda antes de finalizar.");
 		pagamento.getMeiosPagamento().stream().forEach(meioPagamento -> {
 			meioPagamento.setDataPagamento(dataVenda);
 			meioPagamento.setUsuarioLogado(operador);
@@ -641,4 +621,45 @@ public class VendaController extends ControllerBase {
 
 	}
 
+	public float getValorTotalPagamentoVenda() {
+		float valorPagamentoVenda = 0;
+		for (MeioPagamento meio : venda.getPagamento().getMeiosPagamento())
+			valorPagamentoVenda += meio.getValorPago();
+		return valorPagamentoVenda;
+	}
+
+	public float getValorBrutoVenda() {
+		float total = 0;
+		for (ItemVenda item : venda.getItensVenda()) {
+			total += item.getQuantidade() * item.getItemEstoque().getValorUnitario();
+		}
+		return total;
+	}
+
+	public void setVenda(Venda venda) {
+		this.venda = venda;
+
+	}
+
+	public void estornaVenda() throws Exception {
+		Caixa caixa = venda.getCaixa();
+		Pagamento pagamento = venda.getPagamento();
+		for (MeioPagamento mp : pagamento.getMeiosPagamento()) {
+			TipoMeioPagamento tp = mp.getTipoMeioPagamento();
+			if (tp.getIdTipoMeioPagamento() == 1) {
+				float saldoCaixa = caixa.getSaldoFinal() - mp.getValorPago();
+				caixa.setSaldoFinal(saldoCaixa);
+			}
+			mp.setEstornado(true);
+		}
+		pagamento.setEstornado(true);
+		for (ItemVenda itemVenda : venda.getItensVenda()) {
+			itemVenda.setDevolvido(true);
+			devolveProduto(itemVenda.getItemEstoque().getCodigoDeBarras(), itemVenda.getQuantidade());
+
+		}
+
+		venda.setEstornado(true);
+
+	}
 }

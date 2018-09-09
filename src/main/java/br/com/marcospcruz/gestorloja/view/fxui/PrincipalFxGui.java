@@ -1,5 +1,7 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
+import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +15,12 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
@@ -34,13 +39,13 @@ public class PrincipalFxGui extends StageBase {
 		super();
 		interfaces = new HashMap<>();
 		Scene scene = new Scene(new Group());
-		FlowPane flowPane = new FlowPane(Orientation.HORIZONTAL);
-		flowPane.setBorder(new Border(
+		FlowPane btnPane = new FlowPane(Orientation.HORIZONTAL);
+		btnPane.setBorder(new Border(
 				new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-		flowPane.setVgap(8);
-		flowPane.setHgap(4);
-		flowPane.setPrefWrapLength(300);
-		flowPane.setAlignment(Pos.CENTER);
+		btnPane.setVgap(8);
+		btnPane.setHgap(4);
+		btnPane.setPrefWrapLength(300);
+		btnPane.setAlignment(Pos.CENTER);
 		Usuario usuarioLogado = SingletonManager.getInstance().getUsuarioLogado();
 		List<PerfilUsuario> perfis = usuarioLogado.getPerfisUsuario();
 		List<Button> btns = new ArrayList<>();
@@ -53,10 +58,48 @@ public class PrincipalFxGui extends StageBase {
 			});
 		});
 		btns.stream().forEach(btn -> {
-			flowPane.getChildren().add(btn);
+			btnPane.getChildren().add(btn);
 		});
-		scene.setRoot(flowPane);
+		// btnPane.getChildren().add(maintenancePane());
+		TitledPane manutencaoPane = (TitledPane) maintenancePane();
+		btnPane.getChildren().add(manutencaoPane);
+		scene.setRoot(btnPane);
 		setScene(scene);
+	}
+
+	private Node maintenancePane() {
+		TitledPane mainPane = new TitledPane("Manutenção Aplicação", new Button());
+		mainPane.setCollapsible(false);
+		FlowPane pane = new FlowPane(Orientation.HORIZONTAL);
+		DatePicker dataManutencao = new DatePicker();
+		pane.getChildren().add(dataManutencao);
+		mainPane.setContent(pane);
+		dataManutencao.setOnAction(evt -> {
+			DatePicker picker = (DatePicker) evt.getSource();
+			LocalDate dataSistema = picker.getValue();
+			SingletonManager.getInstance().setDataManutencao(dataSistema);
+			System.out.println(LocalDate.now());
+
+		});
+//		CheckBox salvaCheck = new CheckBox();
+//		salvaCheck.setText("Salva Configuração");
+//		salvaCheck.setOnAction(evt -> {
+
+//			try {
+//				String dataManutencaoKey = "dataManutencao";
+//				if (salvaCheck.isSelected())
+//					Util.saveConfigProperty(dataManutencaoKey,
+//							SingletonManager.getInstance().getDataManutencao().toString());
+//				else
+//					Util.removeConfigProperty(dataManutencaoKey);
+//			} catch (IOException e) {
+
+//				e.printStackTrace();
+//			}
+
+//		});
+//		pane.getChildren().add(salvaCheck);
+		return mainPane;
 	}
 
 	private Button criaActionButton(InterfaceGrafica gui) {
@@ -67,23 +110,23 @@ public class PrincipalFxGui extends StageBase {
 
 	@Override
 	public void handle(ActionEvent event) {
-		String pack="br.com.marcospcruz.gestorloja.view.fxui.";
+		String pack = "br.com.marcospcruz.gestorloja.view.fxui.";
 		Button btn = (Button) event.getSource();
 		InterfaceGrafica gui = interfaces.get(btn.getText());
-		
+		String className=gui.getClassName();
 		try {
-			Stage stage = StageFactory.createStage(gui.getClassName());
+			Stage stage = StageFactory.createStage(className);
 			stage.initOwner(this);
 			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.showAndWait();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 
@@ -92,37 +135,37 @@ public class PrincipalFxGui extends StageBase {
 	@Override
 	void reloadForm() throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void carregaDadosTable(TableView table) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	void populaForm() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void salvaDados(ActionEvent event) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void excluiDados(ActionEvent event) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void pesquisaItem(ActionEvent event) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

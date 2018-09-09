@@ -117,7 +117,7 @@ public class ProdutoController extends ControllerBase {
 			produtos = produtoDao.buscaList("produto.readparametrolike", "descricao", valor);
 		}
 
-		if (produtos.size() >= 1)
+		if (!produtos.isEmpty())
 
 			produto = produtos.get(0);
 

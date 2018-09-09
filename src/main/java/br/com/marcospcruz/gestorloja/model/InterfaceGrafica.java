@@ -23,7 +23,8 @@ public class InterfaceGrafica implements Serializable {
 	 */
 	private static final long serialVersionUID = -8914269988172254274L;
 
-	private static final String PACKAGE = "br.com.marcospcruz.gestorloja.view.";
+//	private static final String PACKAGE = "br.com.marcospcruz.gestorloja.view.";
+	private static final String PACKAGE = "br.com.marcospcruz.gestorloja.view.fxui.";
 	public static final String ESTOQUE = "Estoque";
 	public static final String CONTROLE_DE_CAIXA = "Controle de Caixa";
 	public static final String PONTO_DE_VENDA = "Ponto de Venda";

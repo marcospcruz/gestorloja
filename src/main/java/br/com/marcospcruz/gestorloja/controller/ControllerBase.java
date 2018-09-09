@@ -14,7 +14,7 @@ public abstract class ControllerBase {
 	static final String BUSCA_INVALIDA = "Busca Invïálida";
 
 	private Map<Object, Object> cacheMap;
-	
+
 	private List cacheList;
 
 	public Map<Object, Object> getCacheMap() {
@@ -27,7 +27,7 @@ public abstract class ControllerBase {
 
 	public ControllerBase() {
 		cacheMap = new HashMap<>();
-		cacheList=new ArrayList<>();
+		cacheList = new ArrayList<>();
 	}
 
 	/**
@@ -50,16 +50,17 @@ public abstract class ControllerBase {
 	 */
 	protected boolean contemAcentuacao(String parametro) {
 
-		String pattern = "íéçú";
+		String pattern = "ÇÃÉÍÓÚÕ";
 
-		for (char caractere : pattern.toCharArray())
+		for (char caractere : pattern.toLowerCase().toCharArray())
 
 			for (char c : parametro.toLowerCase().toCharArray())
 
-				if (c == caractere)
+				if (c == caractere) {
 
 					return true;
 
+				}
 		return false;
 
 	}

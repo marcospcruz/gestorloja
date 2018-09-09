@@ -40,8 +40,8 @@ public abstract class CadastroBase extends StageBase {
 		if (colunas != null)
 			super.setLabelColunas(colunas);
 		super.setDimension(WIDTH, HEIGHT);
-		double thisWidth = (double) WIDTH - ((double) WIDTH * 10 / 100);
-		setLayoutsMaxWidth(thisWidth);
+		// double thisWidth = (double) WIDTH - ((double) WIDTH * 10 / 100);
+		setLayoutsMaxWidth(width-(width*5/100));
 		resizableProperty().setValue(Boolean.FALSE);
 		Group root = new Group();
 		scene = new Scene(root, WIDTH, HEIGHT);
@@ -113,7 +113,7 @@ public abstract class CadastroBase extends StageBase {
 
 	protected void reloadTableView(String paneTitle) throws Exception {
 		ObservableList<Node> children = getGrid().getChildren();
-		// getvBox().getChildren();
+
 		TitledPane pane = (TitledPane) children.stream().filter(t -> ((TitledPane) t).getText().equals(paneTitle))
 				.findFirst().orElse(null);
 		Node teste = null;
@@ -121,20 +121,9 @@ public abstract class CadastroBase extends StageBase {
 			teste = pane.getContent();
 		TableView<ItemEstoqueModel> table = (TableView<ItemEstoqueModel>) ((Pane) teste).getChildren().get(0);
 		System.out.println();
-		// children.stream().forEach(t -> {
-		// System.out.println(((TitledPane) t).getText().equals("Estoque de Produtos"));
-		// });
-
-		// int indexOfTable = getvBox().getChildren().indexOf(table);
-		// if (table != null)
-		// vBox.getChildren().remove(table);
 		ObservableList<ItemEstoqueModel> items = table.getItems();
 		items.removeAll(items);
 		carregaDadosTable(table);
-		// vBox.getChildren().add(indexOfTable, table);
-		// if(vBox.getChildren().contains(this.table)) {
-		// vBox.getChildren().
-		// }
 	}
 
 	protected void salvaDados(ActionEvent event) {

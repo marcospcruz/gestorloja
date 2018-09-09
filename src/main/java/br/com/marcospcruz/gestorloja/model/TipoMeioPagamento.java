@@ -6,13 +6,19 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "TipoMeioPagamento")
-@NamedQuery(name = "tipoMeioPagamento.buscaPorDescricao", query = "select t from TipoMeioPagamento t "
-		+ "where t.descricaoTipoMeioPagamento=:descricao")
+//@formatter:off
+@NamedQueries({
+	@NamedQuery(name = "tipoMeioPagamento.buscaPorDescricao", query = "select t from TipoMeioPagamento t "
+		+ "where t.descricaoTipoMeioPagamento=:descricao"),
+	@NamedQuery(name="tipoMeioPagamento.buscaTodos",query="select t from TipoMeioPagamento t")
+	})
+//@formatter:on
 public class TipoMeioPagamento implements Serializable {
 	/**
 	 * 
@@ -75,8 +81,8 @@ public class TipoMeioPagamento implements Serializable {
 				return false;
 		} else if (!descricaoTipoMeioPagamento.equals(other.descricaoTipoMeioPagamento))
 			return false;
-//		if (idTipoMeioPagamento != other.idTipoMeioPagamento)
-//			return false;
+		// if (idTipoMeioPagamento != other.idTipoMeioPagamento)
+		// return false;
 		return true;
 	}
 

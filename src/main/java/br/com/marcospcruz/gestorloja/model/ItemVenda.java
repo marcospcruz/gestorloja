@@ -38,6 +38,7 @@ public class ItemVenda implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idVenda")
 	private Venda venda;
+	private boolean devolvidoAoEstoque;
 
 	public ItemVenda() {
 		dataVenda = SingletonManager.getInstance().getData();
@@ -164,6 +165,19 @@ public class ItemVenda implements Serializable {
 	public String toString() {
 		return "ItemVenda [idItemVenda=" + idItemVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
 				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda;
+	}
+
+	public void setDevolvido(boolean devolido) {
+		this.devolvidoAoEstoque = devolido;
+
+	}
+
+	public boolean isDevolvidoAoEstoque() {
+		return devolvidoAoEstoque;
+	}
+
+	public void setDevolvidoAoEstoque(boolean devolvidoAoEstoque) {
+		this.devolvidoAoEstoque = devolvidoAoEstoque;
 	}
 
 }

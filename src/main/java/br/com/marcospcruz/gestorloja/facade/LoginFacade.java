@@ -1,6 +1,4 @@
-package br.com.marcospcruz.gestorloja.controller;
-
-import java.util.Date;
+package br.com.marcospcruz.gestorloja.facade;
 
 import javax.persistence.NoResultException;
 import javax.swing.JDialog;
@@ -12,8 +10,6 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
-import br.com.marcospcruz.gestorloja.view.LoginGui;
-import br.com.marcospcruz.gestorloja.view.PrincipalGui;
 
 public class LoginFacade {
 
@@ -79,7 +75,7 @@ public class LoginFacade {
 
 	private void abreInterfacePrincipal() {
 
-		new PrincipalGui(this);
+//		new PrincipalGui(this);
 
 	}
 

@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
+
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.builder.ItemEstoqueBuilder;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
@@ -51,7 +54,6 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 					int x = 0;
 					while (token.hasMoreTokens()) {
 						columns[x++] = token.nextToken();
-
 					}
 
 					ItemEstoque item = parseRow(columns);
@@ -128,14 +130,18 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 
 					controller.setItem(item);
 				}
+
 				controller.salva();
+
 				controller.setItem(null);
+				System.out.println("Registro: " + i);
 				i++;
 			}
 
 		} catch (Exception e) {
 
 			e.printStackTrace();
+
 		} finally {
 			setMensagemRetorno(" " + i + " dados salvos.");
 		}
@@ -144,15 +150,16 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 
 	private Produto buscaProduto(Produto produto) {
 		try {
+			System.out.print(produto);
 			ProdutoController controller = (ProdutoController) SingletonManager.getInstance()
 					.getController(ControllerAbstractFactory.PRODUTO);
 			controller.setItem(null);
 			controller.busca(produto.getDescricaoProduto());
-			if (controller.getItem() == null)
+			if (controller.getItem() != null)
 				return controller.getItem();
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			System.out.println("\t" + e.getMessage());
+			// e.printStackTrace();
 		}
 		return produto;
 	}
@@ -166,8 +173,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 			if (controller.getItem() != null)
 				return (SubTipoProduto) controller.getItem();
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 		return tipoProduto;
 	}
@@ -181,8 +187,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 			if (controller.getItem() != null)
 				return (Fabricante) controller.getItem();
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 		return fabricante;
 	}

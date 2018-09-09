@@ -24,7 +24,6 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.text.Text;
 
 public class CategoriaProdutoCadastro extends CadastroBase {
 

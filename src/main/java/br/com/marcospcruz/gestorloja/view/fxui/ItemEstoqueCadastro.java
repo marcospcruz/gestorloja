@@ -16,14 +16,19 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
@@ -44,16 +49,17 @@ public class ItemEstoqueCadastro extends StageBase {
 		super();
 
 		setTitle("Cadastro de Item de Estoque");
-		super.setDimension(750, 300);
-		double thisWidth = (double) super.getWidth() - ((double) super.getWidth() * 10 / 100);
-		setLayoutsMaxWidth(thisWidth);
+		super.setDimension(545, 340);
+		// double thisWidth = (double) super.getWidth() - ((double) super.getWidth() *
+		// 10 / 100);
+		setLayoutsMaxWidth(scene.widthProperty().get());
 		resizableProperty().setValue(Boolean.FALSE);
 		Group root = new Group();
 		scene = new Scene(root, width, height);
 		grid = new GridPane();
 
 		grid.setAlignment(Pos.TOP_CENTER);
-		grid.setHgap(10);
+		grid.setHgap(30);
 		grid.setVgap(10);
 		grid.setMinHeight(getHeight());
 		grid.setMinWidth(getWidth());
@@ -70,8 +76,14 @@ public class ItemEstoqueCadastro extends StageBase {
 		grid.getColumnConstraints().add(column2);
 		grid.add(buttonsPane(), 1, 8, 2, 1);
 		populaForm();
-		root.getChildren().add(grid);
-
+		TitledPane titledPane = new TitledPane("Item Estoque", new Button());
+		titledPane.setCollapsible(false);
+		FlowPane flow = new FlowPane(Orientation.HORIZONTAL);
+		flow.getChildren().add(grid);
+		titledPane.setContent(flow);
+		titledPane.setPrefHeight(height);
+		root.getChildren().add(titledPane);
+//		getvBox().setPadding(new Insets(10, 0, 0, 100));
 		setScene(scene);
 
 	}

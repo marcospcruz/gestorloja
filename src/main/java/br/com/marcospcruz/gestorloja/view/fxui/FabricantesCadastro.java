@@ -64,7 +64,7 @@ public class FabricantesCadastro extends CadastroBase {
 	void populaCadastroForm() {
 		TitledPane formPane = new TitledPane("Dados Fabricante / Marca", new Button());
 		formPane.setCollapsible(Boolean.FALSE);
-		double thisWidth = getLayoutsMaxWidth();
+		double thisWidth = width - (width * .05);
 		formPane.setMaxWidth(thisWidth);
 		formPane.setMinWidth(thisWidth);
 		FlowPane pane = new FlowPane(Orientation.HORIZONTAL);

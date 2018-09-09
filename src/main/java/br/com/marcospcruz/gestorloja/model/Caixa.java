@@ -30,6 +30,10 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 				+ "LEFT JOIN fetch v.pagamento p") })
 //@formatter:on
 public class Caixa extends AbstractModel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1891194078556715854L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idCaixa;

@@ -1,11 +1,15 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
-import br.com.marcospcruz.gestorloja.controller.LoginFacade;
+import javax.persistence.PersistenceException;
+
+import br.com.marcospcruz.gestorloja.facade.LoginFacade;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -79,8 +83,13 @@ public class LogIn extends Stage {
 			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.showAndWait();
 
+		} catch (PersistenceException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Erro");
+			alert.setHeaderText("Erro de Conexão com Banco de Dados.");
+			alert.showAndWait();
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
+
 			e1.printStackTrace();
 			actiontarget.setText(e1.getMessage());
 		}

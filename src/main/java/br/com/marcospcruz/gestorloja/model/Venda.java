@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -35,14 +34,14 @@ public class Venda implements Serializable {
 
 	private float totalVendido;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,mappedBy="venda")
-	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "venda")
+
 	// @MapKeyJoinColumn(name = "codigoDeBarras", table = "estoque")
 	// private Map<String, ItemVenda> itensVenda;
 	private List<ItemVenda> itensVenda;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataVenda;
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.REMOVE })
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
 	@ManyToOne(cascade = CascadeType.ALL)
@@ -53,6 +52,8 @@ public class Venda implements Serializable {
 	private Usuario operador;
 
 	private float porcentagemDesconto;
+
+	private boolean estornado;
 
 	public Venda() {
 		setDataVenda(SingletonManager.getInstance().getData());
@@ -181,6 +182,14 @@ public class Venda implements Serializable {
 		if (Float.floatToIntBits(totalVendido) != Float.floatToIntBits(other.totalVendido))
 			return false;
 		return true;
+	}
+
+	public void setEstornado(boolean estornado) {
+		this.estornado = estornado;
+	}
+
+	public boolean isEstornado() {
+		return estornado;
 	}
 
 }

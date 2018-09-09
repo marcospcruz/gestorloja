@@ -12,11 +12,14 @@ import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.model.ItemEstoqueModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -32,7 +35,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-public class EstoquePrincipalGui extends StageBase  {
+public class EstoquePrincipalGui extends StageBase {
 //@formatter:off
 	private static final Object[] COLUNAS_JTABLE = {
 			// ConstantesEnum.CODIGO_LABEL.getValue().toString(),
@@ -61,10 +64,10 @@ public class EstoquePrincipalGui extends StageBase  {
 		controller = getEstoqueController();
 		controller.buscaTodos();
 
-		double layoutsMaxWidth = scene.widthProperty().get();
-		layoutsMaxWidth -= layoutsMaxWidth * (5d / 100d);
-//		super.setLayoutsMaxWidth(layoutsMaxWidth);
-		super.setLayoutsMaxWidth(scene.widthProperty().get());
+		double layoutsMaxWidth = SingletonManager.getInstance().getScreenWidth();
+		// layoutsMaxWidth -= layoutsMaxWidth * (5d / 100d);
+		super.setLayoutsMaxWidth(layoutsMaxWidth);
+
 		TitledPane pesquisaPane = criaPesquisaPanel();
 		TitledPane cadastroPane = criaCadastroPanel();
 		TitledPane operacoes = criaOperacoesPanel();
@@ -127,15 +130,25 @@ public class EstoquePrincipalGui extends StageBase  {
 		File planilha = fileChooser.showOpenDialog(this);
 
 		ImportadorArquivo importador = new ImportadorArquivoCsv(planilha);
-		try {
-			importador.carregaDados();
-			showMensagemSucesso(importador.getMensagemRetorno());
-			reloadForm();
-		} catch (Exception e) {
-			showErrorMessage(e.getMessage());
-			e.printStackTrace();
-		}
+		showMensagemSucesso("Iniciando importação de dados de estoque.");
+		Service<Void> service = new Service() {
 
+			@Override
+			protected Task createTask() {
+				try {
+					importador.carregaDados();
+					showMensagemSucesso(importador.getMensagemRetorno());
+					reloadForm();
+				} catch (Exception e) {
+					showErrorMessage(e.getMessage());
+					e.printStackTrace();
+				}
+
+				return null;
+			}
+
+		};
+		service.start();
 	}
 
 	private TitledPane criaCadastroPanel() {

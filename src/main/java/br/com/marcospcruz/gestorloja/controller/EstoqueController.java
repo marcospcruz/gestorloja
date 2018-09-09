@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
@@ -225,10 +226,11 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public void incrementaItem(int quantidade) throws Exception {
-
-		if (quantidade < 1)
+		if (!itemEstoque.isEstoqueDedutivel())
+			return;
+		if (quantidade < 1 && !SingletonManager.getInstance().isPermiteVendaSemControlarEstoque())
 			throw new Exception("Quantidade inválida!");
-		if (itemEstoque.isEstoqueDedutivel()) {
+		if (itemEstoque.isEstoqueDedutivel() && quantidade > 0) {
 			itemEstoque.setQuantidade(itemEstoque.getQuantidade() + quantidade);
 
 			salva();
@@ -278,8 +280,8 @@ public class EstoqueController extends ControllerBase {
 			Crud<ItemEstoque> dao = getDao();
 			try {
 				itemEstoque = dao.busca("itemestoque.readCodigo", "codigo", text);
-			}catch(NoResultException e) {
-				throw new Exception("Ítem código "+text+" não encontrado no estoque.");
+			} catch (NoResultException e) {
+				throw new Exception("Ítem código " + text + " não encontrado no estoque.");
 			}
 		}
 	}
@@ -428,8 +430,14 @@ public class EstoqueController extends ControllerBase {
 		itemEstoque.setDataContagem(SingletonManager.getInstance().getData());
 
 		Crud<ItemEstoque> itemEstoqueDao = new CrudDao<>();
-		itemEstoque = itemEstoqueDao.update(itemEstoque);
-		getCacheMap().put(itemEstoque.getIdItemEstoque(), itemEstoque);
+		try {
+			itemEstoque = itemEstoqueDao.update(itemEstoque);
+			getCacheMap().put(itemEstoque.getIdItemEstoque(), itemEstoque);
+		} catch (PersistenceException e) {
+			e.printStackTrace();
+			throw e;
+		}
+
 	}
 
 	@Override
@@ -452,7 +460,7 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void novo() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

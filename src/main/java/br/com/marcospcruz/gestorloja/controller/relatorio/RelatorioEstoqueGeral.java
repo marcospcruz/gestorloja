@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import br.com.marcospcruz.gestorloja.App;
+import br.com.marcospcruz.gestorloja.AppFx;
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
@@ -29,7 +29,7 @@ import net.sf.jasperreports.engine.export.JRPdfExporter;
 
 public class RelatorioEstoqueGeral {
 
-	private static final String PASTA_PROJETO = App.CONTROLE_ESTOQUE_HOME + "/";
+	private static final String PASTA_PROJETO = AppFx.CONTROLE_ESTOQUE_HOME + "/";
 
 	private static final String ARQUIVO_JASPER = "META-INF/relatorios_jaspers/relatorio_estoque_geral.jasper";
 

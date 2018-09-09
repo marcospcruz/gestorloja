@@ -1,6 +1,5 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
-import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.ItemVenda;
 import br.com.marcospcruz.gestorloja.util.Util;
 import javafx.beans.property.SimpleStringProperty;

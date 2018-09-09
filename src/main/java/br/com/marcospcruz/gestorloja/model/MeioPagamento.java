@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 @Entity
 public class MeioPagamento implements Serializable {
 	/**
@@ -36,8 +38,20 @@ public class MeioPagamento implements Serializable {
 
 	private int parcelas;
 	private String descricao;
+	private boolean estornado;
+
+	public MeioPagamento(String descricaoMeioPagamento) {
+		this();
+		setDescricao(descricaoMeioPagamento);
+	}
+
+	public MeioPagamento() {
+		setUsuarioLogado(SingletonManager.getInstance().getUsuarioLogado());
+	}
 
 	public TipoMeioPagamento getTipoMeioPagamento() {
+		if (tipoMeioPagamento == null)
+			tipoMeioPagamento = new TipoMeioPagamento();
 		return tipoMeioPagamento;
 	}
 
@@ -99,8 +113,6 @@ public class MeioPagamento implements Serializable {
 		return result;
 	}
 
-	
-
 	public void setDataPagamento(Date dataPagamento) {
 		this.dataPagamento = dataPagamento;
 
@@ -140,9 +152,9 @@ public class MeioPagamento implements Serializable {
 		if (dataPagamento == null) {
 			if (other.dataPagamento != null)
 				return false;
-		} 
-//		else if (!dataPagamento.equals(other.dataPagamento))
-//			return false;
+		}
+		// else if (!dataPagamento.equals(other.dataPagamento))
+		// return false;
 		if (descricao == null) {
 			if (other.descricao != null)
 				return false;
@@ -155,23 +167,30 @@ public class MeioPagamento implements Serializable {
 			// return false;
 			// } else if (!pagamento.equals(other.pagamento))
 			// return false;
-		if (parcelas != other.parcelas)
-			return false;
+			if (parcelas != other.parcelas)
+				return false;
 		if (tipoMeioPagamento == null) {
 			if (other.tipoMeioPagamento != null)
 				return false;
 		} else if (!tipoMeioPagamento.equals(other.tipoMeioPagamento))
 			return false;
-//		if (usuarioLogado == null) {
-//			if (other.usuarioLogado != null)
-//				return false;
-//		} else if (!usuarioLogado.equals(other.usuarioLogado))
-//			return false;
+		// if (usuarioLogado == null) {
+		// if (other.usuarioLogado != null)
+		// return false;
+		// } else if (!usuarioLogado.equals(other.usuarioLogado))
+		// return false;
 		if (Float.floatToIntBits(valorPago) != Float.floatToIntBits(other.valorPago))
 			return false;
 		return true;
 	}
-	
-	
+
+	public void setEstornado(boolean estornado) {
+		this.estornado = estornado;
+
+	}
+
+	public boolean isEstornado() {
+		return estornado;
+	}
 
 }

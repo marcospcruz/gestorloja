@@ -14,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 @Entity
 public class Pagamento implements Serializable {
 	/**
@@ -35,6 +37,12 @@ public class Pagamento implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario usuarioLogado;
+	private boolean estornado;
+
+	public Pagamento() {
+		setUsuarioLogado(SingletonManager.getInstance().getUsuarioLogado());
+
+	}
 
 	public int getIdPagamento() {
 		return idPagamento;
@@ -137,11 +145,6 @@ public class Pagamento implements Serializable {
 		return true;
 	}
 
-	public void setdataVenda(Date dataVenda) {
-		this.dataVenda = dataVenda;
-
-	}
-
 	public void setUsuarioLogado(Usuario usuarioLogado) {
 		this.usuarioLogado = usuarioLogado;
 	}
@@ -156,6 +159,15 @@ public class Pagamento implements Serializable {
 
 	public Usuario getUsuarioLogado() {
 		return usuarioLogado;
+	}
+
+	public void setEstornado(boolean estornado) {
+		this.estornado=estornado;
+		
+	}
+
+	public boolean isEstornado() {
+		return estornado;
 	}
 
 }
