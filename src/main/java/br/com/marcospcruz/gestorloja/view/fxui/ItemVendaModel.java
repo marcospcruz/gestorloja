@@ -24,6 +24,7 @@ public class ItemVendaModel {
 		setQuantidade(item.getQuantidade().toString());
 		setValorVenda(Util.formataMoeda(item.getValorVendido()));
 		setValorTotal(Util.formataMoeda(item.getQuantidade() * item.getValorVendido()));
+
 	}
 
 	public void setValorTotal(String valorTotal) {

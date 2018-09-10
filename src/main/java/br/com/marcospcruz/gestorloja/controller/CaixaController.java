@@ -19,6 +19,7 @@ import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
+import javafx.scene.control.Label;
 
 public class CaixaController extends ControllerBase {
 
@@ -302,6 +303,8 @@ public class CaixaController extends ControllerBase {
 
 		float totalRecebido = 0;
 		for (Venda venda : caixa.getVendas()) {
+			if (venda.isEstornado())
+				continue;
 			Pagamento pagamento = venda.getPagamento();
 			for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
 				totalRecebido += meioPagamento.getValorPago();
@@ -320,13 +323,15 @@ public class CaixaController extends ControllerBase {
 		Map<String, Float> subTotais = inicializaSubTotaisMap();
 
 		Set<Venda> vendas = caixa.getVendas();
-		for (Venda venda : vendas) {
-			for (MeioPagamento meioPagamento : venda.getPagamento().getMeiosPagamento()) {
-				String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
-				float value = subTotais.get(key) + meioPagamento.getValorPago();
 
-				subTotais.put(key, value);
-			}
+		for (Venda venda : vendas) {
+			if (!venda.isEstornado())
+				for (MeioPagamento meioPagamento : venda.getPagamento().getMeiosPagamento()) {
+					String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
+					float value = subTotais.get(key) + meioPagamento.getValorPago();
+
+					subTotais.put(key, value);
+				}
 		}
 		return subTotais;
 	}
@@ -338,6 +343,18 @@ public class CaixaController extends ControllerBase {
 			map.put(tipo.getDescricaoTipoMeioPagamento(), 0f);
 		}
 		return map;
+	}
+
+	public int getQuantidadeVendasEstornadas() {
+		Set<Venda> vendas = caixa.getVendas();
+		int qtVendas = vendas.stream().filter(venda -> venda.isEstornado()).collect(Collectors.toList()).size();
+
+		return qtVendas;
+	}
+
+	public int getQuantidadeVendasEfetivadas() {
+
+		return caixa.getVendas().size() - getQuantidadeVendasEstornadas();
 	}
 
 }

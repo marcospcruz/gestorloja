@@ -668,7 +668,7 @@ public class PDV extends StageBase {
 					}
 
 				} catch (Exception e) {
-
+					showErrorMessage(e.getMessage());
 					e.printStackTrace();
 				}
 			});

@@ -61,4 +61,9 @@ public class VendaModelBuilder {
 		return this;
 	}
 
+	public VendaModelBuilder setStatus(boolean estornado) {
+		vendaModel.setStatus(estornado?"Estornada":"OK");
+		return this;
+	}
+
 }

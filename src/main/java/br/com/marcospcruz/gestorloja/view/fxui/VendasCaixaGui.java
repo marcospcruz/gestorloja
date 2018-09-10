@@ -38,7 +38,8 @@ public class VendasCaixaGui extends StageBase {
 			"subTotalVendido",
 			"descontoConcedido",
 			"totalRecebido",
-			"meiosPagamento"
+			"meiosPagamento",
+			"status"
 	};
 	private TitledPane tablePane;
 	//@formatter:on
@@ -142,6 +143,7 @@ public class VendasCaixaGui extends StageBase {
 					.setTotalPagamentoRecebido(totalRecebido)
 					.setPorcentagemDescontoConcedido(descontoConcedido)
 					.setMeiosPagamentos(tiposMeioPagamentoString.toString())
+					.setStatus(venda.isEstornado())
 					.getVendaModel();
 			//@formatter:on
 			dadoss.add(vendaModel);

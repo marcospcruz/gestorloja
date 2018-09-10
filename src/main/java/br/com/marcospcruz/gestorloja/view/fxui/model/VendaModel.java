@@ -12,6 +12,16 @@ public class VendaModel {
 	private SimpleStringProperty meiosPagamento;
 	private SimpleStringProperty valorVenda;
 	private SimpleStringProperty id;
+	private SimpleStringProperty status;
+
+	public void setStatus(String status) {
+		this.status = new SimpleStringProperty(status);
+
+	}
+
+	public String getStatus() {
+		return status.get();
+	}
 
 	public void setDataVenda(String dataVenda) {
 		this.dataVenda = new SimpleStringProperty(dataVenda);
@@ -80,6 +90,7 @@ public class VendaModel {
 		this.id = new SimpleStringProperty(id);
 
 	}
+
 	public String getId() {
 		return id.get();
 	}

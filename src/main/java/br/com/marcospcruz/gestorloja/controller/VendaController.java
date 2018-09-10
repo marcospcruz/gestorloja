@@ -187,7 +187,14 @@ public class VendaController extends ControllerBase {
 
 	public void devolveProduto(String selectedCodigoBarra, int quantidade) throws Exception {
 		// ItemVenda itemVenda = getItemVenda();
-		ItemVenda itemVenda = itemVendaMap.get(selectedCodigoBarra);
+		ItemVenda itemVenda;
+		if (itemVendaMap != null && !itemVendaMap.isEmpty())
+
+			itemVenda = itemVendaMap.get(selectedCodigoBarra);
+		else
+			itemVenda = venda.getItensVenda().stream()
+					.filter(item -> item.getItemEstoque().getCodigoDeBarras().equals(selectedCodigoBarra)).findFirst()
+					.orElse(null);
 		if (itemVenda != null) {
 
 			itemVenda.setQuantidade(itemVenda.getQuantidade() - quantidade);
@@ -302,7 +309,7 @@ public class VendaController extends ControllerBase {
 		if (itemVenda == null)
 			itemVenda = new ItemVenda();
 		itemVenda.setItemEstoque(itemEstoque);
-		itemVenda.setVenda(venda);
+
 		itemVenda.setQuantidade(quantidade + itemVenda.getQuantidade());
 		itemVenda.setVenda(venda);
 		subtraiEstoque(quantidade);
@@ -409,6 +416,8 @@ public class VendaController extends ControllerBase {
 		if (pagamento.getMeiosPagamento() == null || pagamento.getMeiosPagamento().isEmpty())
 			throw new Exception("Cobrar a venda antes de finalizar.");
 		pagamento.getMeiosPagamento().stream().forEach(meioPagamento -> {
+			float valorPagamento = meioPagamento.getValorPago() + pagamento.getValorPagamento();
+			pagamento.setValorPagamento(valorPagamento);
 			meioPagamento.setDataPagamento(dataVenda);
 			meioPagamento.setUsuarioLogado(operador);
 			TipoMeioPagamento tipoMeioPagamento = meioPagamento.getTipoMeioPagamento();
@@ -432,19 +441,6 @@ public class VendaController extends ControllerBase {
 		itemVenda.setDataVenda(venda.getDataVenda());
 		itemVenda.setOperador(venda.getOperador());
 		itemVendaDao.update(itemVenda);
-
-	}
-
-	public void calculaDescontoProdutos() {
-		float porcentagemDesconto = (float) venda.getPorcentagemDesconto() / 100;
-		float valorTotalVenda = 0;
-		for (ItemVenda itemVenda : venda.getItensVenda()) {
-			float valorItemVenda = itemVenda.getItemEstoque().getValorUnitario();
-			valorItemVenda -= valorItemVenda * porcentagemDesconto;
-			itemVenda.setValorVendido(valorItemVenda);
-			valorTotalVenda += valorItemVenda;
-		}
-		venda.setTotalVendido(valorTotalVenda);
 
 	}
 
@@ -653,6 +649,7 @@ public class VendaController extends ControllerBase {
 			mp.setEstornado(true);
 		}
 		pagamento.setEstornado(true);
+//		pagamento.setValorPagamento(0);
 		for (ItemVenda itemVenda : venda.getItensVenda()) {
 			itemVenda.setDevolvido(true);
 			devolveProduto(itemVenda.getItemEstoque().getCodigoDeBarras(), itemVenda.getQuantidade());
@@ -660,6 +657,7 @@ public class VendaController extends ControllerBase {
 		}
 
 		venda.setEstornado(true);
-
+		salva();
+		iniciaVenda();
 	}
 }

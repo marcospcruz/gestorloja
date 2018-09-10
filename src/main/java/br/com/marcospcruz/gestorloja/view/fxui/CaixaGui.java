@@ -114,6 +114,7 @@ public class CaixaGui extends StageBase {
 			grid.add(valor, 1, rowIndex++);
 		}
 		titledPane.setContent(grid);
+		titledPane.setMaxHeight(Double.MAX_VALUE);
 		return titledPane;
 	}
 
@@ -128,20 +129,28 @@ public class CaixaGui extends StageBase {
 		// grid.setMinWidth(getWidth());
 		// grid.setMaxHeight(getHeight());
 		//
+		int column = 0, row = 0;
 		CaixaController controller = getCaixaController();
-
+		Label qtVendasEfetuadasLbl = criaLabelBold("Qt. Vendas Efetivadas:");
+		int qtVendas = controller.getQuantidadeVendasEfetivadas();
+		subTotalGrid.add(qtVendasEfetuadasLbl, column++, row);
+		subTotalGrid.add(new Label(Integer.toString(qtVendas)), column--, row++);
+		Label qtVendasEstornadasLbl = criaLabelBold("Qt. Vendas Estornadas:");
+		int qtVendasEstornadas = controller.getQuantidadeVendasEstornadas();
+		subTotalGrid.add(qtVendasEstornadasLbl, column++, row);
+		subTotalGrid.add(new Label(Integer.toString(qtVendasEstornadas)), column--, row++);
 		Label totalVendidoLbl = criaLabelBold("Total Vendido:");
-		subTotalGrid.add(totalVendidoLbl, 0, 0);
+		subTotalGrid.add(totalVendidoLbl, column++, row);
 		String totalVendido = Util.formataMoeda(controller.getSubTotalVendas());
-		subTotalGrid.add(new Label(totalVendido), 1, 0);
+		subTotalGrid.add(new Label(totalVendido), column--,row++);
 		String totalRecebido = Util.formataMoeda(controller.getTotalRecebidoCaixa());
 		// String totalRecebido=
-		subTotalGrid.add(criaLabelBold("Total Pagamentos:"), 0, 1);
-		subTotalGrid.add(new Label(totalRecebido), 1, 1);
+		subTotalGrid.add(criaLabelBold("Total Pagamentos:"), column++, row);
+		subTotalGrid.add(new Label(totalRecebido), column--, row++);
 		//
-		subTotalGrid.add(criaLabelBold("Diferença (Venda - Pagamentos):"), 0, 2);
+		subTotalGrid.add(criaLabelBold("Diferença (Venda - Pagamentos):"), column++, row);
 		float diferenca = controller.getSubTotalVendas() - controller.getTotalRecebidoCaixa();
-		subTotalGrid.add(new Label(Util.formataMoeda(diferenca)), 1, 2);
+		subTotalGrid.add(new Label(Util.formataMoeda(diferenca)), column--, row++);
 		Button button = new Button("Visualizar Vendas");
 		button.setOnAction(evt -> {
 			try {
@@ -149,7 +158,10 @@ public class CaixaGui extends StageBase {
 				stage.initOwner(this);
 				stage.initModality(Modality.APPLICATION_MODAL);
 				stage.showAndWait();
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+				ObservableList<Node> children = grid.getChildren();
+				children.removeAll(children);
+				populaGridContent();
+			} catch (Exception e) {
 
 				e.printStackTrace();
 			} finally {
@@ -158,7 +170,7 @@ public class CaixaGui extends StageBase {
 			}
 
 		});
-		subTotalGrid.add(button, 0, 3);
+		subTotalGrid.add(button, column--, row++);
 		//
 		titledPane.setContent(subTotalGrid);
 		return titledPane;
