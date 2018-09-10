@@ -83,6 +83,7 @@ public class ControleCaixaGui extends StageBase {
 			openCaixaGui();
 		} catch (Exception e) {
 			showErrorMessage(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

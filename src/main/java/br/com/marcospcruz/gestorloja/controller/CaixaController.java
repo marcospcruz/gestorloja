@@ -237,9 +237,10 @@ public class CaixaController extends ControllerBase {
 
 	public Float getSubTotalVendas() {
 		float subTotalVendas = 0;
-		for (Venda venda : caixa.getVendas()) {
-			subTotalVendas += venda.getTotalVendido();
-		}
+		if (caixa != null && caixa.getVendas() != null)
+			for (Venda venda : caixa.getVendas()) {
+				subTotalVendas += venda.getTotalVendido();
+			}
 		return subTotalVendas;
 	}
 
@@ -302,16 +303,17 @@ public class CaixaController extends ControllerBase {
 	public Float getTotalRecebidoCaixa() {
 
 		float totalRecebido = 0;
-		for (Venda venda : caixa.getVendas()) {
-			if (venda.isEstornado())
-				continue;
-			Pagamento pagamento = venda.getPagamento();
-			for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
-				totalRecebido += meioPagamento.getValorPago();
+		if (caixa != null && caixa.getVendas() != null)
+			for (Venda venda : caixa.getVendas()) {
+				if (venda.isEstornado())
+					continue;
+				Pagamento pagamento = venda.getPagamento();
+				for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+					totalRecebido += meioPagamento.getValorPago();
 
+				}
+				totalRecebido -= pagamento.getTrocoPagamento();
 			}
-			totalRecebido -= pagamento.getTrocoPagamento();
-		}
 		return totalRecebido;
 	}
 
@@ -321,17 +323,18 @@ public class CaixaController extends ControllerBase {
 	 */
 	public Map<String, Float> getSubTotaisMeiosPagamentoRecebidos() {
 		Map<String, Float> subTotais = inicializaSubTotaisMap();
+		if (caixa != null && caixa.getVendas() != null) {
+			Set<Venda> vendas = caixa.getVendas();
 
-		Set<Venda> vendas = caixa.getVendas();
+			for (Venda venda : vendas) {
+				if (!venda.isEstornado())
+					for (MeioPagamento meioPagamento : venda.getPagamento().getMeiosPagamento()) {
+						String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
+						float value = subTotais.get(key) + meioPagamento.getValorPago();
 
-		for (Venda venda : vendas) {
-			if (!venda.isEstornado())
-				for (MeioPagamento meioPagamento : venda.getPagamento().getMeiosPagamento()) {
-					String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
-					float value = subTotais.get(key) + meioPagamento.getValorPago();
-
-					subTotais.put(key, value);
-				}
+						subTotais.put(key, value);
+					}
+			}
 		}
 		return subTotais;
 	}
@@ -346,6 +349,8 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public int getQuantidadeVendasEstornadas() {
+		if (caixa == null || caixa.getVendas() == null)
+			return 0;
 		Set<Venda> vendas = caixa.getVendas();
 		int qtVendas = vendas.stream().filter(venda -> venda.isEstornado()).collect(Collectors.toList()).size();
 
@@ -353,7 +358,8 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public int getQuantidadeVendasEfetivadas() {
-
+		if (caixa == null || caixa.getVendas() == null)
+			return 0;
 		return caixa.getVendas().size() - getQuantidadeVendasEstornadas();
 	}
 

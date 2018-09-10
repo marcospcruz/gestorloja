@@ -49,7 +49,7 @@ public class CaixaGui extends StageBase {
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_PATTERN);
 		String parsedDate = sdf.format(SingletonManager.getInstance().getData());
 		setTitle("Caixa dia " + parsedDate);
-		super.setDimension(650, 450);
+		super.setDimension(650, 500);
 		double thisWidth = super.getWidth() - (super.getWidth() * 10 / 100);
 		setLayoutsMaxWidth(thisWidth);
 		resizableProperty().setValue(Boolean.FALSE);
@@ -142,7 +142,7 @@ public class CaixaGui extends StageBase {
 		Label totalVendidoLbl = criaLabelBold("Total Vendido:");
 		subTotalGrid.add(totalVendidoLbl, column++, row);
 		String totalVendido = Util.formataMoeda(controller.getSubTotalVendas());
-		subTotalGrid.add(new Label(totalVendido), column--,row++);
+		subTotalGrid.add(new Label(totalVendido), column--, row++);
 		String totalRecebido = Util.formataMoeda(controller.getTotalRecebidoCaixa());
 		// String totalRecebido=
 		subTotalGrid.add(criaLabelBold("Total Pagamentos:"), column++, row);
@@ -151,9 +151,12 @@ public class CaixaGui extends StageBase {
 		subTotalGrid.add(criaLabelBold("Diferença (Venda - Pagamentos):"), column++, row);
 		float diferenca = controller.getSubTotalVendas() - controller.getTotalRecebidoCaixa();
 		subTotalGrid.add(new Label(Util.formataMoeda(diferenca)), column--, row++);
+		Caixa caixa = (Caixa) controller.getItem();
 		Button button = new Button("Visualizar Vendas");
+		button.setDisable(caixa.getVendas() == null || caixa.getVendas().isEmpty());
 		button.setOnAction(evt -> {
 			try {
+
 				Stage stage = StageFactory.createStage("br.com.marcospcruz.gestorloja.view.fxui.VendasCaixaGui");
 				stage.initOwner(this);
 				stage.initModality(Modality.APPLICATION_MODAL);
