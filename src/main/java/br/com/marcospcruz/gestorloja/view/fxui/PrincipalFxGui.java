@@ -78,27 +78,26 @@ public class PrincipalFxGui extends StageBase {
 			DatePicker picker = (DatePicker) evt.getSource();
 			LocalDate dataSistema = picker.getValue();
 			SingletonManager.getInstance().setDataManutencao(dataSistema);
-			System.out.println(LocalDate.now());
 
 		});
-//		CheckBox salvaCheck = new CheckBox();
-//		salvaCheck.setText("Salva Configuração");
-//		salvaCheck.setOnAction(evt -> {
+		// CheckBox salvaCheck = new CheckBox();
+		// salvaCheck.setText("Salva Configuração");
+		// salvaCheck.setOnAction(evt -> {
 
-//			try {
-//				String dataManutencaoKey = "dataManutencao";
-//				if (salvaCheck.isSelected())
-//					Util.saveConfigProperty(dataManutencaoKey,
-//							SingletonManager.getInstance().getDataManutencao().toString());
-//				else
-//					Util.removeConfigProperty(dataManutencaoKey);
-//			} catch (IOException e) {
+		// try {
+		// String dataManutencaoKey = "dataManutencao";
+		// if (salvaCheck.isSelected())
+		// Util.saveConfigProperty(dataManutencaoKey,
+		// SingletonManager.getInstance().getDataManutencao().toString());
+		// else
+		// Util.removeConfigProperty(dataManutencaoKey);
+		// } catch (IOException e) {
 
-//				e.printStackTrace();
-//			}
+		// e.printStackTrace();
+		// }
 
-//		});
-//		pane.getChildren().add(salvaCheck);
+		// });
+		// pane.getChildren().add(salvaCheck);
 		return mainPane;
 	}
 
@@ -113,7 +112,7 @@ public class PrincipalFxGui extends StageBase {
 		String pack = "br.com.marcospcruz.gestorloja.view.fxui.";
 		Button btn = (Button) event.getSource();
 		InterfaceGrafica gui = interfaces.get(btn.getText());
-		String className=gui.getClassName();
+		String className = gui.getClassName();
 		try {
 			Stage stage = StageFactory.createStage(className);
 			stage.initOwner(this);

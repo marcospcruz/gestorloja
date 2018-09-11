@@ -108,7 +108,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		for (Object obj : objs) {
 			System.out.print(obj + ",");
 		}
-		System.out.println();
+		
 	}
 
 	protected FlowPane createHorizontalFlowPane() {
@@ -188,7 +188,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		stage.initOwner(this);
 		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.showAndWait();
-		
+
 	}
 
 	/**

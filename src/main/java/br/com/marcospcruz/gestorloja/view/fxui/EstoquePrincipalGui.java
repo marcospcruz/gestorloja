@@ -81,7 +81,7 @@ public class EstoquePrincipalGui extends StageBase {
 	protected void handleTableClick(Event event) {
 		super.handleTableClick(event);
 		ItemEstoque item = (ItemEstoque) controller.getItem();
-		System.out.println(item);
+		
 		try {
 			abreTelaCadastro(new ItemEstoqueCadastro());
 

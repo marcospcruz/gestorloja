@@ -16,7 +16,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -49,7 +48,7 @@ public class ItemEstoqueCadastro extends StageBase {
 		super();
 
 		setTitle("Cadastro de Item de Estoque");
-		super.setDimension(545, 340);
+		super.setDimension(780, 420);
 		// double thisWidth = (double) super.getWidth() - ((double) super.getWidth() *
 		// 10 / 100);
 		setLayoutsMaxWidth(scene.widthProperty().get());

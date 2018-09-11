@@ -120,7 +120,7 @@ public abstract class CadastroBase extends StageBase {
 		if (pane != null)
 			teste = pane.getContent();
 		TableView<ItemEstoqueModel> table = (TableView<ItemEstoqueModel>) ((Pane) teste).getChildren().get(0);
-		System.out.println();
+		
 		ObservableList<ItemEstoqueModel> items = table.getItems();
 		items.removeAll(items);
 		carregaDadosTable(table);

@@ -179,6 +179,9 @@ public class CaixaGui extends StageBase {
 		return titledPane;
 	}
 
+	/**
+	 * 
+	 */
 	public void atualizaDadosCaixa() {
 		try {
 			CaixaController controller = getCaixaController();
@@ -370,7 +373,7 @@ public class CaixaGui extends StageBase {
 				trocoInicial = criaLabelNormal("");
 			else
 				trocoInicial = new NumberTextField(true);
-			String valorTroco = Util.formataMoeda(caixa.getSaldoInicial());
+			String valorTroco = Util.formataStringDecimaisVirgula(caixa.getSaldoInicial());
 			defineNode(trocoInicial, valorTroco);
 
 		}

@@ -40,7 +40,7 @@ public class MyTableModel extends AbstractTableModel {
 
 	@Override
 	public Class<?> getColumnClass(int arg0) {
-		System.out.println(arg0);
+		
 		return super.getColumnClass(arg0);
 	}
 

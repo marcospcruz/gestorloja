@@ -28,15 +28,16 @@ public class AppFx extends Application {
 	}
 
 	public static void main(String args[]) {
-		switch (args[0]) {
-		case "1":
-			checkAndCreateAppHome();
-			criaUsuario();
-			createOperacao();
-			createTipoMeioPagamento();
-			// if (args.length > 1)
-			// loadEstoqueSheet(args[1]);
-		}
+		if (args.length > 0)
+			switch (args[0]) {
+			case "1":
+				checkAndCreateAppHome();
+				criaUsuario();
+				createOperacao();
+				createTipoMeioPagamento();
+				// if (args.length > 1)
+				// loadEstoqueSheet(args[1]);
+			}
 		launch(args);
 	}
 	//

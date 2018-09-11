@@ -395,7 +395,7 @@ public class PDV extends StageBase {
 	private NumberTextField criaCampoValor() {
 		NumberTextField field = criaNumberTextField(true);
 		field.textProperty().addListener((observableList, oldValue, newValue) -> {
-			System.out.println(newValue);
+
 			try {
 
 				Platform.runLater(() -> {
@@ -968,9 +968,13 @@ public class PDV extends StageBase {
 		if (ehItemEstoque && radioDescricaoProduto.isSelected()) {
 			VendaController vendaController = getVendaController();
 			itemEstoque = (ItemEstoque) estoqueValue;
+
 			boolean temEstoqueSuficiente = itemEstoque.getQuantidade() > 0;
 			populaDadosProduto(itemEstoque);
-			adicionarBtn.setDisable(!temEstoqueSuficiente);
+			if (SingletonManager.getInstance().isPermiteVendaSemControlarEstoque())
+				adicionarBtn.setDisable(!temEstoqueSuficiente);
+			else
+				adicionarBtn.setDisable(false);
 
 			boolean desatibilitaRemover = vendaController.getItemVenda(itemEstoque.getCodigoDeBarras()) == null;
 			removerBtn.setDisable(desatibilitaRemover);
