@@ -435,7 +435,7 @@ public class EstoqueController extends ControllerBase {
 			getCacheMap().put(itemEstoque.getIdItemEstoque(), itemEstoque);
 		} catch (PersistenceException e) {
 			e.printStackTrace();
-//			throw e;
+			throw e;
 		}
 
 	}

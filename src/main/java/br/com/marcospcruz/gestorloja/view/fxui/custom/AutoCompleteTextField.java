@@ -118,7 +118,7 @@ public class AutoCompleteTextField<T> extends ComboBox<T> {
 		// String value = newValue.toUpperCase();
 		// if (value.isEmpty())
 		value = oldValue.toUpperCase();
-		System.out.println(oldValue + " - " + newValue + ": " + value);
+//		System.out.println(oldValue + " - " + newValue + ": " + value);
 
 		if (isShowing())
 			hide();

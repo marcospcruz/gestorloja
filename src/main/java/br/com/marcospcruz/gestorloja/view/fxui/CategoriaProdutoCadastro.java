@@ -195,7 +195,7 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 		TipoProdutoController controller = getTipoProdutoController();
 		
 		ObservableList<TipoProdutoModel> items = table.getItems();
-
+		controller.buscaTodos();
 		carregaTiposProduto(controller.getList(), items);
 		// items.addAll(controller.getList());
 		table.setItems(items);

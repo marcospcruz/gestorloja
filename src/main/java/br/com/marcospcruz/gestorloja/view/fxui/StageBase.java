@@ -248,7 +248,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 			items.add(new SubTipoProduto("Selecione uma opção.", null));
 			items.addAll(controller.getList());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		}
 
@@ -481,7 +481,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 			try {
 				salvaDados(arg0);
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
+		
 				e1.printStackTrace();
 			}
 		});

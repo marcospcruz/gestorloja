@@ -16,7 +16,7 @@ public class OperacaoEstoqueFacade {
 		this.controller = controller;
 	}
 
-	public void adicionaItemEstoque(ItemEstoque itemEstoque) throws Exception {
+	public void salvaDadosItem(ItemEstoque itemEstoque) throws Exception {
 		controller.setItem(itemEstoque);
 //		((EstoqueController)controller).validaProdutoExistente();
 		controller.salva();

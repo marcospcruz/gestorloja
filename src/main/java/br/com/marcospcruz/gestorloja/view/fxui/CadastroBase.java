@@ -60,7 +60,7 @@ public abstract class CadastroBase extends StageBase {
 		column2.setHgrow(Priority.ALWAYS);
 		column2.setFillWidth(true);
 		populaGridContent();
-		controller.novo();
+	
 		populaForm();
 		grid.getColumnConstraints().add(column1);
 		grid.getColumnConstraints().add(column2);

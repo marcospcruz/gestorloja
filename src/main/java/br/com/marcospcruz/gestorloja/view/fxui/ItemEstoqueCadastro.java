@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.view.fxui;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.FabricanteController;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
+import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
 import br.com.marcospcruz.gestorloja.facade.OperacaoEstoqueFacade;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
@@ -12,6 +13,7 @@ import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.NumberTextField;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -82,7 +84,7 @@ public class ItemEstoqueCadastro extends StageBase {
 		titledPane.setContent(flow);
 		titledPane.setPrefHeight(height);
 		root.getChildren().add(titledPane);
-//		getvBox().setPadding(new Insets(10, 0, 0, 100));
+		// getvBox().setPadding(new Insets(10, 0, 0, 100));
 		setScene(scene);
 
 	}
@@ -97,6 +99,10 @@ public class ItemEstoqueCadastro extends StageBase {
 				Produto produto = item.getProduto();
 				comboFabricante.setValue(fabricante);
 				comboCategoria.setValue(subCategoriaProduto.getSuperTipoProduto());
+				ObservableList<TipoProduto> itemsList = subCategoria.getItems();
+				itemsList = FXCollections
+						.observableArrayList(subCategoriaProduto.getSuperTipoProduto().getSubTiposProduto());
+				subCategoria.setItems(itemsList);
 				subCategoria.setValue(subCategoriaProduto);
 				produtocombo.setValue(produto);
 				txtQuantidade.setText(item.getQuantidade().toString());
@@ -194,7 +200,7 @@ public class ItemEstoqueCadastro extends StageBase {
 
 			OperacaoEstoqueFacade operacaoEstoqueFacade = new OperacaoEstoqueFacade((EstoqueController) controller);
 
-			operacaoEstoqueFacade.adicionaItemEstoque(itemEstoque);
+			operacaoEstoqueFacade.salvaDadosItem(itemEstoque);
 			super.showMensagemSucesso("Dados salvos com sucesso no Estoque.");
 			// controller.criaItemEstoque(fabricante, txtQuantidadeInicial.getText());
 			hide();
@@ -209,7 +215,16 @@ public class ItemEstoqueCadastro extends StageBase {
 	private Object parseTipoProduto(Object value) {
 		if (value instanceof TipoProduto)
 			return value;
-		return new SubTipoProduto(value.toString());
+		SubTipoProduto subTipo = null;
+		try {
+			TipoProdutoController controller = getTipoProdutoController();
+			controller.busca(value.toString());
+			subTipo=(SubTipoProduto) controller.getItem();
+		} catch (Exception e) {
+			subTipo = new SubTipoProduto(value.toString());
+		}
+
+		return subTipo;
 	}
 
 	private Object parseFabricante(Object value) throws Exception {
@@ -261,6 +276,7 @@ public class ItemEstoqueCadastro extends StageBase {
 
 			}
 		});
+
 		grid.add(comboCategoria, 1, row++);
 		subCategoria = new AutoCompleteTextField<>();
 		grid.add(new Label("Sub Categoria"), 0, row);
