@@ -1,5 +1,7 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
+import javax.persistence.NoResultException;
+
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.FabricanteController;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
@@ -219,7 +221,7 @@ public class ItemEstoqueCadastro extends StageBase {
 		try {
 			TipoProdutoController controller = getTipoProdutoController();
 			controller.busca(value.toString());
-			subTipo=(SubTipoProduto) controller.getItem();
+			subTipo = (SubTipoProduto) controller.getItem();
 		} catch (Exception e) {
 			subTipo = new SubTipoProduto(value.toString());
 		}
@@ -232,7 +234,11 @@ public class ItemEstoqueCadastro extends StageBase {
 			return value;
 		else {
 			FabricanteController controller = getFabricanteController();
-			controller.buscaNome(value.toString());
+			try {
+				controller.buscaNome(value.toString());
+			} catch (NoResultException e) {
+				e.printStackTrace();
+			}
 			if (controller.getItem() == null)
 				return new Fabricante(value.toString());
 			return controller.getItem();

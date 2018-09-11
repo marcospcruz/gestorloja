@@ -88,6 +88,7 @@ public class LogIn extends Stage {
 			alert.setTitle("Erro");
 			alert.setHeaderText("Erro de Conexão com Banco de Dados.");
 			alert.showAndWait();
+			e.printStackTrace();
 		} catch (Exception e1) {
 
 			e1.printStackTrace();
