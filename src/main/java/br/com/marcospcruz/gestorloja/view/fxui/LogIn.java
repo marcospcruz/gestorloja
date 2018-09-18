@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.view.fxui;
 import javax.persistence.PersistenceException;
 
 import br.com.marcospcruz.gestorloja.facade.LoginFacade;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -76,23 +77,26 @@ public class LogIn extends Stage {
 		LoginFacade controller = new LoginFacade(this);
 		String nomeUsuario = userTextField.getText();
 		String senha = pwBox.getText();
-		try {
-			controller.processaLogin(nomeUsuario, senha);
-			Stage stage = new PrincipalFxGui();
-			stage.initOwner(this);
-			stage.initModality(Modality.APPLICATION_MODAL);
-			stage.showAndWait();
+		Platform.runLater(() -> {
+			try {
+				controller.processaLogin(nomeUsuario, senha);
+				Stage stage = new PrincipalFxGui();
+				stage.initOwner(this);
+				stage.initModality(Modality.APPLICATION_MODAL);
+				stage.showAndWait();
 
-		} catch (PersistenceException e) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Erro");
-			alert.setHeaderText("Erro de Conexão com Banco de Dados.");
-			alert.showAndWait();
-			e.printStackTrace();
-		} catch (Exception e1) {
+			} catch (PersistenceException e) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Erro");
+				alert.setHeaderText("Erro de Conexão com Banco de Dados.");
+				alert.showAndWait();
+				e.printStackTrace();
+			} catch (Exception e1) {
 
-			e1.printStackTrace();
-			actiontarget.setText(e1.getMessage());
-		}
+				e1.printStackTrace();
+				actiontarget.setText(e1.getMessage());
+			}
+
+		});
 	}
 }

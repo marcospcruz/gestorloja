@@ -22,6 +22,7 @@ import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.NumberTextField;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -55,6 +56,11 @@ public class PDV extends StageBase {
 			"valorVenda", 
 			"valorTotal" 
 			};
+	private static final String TOTAL_RECEBIDO = "Total Recebido (R$):";
+	private static final String TROCO_LABEL = "Troco (R$):";
+	private static final String SUB_TOTAL_VENDA = "Sub-Total (R$):";
+	private static final String FONT_VERDANA = "Verdana";
+	private static final String VALOR_VENDA = "Valor Venda:";
 	//@formatter:on
 	private AutoCompleteTextField<ItemEstoque> estoqueDropDown;
 	private RadioButton radioCodigoBarra;
@@ -78,7 +84,7 @@ public class PDV extends StageBase {
 	private NumberTextField subTotalTxt;
 	private Label trocoLabel;
 
-	// private NumberTextField valorDinheiroTxt;
+	private NumberTextField valorDinheiroTxt;
 	private Map<CheckBox, List<Node>> formaPagamentoMap;
 
 	private ItemEstoque itemEstoque;
@@ -89,12 +95,13 @@ public class PDV extends StageBase {
 	private boolean atualizaDesconto;
 	private boolean naoAtualizaDesconto;
 	private boolean novaVenda;
+	private Label subTotalRecebido;
 
 	public PDV() throws Exception {
 		this(false);
 	}
 
-	protected void configuraLayout() {
+	protected void configuraLayout() throws Exception {
 		double layoutsMaxWidth = SingletonManager.getInstance().getScreenWidth();
 		// layoutsMaxWidth -= layoutsMaxWidth * (27d / 100d);
 
@@ -107,7 +114,13 @@ public class PDV extends StageBase {
 
 	public PDV(boolean editaVenda) throws Exception {
 		super();
-
+		setOnCloseRequest(event -> {
+			try {
+				limpaFormularioPdv();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 		if (!editaVenda) {
 			novaVenda = true;
 			String dataAtual = Util.formataData(SingletonManager.getInstance().getData());
@@ -117,7 +130,8 @@ public class PDV extends StageBase {
 				caixaController.validateCaixaFechado();
 				getVendaController().resetVenda();
 			} catch (Exception e) {
-				showErrorMessage(e.getMessage() + " para realização de vendas.");
+				// showErrorMessage(e.getMessage() + "Abrir caixa para realização de vendas.");
+				showErrorMessage("Abrir caixa para realização de vendas.");
 				throw e;
 			}
 		}
@@ -161,7 +175,7 @@ public class PDV extends StageBase {
 		}
 	}
 
-	private GridPane criaGridPane() {
+	private GridPane criaGridPane() throws Exception {
 		GridPane gridPane = new GridPane();
 		// gridPane.setPadding(new Insets(0, 15, 5, 0));
 		gridPane.setHgap(7);
@@ -174,18 +188,25 @@ public class PDV extends StageBase {
 	}
 
 	private TitledPane criaTrocoPanel() {
-		TitledPane titledPane = criaTitledPane("Troco");
+		TitledPane titledPane = criaTitledPane("Sub-Total Recebido");
 		FlowPane flow = new FlowPane();
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.add(criaLabelBold("Troco (R$):"), 0, 0);
+		int rowIndex = 0;
+		grid.add(criaLabelBold(TOTAL_RECEBIDO), 0, rowIndex);
+		subTotalRecebido=new Label();
+		subTotalRecebido.setFont(Font.font(FONT_VERDANA, FontWeight.NORMAL, 12));
+		subTotalRecebido.setText(Util.formataMoeda(0f).substring(3));
+		grid.add(subTotalRecebido, 1, rowIndex++);
+		grid.add(criaLabelBold(TROCO_LABEL), 0, rowIndex);
 		trocoLabel = new Label();
-		trocoLabel.setFont(Font.font("Verdana", FontWeight.NORMAL, 12));
+		trocoLabel.setFont(Font.font(FONT_VERDANA, FontWeight.NORMAL, 12));
 		// trocoLabel = new TextField();
 		// trocoLabel.setPrefColumnCount(8);
-		trocoLabel.setText(Util.formataMoeda(0f).substring(3));
-		grid.add(trocoLabel, 1, 0);
+		String troco=Util.formataMoeda(0f).substring(3);
+		trocoLabel.setText(troco);
+		grid.add(trocoLabel, 1, rowIndex++);
 		flow.getChildren().add(grid);
 		titledPane.setContent(flow);
 		double width = getPercentageWidth();
@@ -193,7 +214,7 @@ public class PDV extends StageBase {
 		return titledPane;
 	}
 
-	private TitledPane criaFormasPagtoPanel() {
+	private TitledPane criaFormasPagtoPanel() throws Exception {
 		TitledPane titledPane = criaTitledPane("Formas de Pagamento");
 		// double width = getLayoutsMaxWidth() * 0.18629502790461694;
 		// double width = getPercentageWidth();
@@ -217,13 +238,14 @@ public class PDV extends StageBase {
 		return titledPane;
 	}
 
-	private Node criaFormaPagamentoOutrosPane() {
+	private Node criaFormaPagamentoOutrosPane() throws Exception {
 		GridPane grid = criaFormaPagamentoGridPane();
 		CheckBox formapagamentoOutrosCheckBox = criaCheckBox("Outros");
 
 		grid.add(formapagamentoOutrosCheckBox, 0, 0, 2, 1);
 		grid.add(criaLabelNormal("Forma pagto:"), 0, 1);
 		AutoCompleteTextField<String> descricaoPagamento = new AutoCompleteTextField<>();
+		carregaTiposMeioPagamentoOutros(descricaoPagamento);
 		descricaoPagamento.setDisable(true);
 		descricaoPagamento.setMaxWidth(120);
 		descricaoPagamento.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -257,9 +279,16 @@ public class PDV extends StageBase {
 		return grid;
 	}
 
+	protected void carregaTiposMeioPagamentoOutros(AutoCompleteTextField<String> descricaoPagamento) throws Exception {
+		CaixaController caixaController = getCaixaController();
+		// ObservableList<String> items = descricaoPagamento.getItems();
+		List outrosPagamentosList = caixaController.getTiposMeioPagamentoOutros();
+		descricaoPagamento.setItems(FXCollections.observableArrayList(outrosPagamentosList));
+	}
+
 	private CheckBox criaCheckBox(String string) {
 		CheckBox checkBox = new CheckBox(string);
-		checkBox.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+		checkBox.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
 		checkBox.setOnAction(action -> {
 			habilitaComponentesPagamento((CheckBox) action.getSource());
 		});
@@ -267,9 +296,9 @@ public class PDV extends StageBase {
 	}
 
 	private void habilitaComponentesPagamento(CheckBox checkBox) {
-
 		lastSelected = checkBox;
 		List<Node> componentes = formaPagamentoMap.get(checkBox);
+
 		try {
 			VendaController controller = getVendaController();
 
@@ -278,6 +307,7 @@ public class PDV extends StageBase {
 				pagamento = new Pagamento();
 			String descricaoTipoMeioPagamento = checkBox.getText();
 			List<MeioPagamento> meiosPagamento = pagamento.getMeiosPagamento();
+			// selecionando meio pagamento existente
 			//@formatter:off
 			MeioPagamento mp = meiosPagamento
 					.stream()
@@ -290,42 +320,66 @@ public class PDV extends StageBase {
 			int count = 0;
 			for (Node node : componentes) {
 				node.setDisable(!checkBox.isSelected());
+				String valorString = "0,00";
 				if (checkBox.isSelected()) {
-					String valorString = null;
+					// valorString = null;
 					if (mp.getTipoMeioPagamento().getIdTipoMeioPagamento() == 3 && count == 0) {
 						valorString = Float.toString(mp.getParcelas());
 						((TextField) node).setText(valorString);
 					} else {
-						valorString = mp.getValorPago() == 0 ? "0,00"
-								: Util.formataStringDecimaisVirgula(mp.getValorPago());
+						// valorString = mp.getValorPago() == 0 ? "0,00"
+						// : Util.formataStringDecimaisVirgula(mp.getValorPago());
 
-						// float valor = Float.parseFloat(valor.replace(',', '.'));
-						// mp.setValorPago(Float.parseFloat(valorString.replace(',', '.')));
+						if (valorString.equals("0,00")
+								&& (controller.getVenda() != null && controller.getVenda().getTotalVendido() > 0)) {
+							// valorString =
+							// Util.formataStringDecimaisVirgula(controller.getVenda().getTotalVendido());
+							valorString = subTotalTxt.getText();
+						}
+						float valor = Float.parseFloat(valorString.replace(',', '.'));
 
-					}
-					if (node instanceof AutoCompleteTextField) {
+						mp.setValorPago(valor);
 
-						((AutoCompleteTextField) node).getEditor().setText(mp.getDescricao());
-
-					} else {
-						((TextField) node).setText(valorString);
 					}
 
 				}
+				if (node instanceof AutoCompleteTextField) {
+
+					((AutoCompleteTextField) node).getEditor().setText(mp.getDescricao());
+
+				} else {
+					if (checkBox.getText().equals("Cartão de Crédito") && count == 0) {
+						count++;
+						continue;
+					}
+					((TextField) node).setText(valorString);
+				}
 				count++;
 			}
-			calculaTroco();
+
 			//
+
 			if (checkBox.isSelected()) {
 				if (!meiosPagamento.contains(mp))
 					meiosPagamento.add(mp);
-			} else if (mp.getIdMeioPagamento() == 0)
+				// valorPago = mp.getValorPago() + pagamento.getValorPagamento();
+
+			} else if (mp.getIdMeioPagamento() == 0) {
 				meiosPagamento.remove(mp);
+				// valorPago = pagamento.getValorPagamento() - mp.getValorPago();
+			}
+			// pagamento.setValorPagamento(valorPago);
+
 			controller.getVenda().setPagamento(pagamento);
+			calculaTroco();
+
+			//
 
 		} catch (Exception e) {
+
 			e.printStackTrace();
 		}
+
 	}
 
 	private Node criaFormaPagamentoCreditoPane() {
@@ -368,7 +422,7 @@ public class PDV extends StageBase {
 
 	private Node criaFormaPagamentoDebitoPane() {
 		GridPane grid = criaFormaPagamentoGridPane();
-		CheckBox formapagamentoCartaoDebitoCheckBox = criaCheckBox("Cartão de Débito:");
+		CheckBox formapagamentoCartaoDebitoCheckBox = criaCheckBox("Cartão de Débito");
 		grid.add(formapagamentoCartaoDebitoCheckBox, 0, 0, 2, 1);
 		grid.add(criaLabelNormal(VALOR_R$), 0, 1);
 		NumberTextField valorDebito = criaCampoValor();
@@ -392,6 +446,24 @@ public class PDV extends StageBase {
 		return grid;
 	}
 
+	private void updatePagamento(CheckBox x, List<Node> nodes, String newValue) throws Exception {
+
+		if (lastSelected == x && x.isSelected()) {
+
+			VendaController controller = getVendaController();
+			Pagamento pagamento = controller.getVenda().getPagamento();
+			MeioPagamento mp = pagamento.getMeiosPagamento().stream()
+					.filter(meio -> meio.getTipoMeioPagamento().getDescricaoTipoMeioPagamento().equals(x.getText()))
+					.findFirst().get();
+
+			// if (mp != null) {
+			mp.setValorPago(Util.parseStringDecimalToFloat(newValue));
+			//// pagamento.setValorPagamento(controller.getValorTotalPagamentoVenda());
+			calculaTroco();
+			// }
+		}
+	}
+
 	private NumberTextField criaCampoValor() {
 		NumberTextField field = criaNumberTextField(true);
 		field.textProperty().addListener((observableList, oldValue, newValue) -> {
@@ -400,22 +472,17 @@ public class PDV extends StageBase {
 
 				Platform.runLater(() -> {
 					try {
-						VendaController controller = getVendaController();
-						Pagamento pagamento = controller.getVenda().getPagamento();
 						//@formatter:off
-						MeioPagamento mp = pagamento.getMeiosPagamento()
-								.stream()
-								.filter(meio -> meio.getTipoMeioPagamento().getDescricaoTipoMeioPagamento().equals(lastSelected.getText()))
-								.findFirst()
-								.orElse(null);
-						
-						
+						formaPagamentoMap
+								.forEach((t, u) -> {
+									try {
+										updatePagamento(t, u, newValue);
+									} catch (Exception e) {
+										
+										e.printStackTrace();
+									}
+								});
 						//@formatter:on
-						if (mp != null) {
-							mp.setValorPago(Util.parseStringDecimalToFloat(newValue));
-
-							calculaTroco();
-						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -433,26 +500,40 @@ public class PDV extends StageBase {
 		Pagamento pagamento = controller.getVenda().getPagamento();
 		if (pagamento != null) {
 			//@formatter:off
-			MeioPagamento mp = pagamento.getMeiosPagamento()
-					.stream()
-					.filter(meio -> meio.getTipoMeioPagamento().getDescricaoTipoMeioPagamento().equals(lastSelected.getText()))
-					.findFirst()
-					.orElse(null);
-			
-			float valorVenda = controller.getVenda().getTotalVendido();
+			formaPagamentoMap
+				.forEach((key,value)->{
+					//@formatter:off
 
-			if (mp != null) {
-				float valorPago = controller.getValorTotalPagamentoVenda();
-						
-				float troco=pagamento.getTrocoPagamento();
-				troco = valorPago == 0f ?
-						0f : 
-							valorPago - valorVenda;
-				//@formatter:on
-				trocoLabel.setText(Util.formataMoedaSemSimbolo(troco));
-				pagamento.setTrocoPagamento(troco);
-			}
+					MeioPagamento mp = pagamento.getMeiosPagamento()
+							.stream()
+							.filter(meio -> meio.getTipoMeioPagamento().getDescricaoTipoMeioPagamento().equals(key.getText()))
+							.findFirst()
+							.orElse(null);
+					
+					float valorVenda = Util.parseStringDecimalToFloat(subTotalTxt.getText()); 
+//							controller.getVenda().getTotalVendido();
 
+					float troco = 0;
+					if (mp != null) {
+						float valorPago = controller.getValorTotalPagamentoVenda();
+								
+						troco=pagamento.getTrocoPagamento();
+						troco = valorPago == 0f ?
+								0f : 
+									valorPago - valorVenda;
+						//@formatter:on
+							pagamento.setTrocoPagamento(troco);
+						}
+
+						//@formatter:on
+
+					});
+			//@formatter:on
+
+		}
+		if (pagamento != null) {
+			trocoLabel.setText(Util.formataMoedaSemSimbolo(pagamento.getTrocoPagamento()));
+			subTotalRecebido.setText(Util.formataMoedaSemSimbolo(controller.getValorTotalPagamentoVenda()));
 		}
 	}
 
@@ -493,10 +574,10 @@ public class PDV extends StageBase {
 		grid.setAlignment(Pos.CENTER);
 		// grid.setHgap(5);
 		grid.setVgap(5);
-		grid.add(criaLabelBold("Valor Venda:"), 0, 0);
+		grid.add(criaLabelBold(VALOR_VENDA), 0, 0);
 		valorVendaLabel = criaLabelNormal(Util.formataMoeda(0f));
 		grid.add(valorVendaLabel, 1, 0);
-		grid.add(criaLabelBold("Desconto %:"), 0, 1);
+		grid.add(criaLabelBold("Desconto (%):"), 0, 1);
 		descontoTxt = new NumberTextField();
 		descontoTxt.setText("0");
 		descontoTxt.setPrefColumnCount(3);
@@ -508,7 +589,7 @@ public class PDV extends StageBase {
 			});
 		});
 		grid.add(descontoTxt, 1, 1);
-		grid.add(criaLabelBold("Sub Total(R$):"), 0, 2);
+		grid.add(criaLabelBold(SUB_TOTAL_VENDA), 0, 2);
 		subTotalTxt = new NumberTextField(true);
 		subTotalTxt.focusedProperty().addListener((a, b, newValue) -> {
 			atualizaDesconto = newValue;
@@ -622,7 +703,7 @@ public class PDV extends StageBase {
 		if (novaVenda) {
 
 			Button buttonLimpar = new Button("Cancelar");
-			buttonLimpar.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+			buttonLimpar.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
 			buttonLimpar.setOnAction(evt -> {
 				try {
 					if (showConfirmAtionMessage("Deseja cancelar esta venda?"))
@@ -635,12 +716,13 @@ public class PDV extends StageBase {
 			});
 			Button button = new Button("Finalizar Venda");
 
-			button.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+			button.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
 			button.setOnAction(evt -> {
 				try {
 					boolean confirmaFinalizacao = showConfirmAtionMessage("Deseja finalizar esta Venda?");
 					if (confirmaFinalizacao) {
 						VendaController controller = getVendaController();
+						controller.getVenda().setTotalVendido(Util.parseStringDecimalToFloat(subTotalTxt.getText()));
 						controller.finalizaVenda();
 						carregaDadosTable(table);
 						limpaFormularioPdv();
@@ -656,7 +738,7 @@ public class PDV extends StageBase {
 			children.addAll(button, buttonLimpar);
 		} else {
 			Button button = new Button("Estornar Venda");
-			button.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+			button.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
 			button.setOnAction(evt -> {
 				try {
 					if (showConfirmAtionMessage("Deseja estornar esta Venda?")) {
@@ -687,7 +769,9 @@ public class PDV extends StageBase {
 		subTotalTxt.setText("0,00");
 		descontoTxt.setText("0");
 		trocoLabel.setText(Util.formataMoedaSemSimbolo(0));
+		subTotalRecebido.setText(Util.formataMoedaSemSimbolo(0));
 		estoqueDropDown.getEditor().setText("");
+		valorVendaLabel.setText("");
 		limpaCarrinho();
 	}
 
@@ -717,9 +801,10 @@ public class PDV extends StageBase {
 	}
 
 	/**
+	 * @throws Exception
 	 * 
 	 */
-	protected void limpaFormasPagamentoFields() {
+	protected void limpaFormasPagamentoFields() throws Exception {
 		for (CheckBox checkBox : formaPagamentoMap.keySet()) {
 			checkBox.setSelected(false);
 			List<Node> componentes = formaPagamentoMap.get(checkBox);
@@ -733,6 +818,10 @@ public class PDV extends StageBase {
 							valorZero.append(",00");
 						valor.setText(valorZero.toString());
 
+					} else if (node instanceof AutoCompleteTextField) {
+						AutoCompleteTextField<String> descricaoMeioPagamento = (AutoCompleteTextField<String>) node;
+						carregaTiposMeioPagamentoOutros(descricaoMeioPagamento);
+						descricaoMeioPagamento.getEditor().setText("");
 					}
 
 				}
@@ -971,7 +1060,7 @@ public class PDV extends StageBase {
 
 			boolean temEstoqueSuficiente = itemEstoque.getQuantidade() > 0;
 			populaDadosProduto(itemEstoque);
-			if (SingletonManager.getInstance().isPermiteVendaSemControlarEstoque())
+			if (!SingletonManager.getInstance().isPermiteVendaSemControlarEstoque())
 				adicionarBtn.setDisable(!temEstoqueSuficiente);
 			else
 				adicionarBtn.setDisable(false);
@@ -1026,7 +1115,7 @@ public class PDV extends StageBase {
 		lista.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		try {
 			EstoqueController controller = getEstoqueController();
-
+			controller.buscaTodos();
 			ObservableList<ItemEstoque> items = lista.getItems();
 			if (controller.getList() == null || controller.getList().isEmpty())
 				controller.buscaTodos();

@@ -10,9 +10,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
+@NamedQueries({ @NamedQuery(name = "meioPagamento.buscaPagamentosOutrosDistinct", query = "select distinct m from MeioPagamento m "
+		+ "where m.descricao != null "
+		+ "group by m.descricao") })
 @Entity
 public class MeioPagamento implements Serializable {
 	/**

@@ -10,6 +10,7 @@ import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+import br.com.marcospcruz.gestorloja.view.fxui.LogIn;
 
 public class LoginFacade {
 
@@ -32,7 +33,7 @@ public class LoginFacade {
 		buscaSessaoUsuarioAtiva(usuario);
 		criaSessaoUsuario(usuario);
 		SingletonManager.getInstance().setUsuarioLogado(getUsuarioLogado());
-//		abreInterfacePrincipal();
+		// abreInterfacePrincipal();
 		closeLoginGui();
 	}
 
@@ -75,13 +76,15 @@ public class LoginFacade {
 
 	private void abreInterfacePrincipal() {
 
-//		new PrincipalGui(this);
+		// new PrincipalGui(this);
 
 	}
 
 	private void closeLoginGui() {
 		if (loginGui instanceof JDialog)
 			((JDialog) loginGui).dispose();
+		else
+			((LogIn) loginGui).close();
 
 	}
 
@@ -113,7 +116,10 @@ public class LoginFacade {
 	}
 
 	public LoginFacade fechaSessaoUsuario() {
-		sessaoUsuarioBuilder.setDataFim(SingletonManager.getInstance().getData());
+		if (sessaoUsuarioBuilder == null) {
+			sessaoUsuarioBuilder = new SessaoUsuarioBuilder();
+		}
+		sessaoUsuarioBuilder.createSessaoUsuario().setDataFim(SingletonManager.getInstance().getData());
 		SessaoUsuario sessao = sessaoUsuarioBuilder.getSessaoUsuario();
 		// temp
 		sessaoUsuarioDao.update(sessao);

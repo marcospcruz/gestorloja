@@ -12,7 +12,6 @@ import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.exception.EstoqueInsuficienteException;
-import br.com.marcospcruz.gestorloja.exception.ProdutoNaListaException;
 import br.com.marcospcruz.gestorloja.facade.OperacaoEstoqueFacade;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
@@ -390,7 +389,7 @@ public class VendaController extends ControllerBase {
 		iniciaVenda();
 		estoqueController.anulaAtributos();
 
-		itemVendaMap = null;
+		itemVendaMap = new HashMap<>();
 	}
 
 	public void salva() {
@@ -407,6 +406,7 @@ public class VendaController extends ControllerBase {
 			throw new NullPointerException("Pagamento não informado para finalizar a Venda.");
 		}
 		Date dataVenda = venda.getDataVenda();
+		pagamento.setVenda(venda);
 		pagamento.setDataVenda(dataVenda);
 		Usuario operador = venda.getOperador();
 		pagamento.setUsuarioLogado(operador);
@@ -415,24 +415,26 @@ public class VendaController extends ControllerBase {
 		Caixa caixa = venda.getCaixa() == null ? (Caixa) caixaController.getItem() : venda.getCaixa();
 		if (pagamento.getMeiosPagamento() == null || pagamento.getMeiosPagamento().isEmpty())
 			throw new Exception("Cobrar a venda antes de finalizar.");
-		pagamento.getMeiosPagamento().stream().forEach(meioPagamento -> {
+		// pagamento.getMeiosPagamento().stream().forEach(meioPagamento -> {
+		for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
 			float valorPagamento = meioPagamento.getValorPago() + pagamento.getValorPagamento();
 			pagamento.setValorPagamento(valorPagamento);
 			meioPagamento.setDataPagamento(dataVenda);
 			meioPagamento.setUsuarioLogado(operador);
 			TipoMeioPagamento tipoMeioPagamento = meioPagamento.getTipoMeioPagamento();
-			meioPagamento.setTipoMeioPagamento(caixaController.buscaTipoMeioPagamento(tipoMeioPagamento));
+			tipoMeioPagamento=caixaController.buscaTipoMeioPagamento(tipoMeioPagamento);
+			meioPagamento.setTipoMeioPagamento(tipoMeioPagamento);
 			// meioPagamento = meioPagamentoDao.update(meioPagamento);
 
 			// pagamento.getMeiosPagamento().add(meioPagamento);
 			meioPagamento.setPagamento(pagamento);
 			if (meioPagamento.getIdMeioPagamento() == 0
 					&& meioPagamento.getTipoMeioPagamento().getIdTipoMeioPagamento() == 1) {
-				float saldoFinal = caixa.getSaldoFinal() + meioPagamento.getValorPago();
-				caixa.setSaldoFinal(saldoFinal);
-				// salva();
+				
+				caixaController.geraReceitaCaixa(meioPagamento,venda.getDataVenda());
+			
 			}
-		});
+		}
 		venda.setPagamento(pagamento);
 		caixaController.setItem(caixa);
 	}
@@ -649,7 +651,7 @@ public class VendaController extends ControllerBase {
 			mp.setEstornado(true);
 		}
 		pagamento.setEstornado(true);
-//		pagamento.setValorPagamento(0);
+		// pagamento.setValorPagamento(0);
 		for (ItemVenda itemVenda : venda.getItensVenda()) {
 			itemVenda.setDevolvido(true);
 			devolveProduto(itemVenda.getItemEstoque().getCodigoDeBarras(), itemVenda.getQuantidade());

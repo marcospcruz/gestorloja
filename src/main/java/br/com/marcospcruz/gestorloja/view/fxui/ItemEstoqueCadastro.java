@@ -130,7 +130,7 @@ public class ItemEstoqueCadastro extends StageBase {
 				hide();
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 	}
@@ -145,7 +145,7 @@ public class ItemEstoqueCadastro extends StageBase {
 			Fabricante fabricante = (Fabricante) parseFabricante(comboFabricante.getValue());
 
 			try {
-				pController.busca(produto.getDescricaoProduto());
+				pController.buscaProduto(produto.getDescricaoProduto());
 				produto = pController.getItem();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -205,6 +205,11 @@ public class ItemEstoqueCadastro extends StageBase {
 			operacaoEstoqueFacade.salvaDadosItem(itemEstoque);
 			super.showMensagemSucesso("Dados salvos com sucesso no Estoque.");
 			// controller.criaItemEstoque(fabricante, txtQuantidadeInicial.getText());
+			controller.anulaAtributos();
+//			comboFabricante.getEditor(),
+//			comboCategoria.getEditor(),
+//			subCategoria.getEditor(),
+//			produtocombo.getEditor()
 			hide();
 
 		} catch (Exception e1) {
@@ -220,7 +225,8 @@ public class ItemEstoqueCadastro extends StageBase {
 		SubTipoProduto subTipo = null;
 		try {
 			TipoProdutoController controller = getTipoProdutoController();
-			controller.busca(value.toString());
+//			controller.busca(value.toString());
+			controller.buscaTipoProduto(value.toString());
 			subTipo = (SubTipoProduto) controller.getItem();
 		} catch (Exception e) {
 			subTipo = new SubTipoProduto(value.toString());

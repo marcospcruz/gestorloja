@@ -202,10 +202,11 @@ public class EstoqueController extends ControllerBase {
 
 		Crud<ItemEstoque> itemEstoqueDao = getDao();
 		try {
-			itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
-					itemEstoque.getProduto().getIdProduto(), "idFabricante",
-					itemEstoque.getFabricante().getIdFabricante(), "idTipoProduto",
-					itemEstoque.getTipoProduto().getIdTipoItem());
+			// itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
+			// itemEstoque.getProduto().getIdProduto(), "idFabricante",
+			// itemEstoque.getFabricante().getIdFabricante(), "idTipoProduto",
+			// itemEstoque.getTipoProduto().getIdTipoItem());
+			itemEstoque = itemEstoqueDao.busca(ItemEstoque.class, itemEstoque.getIdItemEstoque());
 			itemEstoqueDao.delete(itemEstoque);
 			getCacheMap().remove(itemEstoque.getIdItemEstoque());
 		} catch (NoResultException e) {
@@ -273,6 +274,8 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void busca(String text) throws Exception {
 		// busca(text, null, null);
+		if(itensEstoque==null)
+			itensEstoque=new ArrayList(getCacheMap().values());
 		itemEstoque = itensEstoque.stream()
 				.filter(item -> ((ItemEstoque) item).getCodigoDeBarras().equalsIgnoreCase(text)).findFirst()
 				.orElse(null);
@@ -459,7 +462,7 @@ public class EstoqueController extends ControllerBase {
 
 	@Override
 	public void novo() {
-		// TODO Auto-generated method stub
+		itemEstoque = new ItemEstoque();
 
 	}
 

@@ -192,6 +192,9 @@ public class EstoquePrincipalGui extends StageBase {
 				stage = new ProdutoCadastro();
 				break;
 			default:
+				getTipoProdutoController().novo();
+				getFabricanteController().novo();
+				getEstoqueController().novo();
 				stage = new ItemEstoqueCadastro();
 			}
 			abreTelaCadastro(stage);

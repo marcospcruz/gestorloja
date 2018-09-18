@@ -9,14 +9,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
-@Table(name = "itemVenda")
+//@Table(name = "ItemVenda")
 public class ItemVenda implements Serializable {
 	/**
 	 * 
@@ -43,6 +42,7 @@ public class ItemVenda implements Serializable {
 	public ItemVenda() {
 		dataVenda = SingletonManager.getInstance().getData();
 		operador = SingletonManager.getInstance().getUsuarioLogado();
+		setOperador(operador);
 		quantidade = 0;
 	}
 

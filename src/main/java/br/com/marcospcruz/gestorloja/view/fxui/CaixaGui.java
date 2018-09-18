@@ -37,10 +37,11 @@ public class CaixaGui extends StageBase {
 
 	private static final String DATE_PATTERN = "dd/MM/yyyy";
 	private static final String DATE_TIME_PATTERN = DATE_PATTERN + " " + "H:mm:ss";
+	private static final String INTERFACE_VENDAS_CAIXA = "VendasCaixaGui";
 	private GridPane grid;
 	private Label horaAberturaLbl;
 	private Node trocoInicial;
-	private NumberTextField saldoFechamento;
+	private Label saldoFechamento;
 	private Label horaFechamentoLbl;
 
 	public CaixaGui() throws Exception {
@@ -49,7 +50,7 @@ public class CaixaGui extends StageBase {
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_PATTERN);
 		String parsedDate = sdf.format(SingletonManager.getInstance().getData());
 		setTitle("Caixa dia " + parsedDate);
-		super.setDimension(650, 500);
+		super.setDimension(650, 550);
 		double thisWidth = super.getWidth() - (super.getWidth() * 10 / 100);
 		setLayoutsMaxWidth(thisWidth);
 		resizableProperty().setValue(Boolean.FALSE);
@@ -155,28 +156,32 @@ public class CaixaGui extends StageBase {
 		Button button = new Button("Visualizar Vendas");
 		button.setDisable(caixa.getVendas() == null || caixa.getVendas().isEmpty());
 		button.setOnAction(evt -> {
-			try {
-
-				Stage stage = StageFactory.createStage("br.com.marcospcruz.gestorloja.view.fxui.VendasCaixaGui");
-				stage.initOwner(this);
-				stage.initModality(Modality.APPLICATION_MODAL);
-				stage.showAndWait();
-				ObservableList<Node> children = grid.getChildren();
-				children.removeAll(children);
-				populaGridContent();
-			} catch (Exception e) {
-
-				e.printStackTrace();
-			} finally {
-				atualizaDadosCaixa();
-
-			}
+			abrirInterface(INTERFACE_VENDAS_CAIXA);
 
 		});
 		subTotalGrid.add(button, column--, row++);
 		//
 		titledPane.setContent(subTotalGrid);
 		return titledPane;
+	}
+
+	protected void abrirInterface(String nomeInterface) {
+		try {
+
+			Stage stage = StageFactory.createStage("br.com.marcospcruz.gestorloja.view.fxui." + nomeInterface);
+			stage.initOwner(this);
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.showAndWait();
+			ObservableList<Node> children = grid.getChildren();
+			children.removeAll(children);
+			populaGridContent();
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		} finally {
+			atualizaDadosCaixa();
+
+		}
 	}
 
 	/**
@@ -207,8 +212,11 @@ public class CaixaGui extends StageBase {
 		Button btnSave = new Button("Abre Caixa");
 		btnSave.setOnAction(arg0 -> {
 			try {
-				abreCaixa(arg0);
-				showMensagemSucesso("Caixa aberto com sucesso.");
+				if (showConfirmAtionMessage("Deseja abrir o Caixa?")) {
+					abreCaixa(arg0);
+					showMensagemSucesso("Caixa aberto com sucesso.");
+				}
+
 			} catch (Exception e) {
 				showErrorMessage("Falha ao abrir o Caixa.");
 				e.printStackTrace();
@@ -234,6 +242,7 @@ public class CaixaGui extends StageBase {
 				hide();
 			}
 		});
+		btnFechar.setDisable(controller.getItem() == null);
 
 		pane.getChildren().addAll(btnSave, btnFechar, btnExcluir);
 		try {
@@ -274,7 +283,7 @@ public class CaixaGui extends StageBase {
 	private void fechaCaixa(ActionEvent e) throws Exception {
 		CaixaController controller = getCaixaController();
 		if (showConfirmAtionMessage("Deseja fechar o Caixa?")) {
-			Caixa caixa = (Caixa) controller.getItem();
+			// Caixa caixa = (Caixa) controller.getItem();
 			// caixa.setDataFechamento(Util.parseData(horaFechamentoLbl.getText()));
 			controller.fechaCaixa();
 
@@ -282,18 +291,17 @@ public class CaixaGui extends StageBase {
 	}
 
 	private void abreCaixa(ActionEvent e) throws Exception {
-		if (showConfirmAtionMessage("Deseja abrir o Caixa?")) {
-			controller.novo();
-			Caixa caixa = (Caixa) controller.getItem();
-			caixa.setDataAbertura(SingletonManager.getInstance().getData());
-			caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
-			caixa.setSaldoInicial(Util.parseStringDecimalToFloat(((TextField) trocoInicial).getText()));
 
-			salvaDados(e);
-			// hide();
-			// reloadForm();
+		controller.novo();
+		Caixa caixa = (Caixa) controller.getItem();
+		caixa.setDataAbertura(SingletonManager.getInstance().getData());
+		caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
+		caixa.setSaldoInicial(Util.parseStringDecimalToFloat(((TextField) trocoInicial).getText()));
 
-		}
+		salvaDados(e);
+		// hide();
+		// reloadForm();
+
 	}
 
 	private void close(ActionEvent e) {
@@ -401,27 +409,31 @@ public class CaixaGui extends StageBase {
 		}, 0, 1000);
 		//
 		dadosGrid.add(criaLabelBold("Operador Fechamento:"), 0, row);
-		Label usuarioFechamento = new Label();
+		Label usuarioFechamento = criaLabelNormal("");
 		if (caixa != null && caixa.getIdCaixa() != 0)
 			usuarioFechamento.setText(SingletonManager.getInstance().getUsuarioLogado().getNomeCompleto());
 		dadosGrid.add(usuarioFechamento, 1, row++);
 		dadosGrid.add(criaLabelBold("Saldo Fechamento:"), 0, row);
-		saldoFechamento = new NumberTextField(true);
+		saldoFechamento = criaLabelNormal("");
 		if (caixa != null && caixa.getIdCaixa() != 0) {
 			saldoFechamento.setText(Util.formataMoeda(caixa.getSaldoFinal()));
 
-		} else
-			saldoFechamento.setDisable(true);
+		}
 		dadosGrid.add(saldoFechamento, 1, row);
-
+		Button button = new Button("Adicionar Entrada / Saída");
+		button.setOnAction(evt -> {
+			abrirInterface("OperacaoCaixaGui");
+		});
+		dadosGrid.add(button, 0, ++row, 2, 1);
 		titledPane.setContent(dadosGrid);
 		return titledPane;
 	}
 
 	private void defineNode(Node trocoInicial, String valorTroco) {
-		if (trocoInicial instanceof Label)
-			((Label) trocoInicial).setText(valorTroco);
-		else
+		if (trocoInicial instanceof Label) {
+
+			((Label) trocoInicial).setText(Util.formataMoeda(Util.parseStringDecimalToFloat(valorTroco)));
+		} else
 			((TextField) trocoInicial).setText(valorTroco);
 
 	}

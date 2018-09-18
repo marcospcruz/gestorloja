@@ -5,9 +5,11 @@ import javafx.beans.property.SimpleStringProperty;
 public class CaixaModel {
 	private SimpleStringProperty abertura, operadorAbertura, trocoInicial, fechamento, trocoFinal, status;
 	private SimpleStringProperty operadorFechamento;
+	private SimpleStringProperty totalVendido;
 
-	public CaixaModel(String dataInicio, String usuarioAbertura, String trocoInicial, String dataHoraFechamento,
-			String operadorFechamento, String trocoFinal, String status) {
+	public CaixaModel(String dataInicio, String usuarioAbertura, String trocoInicial, String totalVendido,
+			String dataHoraFechamento, String operadorFechamento, String trocoFinal, String status) {
+		setTotalVendido(totalVendido);
 		setAbertura(dataInicio);
 		setOperadorAbertura(usuarioAbertura);
 		setTrocoInicial(trocoInicial);
@@ -15,6 +17,15 @@ public class CaixaModel {
 		setTrocoFinal(trocoFinal);
 		setStatus(status);
 		setOperadorFechamento(operadorFechamento);
+	}
+
+	private void setTotalVendido(String totalVendido) {
+		this.totalVendido = new SimpleStringProperty(totalVendido);
+
+	}
+
+	public String getTotalVendido() {
+		return totalVendido.get();
 	}
 
 	private void setOperadorFechamento(String operadorFechamento) {

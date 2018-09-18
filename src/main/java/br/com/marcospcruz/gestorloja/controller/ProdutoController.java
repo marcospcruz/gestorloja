@@ -206,4 +206,9 @@ public class ProdutoController extends ControllerBase {
 		produto = new Produto();
 	}
 
+	public void buscaProduto(String descricaoProduto) {
+		produto=produtoDao.busca("produto.readparametro", "descricao",descricaoProduto.toUpperCase());
+		
+	}
+
 }

@@ -184,7 +184,7 @@ public class TipoProdutoController extends ControllerBase {
 		// // implementação para AutocompleteComboBox
 		// if (tipoProduto != null)
 		// setList((List) ((SubTipoProduto) tipoProduto).getSubTiposProduto());
-		this.tipoProduto = (SubTipoProduto)tipoProduto;
+		this.tipoProduto = (SubTipoProduto) tipoProduto;
 	}
 
 	public void carregaTiposProdutos() {
@@ -406,6 +406,10 @@ public class TipoProdutoController extends ControllerBase {
 		return (TipoProduto) tiposProdutos.stream().filter(t -> ((TipoProduto) t).getDescricaoTipo().equals(string))
 				.findFirst().orElse(null);
 
+	}
+
+	public void buscaTipoProduto(String string) {
+		tipoProduto = tipoProdutoDao.busca("tipoProduto.readParametro", "descricao", string.toLowerCase());
 	}
 
 	// public void iniciaTipoPecaRoupa() {

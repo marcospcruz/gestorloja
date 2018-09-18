@@ -108,7 +108,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		for (Object obj : objs) {
 			System.out.print(obj + ",");
 		}
-		
+
 	}
 
 	protected FlowPane createHorizontalFlowPane() {
@@ -243,12 +243,12 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		TipoProdutoController controller;
 		try {
 			controller = getTipoProdutoController();
-
+			controller.buscaTodos();
 			ObservableList<TipoProduto> items = categoriaProduto.getItems();
 			items.add(new SubTipoProduto("Selecione uma opção.", null));
 			items.addAll(controller.getList());
 		} catch (Exception e) {
-		
+
 			e.printStackTrace();
 		}
 
@@ -364,6 +364,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		ProdutoController produtoController = null;
 		try {
 			produtoController = getProdutoController();
+			produtoController.buscaTodos();
 			ObservableList<Produto> items = combo.getItems();
 			items.addAll(produtoController.getList());
 		} catch (Exception e) {
@@ -481,7 +482,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 			try {
 				salvaDados(arg0);
 			} catch (Exception e1) {
-		
+
 				e1.printStackTrace();
 			}
 		});

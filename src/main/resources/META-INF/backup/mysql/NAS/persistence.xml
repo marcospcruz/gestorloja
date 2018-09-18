@@ -15,11 +15,10 @@
 			<!-- property name="javax.persistence.jdbc.url"
 				value="jdbc:sqlite:c:\gestorLoja\controleestoque.db" /-->
 			<!-- MYSQL -->	
-			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-			<!--property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/-->
+			<!-- property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/-->
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
 			
 			<!-- <property name="javax.persistence.jdbc.url" value="jdbc:mysql://dlink-bc19e7:3306/loja?useSSL=false" /> -->
-			<!--property name="javax.persistence.jdbc.url" value="jdbc:mysql://dlink-bc19e7:3306/loja?useSSL=false&amp;autoReconnect=true" /-->
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://dlink-bc19e7:3306/loja" />
             <property name="javax.persistence.jdbc.user" value="admin" />
             <property name="javax.persistence.jdbc.password" value="admin" />

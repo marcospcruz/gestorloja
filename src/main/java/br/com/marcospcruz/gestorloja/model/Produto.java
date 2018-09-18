@@ -26,7 +26,6 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 //				+ "JOIN fetch p.tiposProduto t "
 				+ "where upper(p.descricaoProduto) like :descricao"),
 		@NamedQuery(name = "produto.readparametro", query = "select distinct p from Produto p "
-				
 				+"where upper(p.descricaoProduto) = :descricao")
 		})
 		

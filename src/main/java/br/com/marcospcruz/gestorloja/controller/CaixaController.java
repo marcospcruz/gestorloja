@@ -1,13 +1,16 @@
 package br.com.marcospcruz.gestorloja.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import br.com.marcospcruz.gestorloja.builder.TransacaoFinanceiraBuilder;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Caixa;
@@ -15,11 +18,11 @@ import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
+import br.com.marcospcruz.gestorloja.model.TransacaoFinanceira;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
-import javafx.scene.control.Label;
 
 public class CaixaController extends ControllerBase {
 
@@ -30,6 +33,7 @@ public class CaixaController extends ControllerBase {
 
 	private static final String QUERY_BUSCA_TODOS = "caixa.findAll";
 	private static final String BUSCA_CAIXA_ABERTO = "caixa.findCaixaAberto";
+	private static final String DESCRICAO_TRANSACAO = "Entrada da Venda ";
 	// private Crud<Caixa> dao = new CrudDao<>();
 	private List<Caixa> caixaList;
 	private Caixa caixa;
@@ -165,6 +169,7 @@ public class CaixaController extends ControllerBase {
 		caixa.setUsuarioFechamento(getUsuarioLogado());
 
 		salva();
+		caixa = null;
 	}
 
 	public void abreCaixa(String saldoAbertura) throws Exception {
@@ -361,6 +366,36 @@ public class CaixaController extends ControllerBase {
 		if (caixa == null || caixa.getVendas() == null)
 			return 0;
 		return caixa.getVendas().size() - getQuantidadeVendasEstornadas();
+	}
+
+	public List<String> getTiposMeioPagamentoOutros() {
+		Crud<MeioPagamento> tipoMeioPagamentoDao = new CrudDao<>();
+		List<MeioPagamento> tipos = tipoMeioPagamentoDao.busca("meioPagamento.buscaPagamentosOutrosDistinct");
+		List<String> descricoes = new ArrayList<>();
+		for (MeioPagamento tipo : tipos) {
+			if (tipo.getDescricao() != null)
+				descricoes.add(tipo.getDescricao());
+		}
+		return descricoes;
+	}
+
+	public void geraReceitaCaixa(MeioPagamento meioPagamento, Date date) {
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy H:m:s");
+		//@formatter:off
+		TransacaoFinanceiraBuilder builder=TransacaoFinanceiraBuilder
+				.criaReceita()
+				.setMeioPagamento(meioPagamento)
+				.setCaixa(caixa)
+				.setDescricao(DESCRICAO_TRANSACAO +(caixa.getVendas().size() + 1)+" em "+ sdf.format(date));
+		//@formatter:on
+
+		float saldoFinal = caixa.getSaldoFinal() + meioPagamento.getValorPago();
+		caixa.setSaldoFinal(saldoFinal);
+
+		if (caixa.getTransacoesCaixa() == null)
+			caixa.setTransacoesCaixa(new HashSet<>());
+		caixa.getTransacoesCaixa().add(builder.getTransacaoFinanceira());
 	}
 
 }

@@ -8,6 +8,7 @@ import javax.persistence.NoResultException;
 
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
+import br.com.marcospcruz.gestorloja.facade.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
@@ -24,7 +25,14 @@ public class AppFx extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage = new LogIn();
+
 		primaryStage.show();
+	}
+
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		System.out.println("application stopped");
 	}
 
 	public static void main(String args[]) {

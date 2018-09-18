@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.com.marcospcruz.gestorloja.facade.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
 import br.com.marcospcruz.gestorloja.model.Usuario;
@@ -65,6 +66,11 @@ public class PrincipalFxGui extends StageBase {
 		btnPane.getChildren().add(manutencaoPane);
 		scene.setRoot(btnPane);
 		setScene(scene);
+		LoginFacade facade = new LoginFacade(this);
+		setOnCloseRequest(event -> {
+			facade.fechaSessaoUsuario();
+		});
+
 	}
 
 	private Node maintenancePane() {

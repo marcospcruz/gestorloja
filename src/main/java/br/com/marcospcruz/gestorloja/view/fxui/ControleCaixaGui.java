@@ -2,11 +2,12 @@ package br.com.marcospcruz.gestorloja.view.fxui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.CaixaModel;
-import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.util.Util;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +30,7 @@ public class ControleCaixaGui extends StageBase {
 			"abertura",
 			"operadorAbertura",
 			"trocoInicial",
+			"totalVendido",
 			"fechamento",
 			"operadorFechamento",
 			"trocoFinal",
@@ -42,8 +44,8 @@ public class ControleCaixaGui extends StageBase {
 		controller.buscaTodos();
 		super.setLabelColunas(COLUNAS_TABLEVIEW);
 
-//		super.width = SingletonManager.getInstance().getScreenWidth();
-//		super.height = SingletonManager.getInstance().getScreenHeight();
+		// super.width = SingletonManager.getInstance().getScreenWidth();
+		// super.height = SingletonManager.getInstance().getScreenHeight();
 
 		getvBox().setSpacing(5);
 		getvBox().setPadding(new Insets(10, 0, 0, 10));
@@ -123,6 +125,7 @@ public class ControleCaixaGui extends StageBase {
 				String dataHoraFechamento = caixa != null && caixa.getDataFechamento() != null
 						? Util.formataDataHora(caixa.getDataFechamento())
 						: "";
+				String totalVendido = Util.formataMoeda(sumarizaVendasCaixa(caixa.getVendas()));
 				String trocoFinal = Util.formataMoeda(caixa != null ? caixa.getSaldoFinal() : 0f);
 				String status = caixa != null && caixa.getDataFechamento() == null ? "Aberto" : "Fechado";
 				String operadorFechamento = caixa != null && caixa.getUsuarioFechamento() != null
@@ -132,7 +135,9 @@ public class ControleCaixaGui extends StageBase {
 				caixas.add(new CaixaModel(Util.formataDataHora(caixa.getDataAbertura()),
 						usuarioAbertura,
 						trocoInicial,
-						dataHoraFechamento,operadorFechamento,
+						totalVendido,
+						dataHoraFechamento,
+						operadorFechamento,
 						trocoFinal,
 						status
 						));
@@ -143,6 +148,15 @@ public class ControleCaixaGui extends StageBase {
 		});
 		ObservableList<CaixaModel> dados = FXCollections.observableArrayList(caixas);
 		table.setItems(dados);
+	}
+
+	private Float sumarizaVendasCaixa(Set<Venda> vendas) {
+		float totalVendas = 0;
+		for (Venda venda : vendas) {
+			totalVendas += venda.getTotalVendido();
+		}
+
+		return totalVendas;
 	}
 
 	@Override
