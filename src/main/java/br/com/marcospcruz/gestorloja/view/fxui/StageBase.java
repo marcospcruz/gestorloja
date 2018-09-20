@@ -381,7 +381,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	}
 
 	public void showErrorMessage(String message) {
-		showMessage(message, AlertType.ERROR, "Erro");
+		showErrorMessage("Erro", message);
 
 	}
 
@@ -538,6 +538,11 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	protected Label criaLabelNormal(String string) {
 		return criaLabel(string, false);
+	}
+
+	public void showErrorMessage(String string, String message) {
+		showMessage(message, AlertType.ERROR, string);
+
 	}
 
 }

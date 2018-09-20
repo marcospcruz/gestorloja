@@ -4,27 +4,21 @@ import br.com.marcospcruz.gestorloja.controller.OperacaoEnum;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.TransacaoFinanceira;
+import br.com.marcospcruz.gestorloja.util.Util;
 
 public class TransacaoFinanceiraBuilder {
 	private static TransacaoFinanceiraBuilder instance;
-	private static TransacaoFinanceira transacao;
-
-	private static TransacaoFinanceiraBuilder getInstance() {
-		if (instance == null) {
-			instance = new TransacaoFinanceiraBuilder();
-			instance.criaTransacao();
-		}
-		return instance;
-
-	}
+	private TransacaoFinanceira transacao;
 
 	public void criaTransacao() {
-		transacao = new TransacaoFinanceira();
+		if (transacao == null)
+			transacao = new TransacaoFinanceira();
 
 	}
 
 	public TransacaoFinanceiraBuilder setMeioPagamento(MeioPagamento meioPagamento) {
 		transacao.setMeioPagamento(meioPagamento);
+		transacao.setValorTransacaoFinanceira(meioPagamento.getValorPago());
 		return this;
 	}
 
@@ -33,8 +27,10 @@ public class TransacaoFinanceiraBuilder {
 		return this;
 	}
 
-	public TransacaoFinanceiraBuilder setDescricao(String descricaoTransacao) {
-		transacao.setDescricaoTransacao(descricaoTransacao);
+	public TransacaoFinanceiraBuilder setMotivo(String motivo) throws Exception {
+		if (motivo.isEmpty())
+			throw new Exception("Informar o motivo desta transação.");
+		transacao.setMotivo(motivo);
 		return this;
 	}
 
@@ -43,21 +39,34 @@ public class TransacaoFinanceiraBuilder {
 		return transacao;
 	}
 
-	public static TransacaoFinanceiraBuilder criaTransacao(boolean isReceita) {
+	public TransacaoFinanceiraBuilder criaTransacao(boolean isReceita) {
+		criaTransacao();
 		if (isReceita)
 			return criaReceita();
 		else
 			return criaDespesa();
 	}
 
-	private static TransacaoFinanceiraBuilder criaDespesa() {
-		// TODO Auto-generated method stub
-		return null;
+	private TransacaoFinanceiraBuilder criaDespesa() {
+
+		return criaTransacao(OperacaoEnum.DESPESA);
 	}
 
-	public static TransacaoFinanceiraBuilder criaReceita() {
-		getInstance();
-		transacao.setOperacao(OperacaoEnum.RECEITA.getOperacao());
-		return instance;
+	public TransacaoFinanceiraBuilder criaReceita() {
+		criaTransacao();
+		return criaTransacao(OperacaoEnum.RECEITA);
+	}
+
+	protected TransacaoFinanceiraBuilder criaTransacao(OperacaoEnum operacao) {
+
+		transacao.setOperacao(operacao.getOperacao());
+		return this;
+	}
+
+	public TransacaoFinanceiraBuilder setValorTransacaoFinanceira(String text) throws Exception {
+		if (text.equals("0,00"))
+			throw new Exception("Valor inválido para a Transação.");
+		transacao.setValorTransacaoFinanceira(Util.parseStringDecimalToFloat(text));
+		return this;
 	}
 }

@@ -1,17 +1,14 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
 import java.text.SimpleDateFormat;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import br.com.marcospcruz.gestorloja.builder.TransacaoFinanceiraBuilder;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
+import br.com.marcospcruz.gestorloja.model.TransacaoFinanceira;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.NumberTextField;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -33,20 +30,13 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 public class OperacaoCaixaGui extends StageBase {
 
 	private static final String DATE_PATTERN = "dd/MM/yyyy";
-	private static final String DATE_TIME_PATTERN = DATE_PATTERN + " " + "H:mm:ss";
-	private static final String INTERFACE_VENDAS_CAIXA = "VendasCaixaGui";
 	private GridPane grid;
-	private Label horaAberturaLbl;
-	private Node trocoInicial;
-	private Label saldoFechamento;
-	private Label horaFechamentoLbl;
 	private TextField txtDescricao;
+	private NumberTextField txtValorTransacao;
 	private RadioButton radioReceita;
 	private RadioButton radioDespesa;
 
@@ -56,7 +46,7 @@ public class OperacaoCaixaGui extends StageBase {
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_PATTERN);
 		String parsedDate = sdf.format(SingletonManager.getInstance().getData());
 		setTitle("Caixa dia " + parsedDate);
-		super.setDimension(650, 550);
+		super.setDimension(650, 160);
 		double thisWidth = super.getWidth() - (super.getWidth() * 10 / 100);
 		setLayoutsMaxWidth(thisWidth);
 		resizableProperty().setValue(Boolean.FALSE);
@@ -87,21 +77,6 @@ public class OperacaoCaixaGui extends StageBase {
 	/**
 	 * 
 	 */
-	public void atualizaDadosCaixa() {
-		try {
-			CaixaController controller = getCaixaController();
-			Caixa caixa = (Caixa) controller.getItem();
-			saldoFechamento.setText(Util.formataMoeda(caixa.getSaldoFinal()));
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		}
-
-	}
-
-	/**
-	 * 
-	 */
 	protected Node buttonsPane() {
 		FlowPane pane = new FlowPane(Orientation.HORIZONTAL);
 		// pane.setBackground(new Background(new BackgroundFill(Color.AQUAMARINE,
@@ -115,36 +90,26 @@ public class OperacaoCaixaGui extends StageBase {
 				if (showConfirmAtionMessage("Deseja salvar esta Operação?")) {
 					salvaOperacao(arg0);
 					showMensagemSucesso("Operação registrada com sucesso.");
+					hide();
 				}
 
 			} catch (Exception e) {
-				showErrorMessage("Falha ao registrar operação.");
+				
+				super.showErrorMessage("Falha ao registrar operação.",e.getMessage());
 				e.printStackTrace();
 			} finally {
-				hide();
+
 			}
 		});
 
-		btnExcluir = new Button("Cancelar");
-
-		btnExcluir.setOnAction(this::close);
 		pane.setHgap(10);
-		Button btnFechar = new Button("Fechar Caixa");
+		Button btnFechar = new Button("Cancelar");
 		btnFechar.setOnAction(arg0 -> {
-			try {
-				fechaCaixa(arg0);
-				showMensagemSucesso("Caixa Fechado com Sucesso");
-				reloadForm();
-			} catch (Exception e1) {
-				showErrorMessage(e1.getMessage());
-				e1.printStackTrace();
-			} finally {
-				hide();
-			}
+			hide();
 		});
 		btnFechar.setDisable(controller.getItem() == null);
 
-		pane.getChildren().addAll(btnSave, btnFechar, btnExcluir);
+		pane.getChildren().addAll(btnSave, btnFechar);
 		try {
 			defineEstadoBotoes(pane.getChildren());
 		} catch (Exception e) {
@@ -192,21 +157,21 @@ public class OperacaoCaixaGui extends StageBase {
 
 	private void salvaOperacao(ActionEvent e) throws Exception {
 
-		controller.novo();
 		Caixa caixa = (Caixa) controller.getItem();
-//		TransacaoFinanceiraBuilder builder=TransacaoFinanceiraBuilder
-				
-//				.criaTransacao(radioReceita.isSelected())
-				
-		salvaDados(e);
+		//@formatter:off
+		TransacaoFinanceira transacao = new TransacaoFinanceiraBuilder()
+				.criaTransacao(radioReceita.isSelected())
+				.setCaixa(caixa)
+				.setMotivo(txtDescricao.getText())
+				.setValorTransacaoFinanceira(txtValorTransacao.getText())
+				.getTransacaoFinanceira();
+		// .criaTransacao(radioReceita.isSelected())
+		caixa.getTransacoesCaixa().add(transacao);
+		
+//		salvaDados(e);
 		// hide();
 		// reloadForm();
 
-	}
-
-	private void close(ActionEvent e) {
-		controller.novo();
-		hide();
 	}
 
 	protected void populaForm() {
@@ -228,7 +193,7 @@ public class OperacaoCaixaGui extends StageBase {
 	}
 
 	private Node criaDadosCaixa() {
-		TitledPane titledPane = new TitledPane("Dados do Caixa", new Button());
+		TitledPane titledPane = new TitledPane("Transação", new Button());
 		titledPane.setCollapsible(false);
 
 		GridPane dadosGrid = new GridPane();
@@ -245,9 +210,14 @@ public class OperacaoCaixaGui extends StageBase {
 		dadosGrid.setVgap(10);
 
 		int row = 0;
-		dadosGrid.add(criaLabelBold("Descrição:"), 0, row);
+		dadosGrid.add(criaLabelBold("Motivo:"), 0, row);
 		txtDescricao = new TextField();
 		dadosGrid.add(txtDescricao, 1, row++);
+		
+		dadosGrid.add(criaLabelBold("Valor (R$):"), 0, row);
+		txtValorTransacao = new NumberTextField(true);
+		dadosGrid.add(txtValorTransacao, 1, row++);
+		
 		dadosGrid.add(criaLabelBold("Tipo Operação:"), 0, row);
 		FlowPane flowPane = new FlowPane();
 		flowPane.setHgap(20);

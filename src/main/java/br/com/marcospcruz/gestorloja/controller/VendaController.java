@@ -422,7 +422,7 @@ public class VendaController extends ControllerBase {
 			meioPagamento.setDataPagamento(dataVenda);
 			meioPagamento.setUsuarioLogado(operador);
 			TipoMeioPagamento tipoMeioPagamento = meioPagamento.getTipoMeioPagamento();
-			tipoMeioPagamento=caixaController.buscaTipoMeioPagamento(tipoMeioPagamento);
+			tipoMeioPagamento = caixaController.buscaTipoMeioPagamento(tipoMeioPagamento);
 			meioPagamento.setTipoMeioPagamento(tipoMeioPagamento);
 			// meioPagamento = meioPagamentoDao.update(meioPagamento);
 
@@ -430,9 +430,9 @@ public class VendaController extends ControllerBase {
 			meioPagamento.setPagamento(pagamento);
 			if (meioPagamento.getIdMeioPagamento() == 0
 					&& meioPagamento.getTipoMeioPagamento().getIdTipoMeioPagamento() == 1) {
-				
-				caixaController.geraReceitaCaixa(meioPagamento,venda.getDataVenda());
-			
+
+				caixaController.geraReceitaDeVendaCaixa(meioPagamento, venda.getDataVenda());
+
 			}
 		}
 		venda.setPagamento(pagamento);

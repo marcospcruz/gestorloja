@@ -33,7 +33,7 @@ public class CaixaController extends ControllerBase {
 
 	private static final String QUERY_BUSCA_TODOS = "caixa.findAll";
 	private static final String BUSCA_CAIXA_ABERTO = "caixa.findCaixaAberto";
-	private static final String DESCRICAO_TRANSACAO = "Entrada da Venda ";
+	private static final String MOTIVO_TRANSACAO = "Entrada da Venda ";
 	// private Crud<Caixa> dao = new CrudDao<>();
 	private List<Caixa> caixaList;
 	private Caixa caixa;
@@ -97,15 +97,14 @@ public class CaixaController extends ControllerBase {
 
 			e.printStackTrace();
 		}
-
+		ajustaSaldoFinalZeroCaixa();
 		return caixa;
 	}
 
 	private void ajustaSaldoFinalZeroCaixa() {
-		if (caixa.getSaldoFinal() == 0f && caixa.getSaldoInicial() > 0f) {
-			caixa.setSaldoFinal(caixa.getSaldoInicial());
-		}
-
+		Float saldoCaixa = atualizaSaldoCaixa();
+		// saldoCaixa += atualizaSaldoCaixa();
+		caixa.setSaldoFinal(saldoCaixa);
 	}
 
 	@Override
@@ -134,7 +133,7 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public void salva() throws Exception {
-
+		caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
 		ajustaSaldoFinalZeroCaixa();
 
 		Crud<Caixa> dao = new CrudDao<>();
@@ -173,14 +172,14 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public void abreCaixa(String saldoAbertura) throws Exception {
-		caixa = new Caixa();
-		float saldoInicial = 0f;
-		if (saldoAbertura != null) {
-
-			saldoInicial = Float.parseFloat(saldoAbertura);
-		}
-		caixa.setSaldoInicial(saldoInicial);
-		caixa.setUsuarioAbertura(getUsuarioLogado());
+		// caixa = new Caixa();
+		// float saldoInicial = 0f;
+		// if (saldoAbertura != null) {
+		//
+		// saldoInicial = Float.parseFloat(saldoAbertura);
+		// }
+		// caixa.setSaldoInicial(saldoInicial);
+		// caixa.setUsuarioAbertura(getUsuarioLogado());
 
 		salva();
 
@@ -305,7 +304,7 @@ public class CaixaController extends ControllerBase {
 
 	}
 
-	public Float getTotalRecebidoCaixa() {
+	public Float getTotalPagamentosVendasRecebidoCaixa() {
 
 		float totalRecebido = 0;
 		if (caixa != null && caixa.getVendas() != null)
@@ -379,23 +378,48 @@ public class CaixaController extends ControllerBase {
 		return descricoes;
 	}
 
-	public void geraReceitaCaixa(MeioPagamento meioPagamento, Date date) {
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy H:m:s");
+	public void geraReceitaDeVendaCaixa(MeioPagamento meioPagamento, Date date) throws Exception {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy HH:mm:ss");
 		//@formatter:off
-		TransacaoFinanceiraBuilder builder=TransacaoFinanceiraBuilder
-				.criaReceita()
-				.setMeioPagamento(meioPagamento)
-				.setCaixa(caixa)
-				.setDescricao(DESCRICAO_TRANSACAO +(caixa.getVendas().size() + 1)+" em "+ sdf.format(date));
+		TransacaoFinanceiraBuilder builder=new TransacaoFinanceiraBuilder();
+		builder.criaReceita()
+		.setMeioPagamento(meioPagamento)
+		.setCaixa(caixa)
+		.setMotivo(MOTIVO_TRANSACAO +(caixa.getVendas().size() + 1)+" em "+ sdf.format(date));
 		//@formatter:on
 
-		float saldoFinal = caixa.getSaldoFinal() + meioPagamento.getValorPago();
-		caixa.setSaldoFinal(saldoFinal);
-
-		if (caixa.getTransacoesCaixa() == null)
-			caixa.setTransacoesCaixa(new HashSet<>());
 		caixa.getTransacoesCaixa().add(builder.getTransacaoFinanceira());
+		float saldoCaixa=atualizaSaldoCaixa();
+		caixa.setSaldoFinal(saldoCaixa);
+	}
+
+	public float atualizaSaldoCaixa() {
+		float saldoCaixa = 0f;
+
+		for (TransacaoFinanceira transacaoFinanceira : caixa.getTransacoesCaixa()) {
+
+			if (transacaoFinanceira.getOperacao().getIdOperacao() == 1) {
+				saldoCaixa += transacaoFinanceira.getValorTransacaoFinanceira();
+			} else {
+				saldoCaixa -= transacaoFinanceira.getValorTransacaoFinanceira();
+			}
+		}
+		return saldoCaixa;
+	}
+
+	public Float getTotalTransacoesCaixa(int idOperacao) {
+		float totalReceitas = 0;
+		//@formatter:off
+		Set<TransacaoFinanceira> transacoes = caixa.getTransacoesCaixa()
+				.stream()
+				.filter(tf->tf.getOperacao().getIdOperacao()==idOperacao)
+				.collect(Collectors.toSet());
+		//@formatter:on
+		for (TransacaoFinanceira tf : transacoes) {
+			totalReceitas += tf.getValorTransacaoFinanceira();
+		}
+		return totalReceitas;
 	}
 
 }

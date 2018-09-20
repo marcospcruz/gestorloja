@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -128,6 +129,8 @@ public class Caixa extends AbstractModel {
 	}
 
 	public Set<TransacaoFinanceira> getTransacoesCaixa() {
+		if (transacoesCaixa == null)
+			transacoesCaixa = new HashSet<>();
 		return transacoesCaixa;
 	}
 

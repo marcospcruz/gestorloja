@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -9,7 +10,6 @@ import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
-import br.com.marcospcruz.gestorloja.view.fxui.custom.NumberTextField;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -40,7 +40,7 @@ public class CaixaGui extends StageBase {
 	private static final String INTERFACE_VENDAS_CAIXA = "VendasCaixaGui";
 	private GridPane grid;
 	private Label horaAberturaLbl;
-	private Node trocoInicial;
+	private Label trocoInicial;
 	private Label saldoFechamento;
 	private Label horaFechamentoLbl;
 
@@ -50,7 +50,7 @@ public class CaixaGui extends StageBase {
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_PATTERN);
 		String parsedDate = sdf.format(SingletonManager.getInstance().getData());
 		setTitle("Caixa dia " + parsedDate);
-		super.setDimension(650, 550);
+		super.setDimension(650, 600);
 		double thisWidth = super.getWidth() - (super.getWidth() * 10 / 100);
 		setLayoutsMaxWidth(thisWidth);
 		resizableProperty().setValue(Boolean.FALSE);
@@ -111,7 +111,7 @@ public class CaixaGui extends StageBase {
 		for (String key : subTotaisMap.keySet()) {
 			Label descricao = criaLabelBold(key);
 			grid.add(descricao, 0, rowIndex);
-			Label valor = new Label(Util.formataMoeda(subTotaisMap.get(key)));
+			Label valor = criaLabelNormal(Util.formataMoeda(subTotaisMap.get(key)));
 			grid.add(valor, 1, rowIndex++);
 		}
 		titledPane.setContent(grid);
@@ -135,23 +135,23 @@ public class CaixaGui extends StageBase {
 		Label qtVendasEfetuadasLbl = criaLabelBold("Qt. Vendas Efetivadas:");
 		int qtVendas = controller.getQuantidadeVendasEfetivadas();
 		subTotalGrid.add(qtVendasEfetuadasLbl, column++, row);
-		subTotalGrid.add(new Label(Integer.toString(qtVendas)), column--, row++);
+		subTotalGrid.add(criaLabelNormal(Integer.toString(qtVendas)), column--, row++);
 		Label qtVendasEstornadasLbl = criaLabelBold("Qt. Vendas Estornadas:");
 		int qtVendasEstornadas = controller.getQuantidadeVendasEstornadas();
 		subTotalGrid.add(qtVendasEstornadasLbl, column++, row);
-		subTotalGrid.add(new Label(Integer.toString(qtVendasEstornadas)), column--, row++);
+		subTotalGrid.add(criaLabelNormal(Integer.toString(qtVendasEstornadas)), column--, row++);
 		Label totalVendidoLbl = criaLabelBold("Total Vendido:");
 		subTotalGrid.add(totalVendidoLbl, column++, row);
 		String totalVendido = Util.formataMoeda(controller.getSubTotalVendas());
-		subTotalGrid.add(new Label(totalVendido), column--, row++);
-		String totalRecebido = Util.formataMoeda(controller.getTotalRecebidoCaixa());
+		subTotalGrid.add(criaLabelNormal(totalVendido), column--, row++);
+		String totalRecebido = Util.formataMoeda(controller.getTotalPagamentosVendasRecebidoCaixa());
 		// String totalRecebido=
 		subTotalGrid.add(criaLabelBold("Total Pagamentos:"), column++, row);
-		subTotalGrid.add(new Label(totalRecebido), column--, row++);
+		subTotalGrid.add(criaLabelNormal(totalRecebido), column--, row++);
 		//
 		subTotalGrid.add(criaLabelBold("Diferença (Venda - Pagamentos):"), column++, row);
-		float diferenca = controller.getSubTotalVendas() - controller.getTotalRecebidoCaixa();
-		subTotalGrid.add(new Label(Util.formataMoeda(diferenca)), column--, row++);
+		float diferenca = controller.getSubTotalVendas() - controller.getTotalPagamentosVendasRecebidoCaixa();
+		subTotalGrid.add(criaLabelNormal(Util.formataMoeda(diferenca)), column--, row++);
 		Caixa caixa = (Caixa) controller.getItem();
 		Button button = new Button("Visualizar Vendas");
 		button.setDisable(caixa.getVendas() == null || caixa.getVendas().isEmpty());
@@ -174,6 +174,7 @@ public class CaixaGui extends StageBase {
 			stage.showAndWait();
 			ObservableList<Node> children = grid.getChildren();
 			children.removeAll(children);
+
 			populaGridContent();
 		} catch (Exception e) {
 
@@ -230,10 +231,18 @@ public class CaixaGui extends StageBase {
 		btnExcluir.setOnAction(this::close);
 		pane.setHgap(10);
 		Button btnFechar = new Button("Fechar Caixa");
+		try {
+			CaixaController controller = getCaixaController();
+			boolean caixaFechado = ((Caixa) controller.getItem()).getDataFechamento() != null;
+			btnFechar.setDisable(caixaFechado);
+		} catch (Exception e) {
+			e.getLocalizedMessage();
+		}
+
 		btnFechar.setOnAction(arg0 -> {
 			try {
 				fechaCaixa(arg0);
-				showMensagemSucesso("Caixa Fechado com Sucesso");
+
 				reloadForm();
 			} catch (Exception e1) {
 				showErrorMessage(e1.getMessage());
@@ -242,7 +251,6 @@ public class CaixaGui extends StageBase {
 				hide();
 			}
 		});
-		btnFechar.setDisable(controller.getItem() == null);
 
 		pane.getChildren().addAll(btnSave, btnFechar, btnExcluir);
 		try {
@@ -273,8 +281,11 @@ public class CaixaGui extends StageBase {
 			} else {
 				if (button.getText().contains("Abre"))
 					button.setDisable(true);
-				if (button.getText().contains("Fecha"))
-					button.setDisable(false);
+				if (button.getText().contains("Fecha")) {
+					boolean desativa=false;
+					if(caixa.getDataFechamento()!=null)
+						desativa=true;
+					button.setDisable(desativa);}
 			}
 		}
 
@@ -286,17 +297,18 @@ public class CaixaGui extends StageBase {
 			// Caixa caixa = (Caixa) controller.getItem();
 			// caixa.setDataFechamento(Util.parseData(horaFechamentoLbl.getText()));
 			controller.fechaCaixa();
+			showMensagemSucesso("Caixa Fechado com Sucesso");
 
 		}
 	}
 
 	private void abreCaixa(ActionEvent e) throws Exception {
 
-		controller.novo();
+		// controller.novo();
 		Caixa caixa = (Caixa) controller.getItem();
-		caixa.setDataAbertura(SingletonManager.getInstance().getData());
-		caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
-		caixa.setSaldoInicial(Util.parseStringDecimalToFloat(((TextField) trocoInicial).getText()));
+		// caixa.setDataAbertura(SingletonManager.getInstance().getData());
+		// caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
+		// caixa.setSaldoInicial(Util.parseStringDecimalToFloat(trocoInicial.getText()));
 
 		salvaDados(e);
 		// hide();
@@ -327,7 +339,8 @@ public class CaixaGui extends StageBase {
 		grid.add(buttonsPane(), 0, 2);
 	}
 
-	private Node criaDadosCaixa() {
+	private Node criaDadosCaixa() throws Exception {
+		CaixaController controller = getCaixaController();
 		TitledPane titledPane = new TitledPane("Dados do Caixa", new Button());
 		titledPane.setCollapsible(false);
 
@@ -345,25 +358,43 @@ public class CaixaGui extends StageBase {
 		dadosGrid.setVgap(10);
 
 		int row = 0;
+
 		Caixa caixa = (Caixa) controller.getItem();
 		dadosGrid.add(criaLabelBold("Data Hora Abertura Caixa:"), 0, row);
-		horaAberturaLbl = new Label();
+		horaAberturaLbl = criaLabelNormal("");
 		dadosGrid.add(horaAberturaLbl, 1, row++);
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 
 			@Override
 			public void run() {
-				SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_PATTERN);
+				Platform.runLater(() -> {
+					SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_PATTERN);
+					String dataAbertura = sdf.format(caixa.getDataAbertura());
+					// preencheData(caixa, caixa.getDataAbertura());
+					String dataFechamento = preencheData(caixa, caixa.getDataFechamento());
+
+					horaAberturaLbl.setText(dataAbertura);
+
+					horaFechamentoLbl.setText(dataFechamento);
+				});
+				// horaAberturaLbl.setText(dataAbertura);
+				// horaFechamentoLbl.setText(dataFechamento);
+			}
+
+			protected String preencheData(Caixa caixa, Date data) {
+
 				String formattedDate;
-				if (caixa.getIdCaixa() == 0) {
+				SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_PATTERN);
+				if (caixa.getIdCaixa() == 0 || data == null) {
 
 					formattedDate = sdf.format(SingletonManager.getInstance().getData());
 
 				} else {
-					formattedDate = sdf.format(caixa.getDataAbertura());
+
+					formattedDate = sdf.format(data);
 				}
-				Platform.runLater(() -> horaAberturaLbl.setText(formattedDate));
+				return formattedDate;
 			}
 		}, 0, 1000);
 		dadosGrid.add(criaLabelBold("Operador Abertura:"), 0, row);
@@ -374,39 +405,35 @@ public class CaixaGui extends StageBase {
 			nomeOperador = SingletonManager.getInstance().getUsuarioLogado().getNomeCompleto();
 		dadosGrid.add(criaLabelNormal(nomeOperador), 1, row++);
 		dadosGrid.add(criaLabelBold("Saldo Abertura:"), 0, row);
-
+		trocoInicial = criaLabelNormal("");
 		if (caixa != null) {
 			boolean caixaJaAberto = caixa.getSaldoInicial() > 0f;
-			if (caixaJaAberto)
-				trocoInicial = criaLabelNormal("");
-			else
-				trocoInicial = new NumberTextField(true);
-			String valorTroco = Util.formataStringDecimaisVirgula(caixa.getSaldoInicial());
-			defineNode(trocoInicial, valorTroco);
+			String valorTroco = Util.formataStringDecimaisVirgula(!caixaJaAberto ? 0f : caixa.getSaldoInicial());
+			trocoInicial.setText(valorTroco);
 
 		}
 		dadosGrid.add(trocoInicial, 1, row++);
 		dadosGrid.add(criaLabelBold("Data Hora Fechamento:"), 0, row);
-		horaFechamentoLbl = new Label();
+		horaFechamentoLbl = criaLabelNormal("");
 		dadosGrid.add(horaFechamentoLbl, 1, row++);
 		//
-		Timer timer2 = new Timer();
-		timer2.scheduleAtFixedRate(new TimerTask() {
-
-			@Override
-			public void run() {
-				SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_PATTERN);
-				String formattedDate;
-				if (caixa.getIdCaixa() != 0) {
-
-					formattedDate = sdf.format(SingletonManager.getInstance().getData());
-
-				} else {
-					formattedDate = "";
-				}
-				Platform.runLater(() -> horaFechamentoLbl.setText(formattedDate));
-			}
-		}, 0, 1000);
+		// Timer timer2 = new Timer();
+		// timer2.scheduleAtFixedRate(new TimerTask() {
+		//
+		// @Override
+		// public void run() {
+		// SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_PATTERN);
+		// String formattedDate;
+		//// if (caixa.getIdCaixa() != 0) {
+		//
+		// formattedDate = sdf.format(SingletonManager.getInstance().getData());
+		//
+		//// } else {
+		//// formattedDate = "";
+		//// }
+		// Platform.runLater(() -> horaFechamentoLbl.setText(formattedDate));
+		// }
+		// }, 0, 1000);
 		//
 		dadosGrid.add(criaLabelBold("Operador Fechamento:"), 0, row);
 		Label usuarioFechamento = criaLabelNormal("");
@@ -415,27 +442,35 @@ public class CaixaGui extends StageBase {
 		dadosGrid.add(usuarioFechamento, 1, row++);
 		dadosGrid.add(criaLabelBold("Saldo Fechamento:"), 0, row);
 		saldoFechamento = criaLabelNormal("");
-		if (caixa != null && caixa.getIdCaixa() != 0) {
+		if (caixa != null
+		// && caixa.getIdCaixa() != 0
+		) {
 			saldoFechamento.setText(Util.formataMoeda(caixa.getSaldoFinal()));
 
 		}
-		dadosGrid.add(saldoFechamento, 1, row);
+		dadosGrid.add(saldoFechamento, 1, row++);
+		dadosGrid.add(criaLabelBold("Total Receita:"), 0, row);
+		dadosGrid.add(criaLabelNormal(Util.formataMoeda(controller.getTotalTransacoesCaixa(1))), 1, row++);
+		dadosGrid.add(criaLabelBold("Total Despesa:"), 0, row);
+		dadosGrid.add(criaLabelNormal(Util.formataMoeda(controller.getTotalTransacoesCaixa(2))), 1, row++);
+
 		Button button = new Button("Adicionar Entrada / Saída");
 		button.setOnAction(evt -> {
 			abrirInterface("OperacaoCaixaGui");
+			try {
+
+				controller.atualizaSaldoCaixa();
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			} finally {
+
+			}
 		});
 		dadosGrid.add(button, 0, ++row, 2, 1);
 		titledPane.setContent(dadosGrid);
 		return titledPane;
-	}
-
-	private void defineNode(Node trocoInicial, String valorTroco) {
-		if (trocoInicial instanceof Label) {
-
-			((Label) trocoInicial).setText(Util.formataMoeda(Util.parseStringDecimalToFloat(valorTroco)));
-		} else
-			((TextField) trocoInicial).setText(valorTroco);
-
 	}
 
 	@Override

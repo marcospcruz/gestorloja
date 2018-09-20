@@ -110,7 +110,7 @@ public class MeioPagamento implements Serializable {
 		result = prime * result + ((dataPagamento == null) ? 0 : dataPagamento.hashCode());
 		result = prime * result + ((descricao == null) ? 0 : descricao.hashCode());
 		result = prime * result + idMeioPagamento;
-		result = prime * result + ((pagamento == null) ? 0 : pagamento.hashCode());
+//		result = prime * result + ((pagamento == null) ? 0 : pagamento.hashCode());
 		result = prime * result + parcelas;
 		result = prime * result + ((tipoMeioPagamento == null) ? 0 : tipoMeioPagamento.hashCode());
 		result = prime * result + ((usuarioLogado == null) ? 0 : usuarioLogado.hashCode());

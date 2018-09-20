@@ -91,9 +91,16 @@ public class ControleCaixaGui extends StageBase {
 
 	protected void openCaixaGui() throws Exception {
 		((CaixaController) controller).validateCaixaAberto();
-		controller.novo();
-		abreTelaCadastro();
-		reloadForm();
+		try {
+			controller.novo();
+			abreTelaCadastro();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		} finally {
+			reloadForm();
+		}
 	}
 
 	protected void abreTelaCadastro() throws Exception {
@@ -148,6 +155,7 @@ public class ControleCaixaGui extends StageBase {
 		});
 		ObservableList<CaixaModel> dados = FXCollections.observableArrayList(caixas);
 		table.setItems(dados);
+		System.out.println("Desativar ou ativar botão");
 	}
 
 	private Float sumarizaVendasCaixa(Set<Venda> vendas) {
