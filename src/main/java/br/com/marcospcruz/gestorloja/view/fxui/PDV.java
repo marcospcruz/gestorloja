@@ -96,6 +96,7 @@ public class PDV extends StageBase {
 	private boolean naoAtualizaDesconto;
 	private boolean novaVenda;
 	private Label subTotalRecebido;
+	private boolean editaVenda;
 
 	public PDV() throws Exception {
 		this(false);
@@ -114,9 +115,11 @@ public class PDV extends StageBase {
 
 	public PDV(boolean editaVenda) throws Exception {
 		super();
+		this.editaVenda = editaVenda;
 		setOnCloseRequest(event -> {
 			try {
-				limpaFormularioPdv();
+				if (!editaVenda)
+					limpaFormularioPdv();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -645,6 +648,8 @@ public class PDV extends StageBase {
 	}
 
 	protected void calculaDesconto(String valorDesconto) {
+		if (editaVenda)
+			return;
 		VendaController controller;
 		try {
 			float desconto = Float.parseFloat(!valorDesconto.isEmpty() ? valorDesconto.replace(',', '.') : "0");
@@ -1022,7 +1027,7 @@ public class PDV extends StageBase {
 	protected void atualizaSubTotal(VendaController controller) {
 		float subTotal = controller.getVenda().getTotalVendido();
 		subTotalTxt.setText(Util.formataStringDecimaisVirgula(subTotal));
-
+		
 		float valorBrutoVenda = controller.getValorBrutoVenda();
 		valorVendaLabel.setText(Util.formataMoeda(valorBrutoVenda));
 	}

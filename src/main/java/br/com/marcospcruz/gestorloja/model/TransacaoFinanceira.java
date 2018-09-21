@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,7 +28,7 @@ public class TransacaoFinanceira implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idCaixa")
 	private Caixa caixa;
-	@OneToOne
+	@OneToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "idMeioPagamento")
 	private MeioPagamento meioPagamento;
 	@ManyToOne

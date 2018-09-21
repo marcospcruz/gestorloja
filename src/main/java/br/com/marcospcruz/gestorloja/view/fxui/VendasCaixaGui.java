@@ -113,7 +113,7 @@ public class VendasCaixaGui extends StageBase {
 	}
 
 	@Override
-	protected void carregaDadosTable(TableView table) throws Exception {
+	protected void carregaDadosTable(@SuppressWarnings("rawtypes") TableView table) throws Exception {
 		List<VendaModel> dadoss = new ArrayList<>();
 		Caixa caixa = (Caixa) controller.getItem();
 		VendaController controller = getVendaController();

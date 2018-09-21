@@ -97,14 +97,9 @@ public class CaixaController extends ControllerBase {
 
 			e.printStackTrace();
 		}
-		ajustaSaldoFinalZeroCaixa();
+		// ajustaSaldoFinalZeroCaixa();
+		// caixa.setSaldoFinal(atualizaSaldoCaixa());
 		return caixa;
-	}
-
-	private void ajustaSaldoFinalZeroCaixa() {
-		Float saldoCaixa = atualizaSaldoCaixa();
-		// saldoCaixa += atualizaSaldoCaixa();
-		caixa.setSaldoFinal(saldoCaixa);
 	}
 
 	@Override
@@ -134,8 +129,7 @@ public class CaixaController extends ControllerBase {
 	@Override
 	public void salva() throws Exception {
 		caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
-		ajustaSaldoFinalZeroCaixa();
-
+		// atualizaSaldoCaixa();
 		Crud<Caixa> dao = new CrudDao<>();
 		caixa = dao.update(caixa);
 
@@ -300,8 +294,13 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public void novo() {
+		buscaUltimoCaixa();
+		float saldoInicial = 0;
+		if (caixa != null)
+			saldoInicial = caixa.getSaldoFinal();
 		caixa = new Caixa();
-
+		caixa.setSaldoInicial(saldoInicial);
+		caixa.setSaldoFinal(saldoInicial);
 	}
 
 	public Float getTotalPagamentosVendasRecebidoCaixa() {
@@ -383,19 +382,21 @@ public class CaixaController extends ControllerBase {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy HH:mm:ss");
 		//@formatter:off
 		TransacaoFinanceiraBuilder builder=new TransacaoFinanceiraBuilder();
-		builder.criaReceita()
+		TransacaoFinanceira tf=builder.criaReceita()
 		.setMeioPagamento(meioPagamento)
 		.setCaixa(caixa)
-		.setMotivo(MOTIVO_TRANSACAO +(caixa.getVendas().size() + 1)+" em "+ sdf.format(date));
-		//@formatter:on
+		.setMotivo(MOTIVO_TRANSACAO +(caixa.getVendas().size() + 1)+" em "+ sdf.format(date))
+		.getTransacaoFinanceira();
 
-		caixa.getTransacoesCaixa().add(builder.getTransacaoFinanceira());
-		float saldoCaixa=atualizaSaldoCaixa();
-		caixa.setSaldoFinal(saldoCaixa);
+		//@formatter:on
+		meioPagamento.setTransacaoFinanceira(tf);
+		caixa.getTransacoesCaixa().add(tf);
+		atualizaSaldoCaixa();
+
 	}
 
-	public float atualizaSaldoCaixa() {
-		float saldoCaixa = 0f;
+	public void atualizaSaldoCaixa() {
+		float saldoCaixa = caixa.getSaldoFinal();
 
 		for (TransacaoFinanceira transacaoFinanceira : caixa.getTransacoesCaixa()) {
 
@@ -405,7 +406,7 @@ public class CaixaController extends ControllerBase {
 				saldoCaixa -= transacaoFinanceira.getValorTransacaoFinanceira();
 			}
 		}
-		return saldoCaixa;
+		caixa.setSaldoFinal(saldoCaixa);
 	}
 
 	public Float getTotalTransacoesCaixa(int idOperacao) {
@@ -420,6 +421,19 @@ public class CaixaController extends ControllerBase {
 			totalReceitas += tf.getValorTransacaoFinanceira();
 		}
 		return totalReceitas;
+	}
+
+	public void adicionaTransacao(TransacaoFinanceira transacao) {
+		caixa.getTransacoesCaixa().add(transacao);
+		atualizaSaldoCaixa();
+
+	}
+
+	public void buscaUltimoCaixa() {
+		buscaTodos();
+		if (!caixaList.isEmpty())
+			caixa = caixaList.get(caixaList.size() - 1);
+
 	}
 
 }

@@ -37,6 +37,7 @@ public class ControleCaixaGui extends StageBase {
 			"status"
 	};
 	private TitledPane tablePane;
+	private Button button;
 	//@formatter:on
 	public ControleCaixaGui() throws Exception {
 		super();
@@ -53,9 +54,9 @@ public class ControleCaixaGui extends StageBase {
 		double layoutsMaxWidth = scene.widthProperty().get();
 
 		super.setLayoutsMaxWidth(layoutsMaxWidth);
-
-		tablePane = super.criaTablePane("Caixa Diário");
 		TitledPane buttonPane = criaButtonPane();
+		tablePane = super.criaTablePane("Caixa Diário");
+
 		getvBox().getChildren().addAll(buttonPane, tablePane);
 		((Group) scene.getRoot()).getChildren().add(getvBox());
 		setScene(scene);
@@ -65,7 +66,7 @@ public class ControleCaixaGui extends StageBase {
 		TitledPane titledPane = new TitledPane("", new Button());
 		titledPane.setCollapsible(false);
 		FlowPane content = new FlowPane(Orientation.HORIZONTAL);
-		Button button = new Button("Abrir Caixa");
+		button = new Button("Abrir Caixa");
 		button.setOnAction(this::handle);
 
 		CaixaController controller = getCaixaController();
@@ -82,6 +83,7 @@ public class ControleCaixaGui extends StageBase {
 	@Override
 	public void handle(ActionEvent arg0) {
 		try {
+
 			openCaixaGui();
 		} catch (Exception e) {
 			showErrorMessage(e.getMessage());
@@ -92,6 +94,7 @@ public class ControleCaixaGui extends StageBase {
 	protected void openCaixaGui() throws Exception {
 		((CaixaController) controller).validateCaixaAberto();
 		try {
+
 			controller.novo();
 			abreTelaCadastro();
 
@@ -123,9 +126,10 @@ public class ControleCaixaGui extends StageBase {
 		List<CaixaModel> caixas = new ArrayList<>();
 		if (controller.getList().isEmpty())
 			controller.buscaTodos();
-
-		controller.getList().stream().forEach(item -> {
+		boolean ativaBotaoAbrir = false;
+		for (Object item : controller.getList()) {
 			Caixa caixa = (Caixa) item;
+			ativaBotaoAbrir = caixa.getDataFechamento() == null;
 			try {
 				String usuarioAbertura = caixa != null ? caixa.getUsuarioAbertura().getNomeCompleto() : "";
 				String trocoInicial = Util.formataMoeda(caixa != null ? caixa.getSaldoInicial() : 0f);
@@ -152,10 +156,10 @@ public class ControleCaixaGui extends StageBase {
 			} catch (NullPointerException e) {
 				e.printStackTrace();
 			}
-		});
+		}
 		ObservableList<CaixaModel> dados = FXCollections.observableArrayList(caixas);
 		table.setItems(dados);
-		System.out.println("Desativar ou ativar botão");
+		button.setDisable(ativaBotaoAbrir);
 	}
 
 	private Float sumarizaVendasCaixa(Set<Venda> vendas) {
@@ -194,6 +198,8 @@ public class ControleCaixaGui extends StageBase {
 	protected void handleTableClick(Event event) {
 		super.handleTableClick(event);
 		try {
+			CaixaController controller = getCaixaController();
+
 			abreTelaCadastro();
 			reloadForm();
 		} catch (Exception e) {

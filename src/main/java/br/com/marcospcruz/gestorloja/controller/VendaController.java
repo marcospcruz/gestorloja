@@ -368,6 +368,7 @@ public class VendaController extends ControllerBase {
 		recebePagamento();
 		if (venda.getIdVenda() == 0)
 			for (ItemVenda itemVenda : venda.getItensVenda()) {
+				itemVenda.setOperador(getUsuarioLogado());
 				ItemEstoque novoItemEstoque = new ItemEstoque();
 				ItemEstoque itemEstoque = itemVenda.getItemEstoque();
 				novoItemEstoque.setIdItemEstoque(itemEstoque.getIdItemEstoque());
@@ -395,7 +396,7 @@ public class VendaController extends ControllerBase {
 	public void salva() {
 		Crud<Venda> vendaDao = new CrudDao<>();
 		venda = vendaDao.update(venda);
-		venda.getPagamento().setVenda(venda);
+		// venda.getPagamento().setVenda(venda);
 		// caixaController.atualizaPagamento(venda.getPagamento());
 	}
 

@@ -31,7 +31,8 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 		@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c "
 				+ "LEFT JOIN fetch c.vendas v "
 				+ "LEFT JOIN c.transacoesCaixa t "
-				+ "LEFT JOIN fetch v.pagamento p") })
+				+ "LEFT JOIN fetch v.pagamento p "
+				+ "ORDER BY c.dataAbertura desc") })
 //@formatter:on
 public class Caixa extends AbstractModel {
 	/**

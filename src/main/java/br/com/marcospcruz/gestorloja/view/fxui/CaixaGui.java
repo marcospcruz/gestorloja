@@ -455,6 +455,8 @@ public class CaixaGui extends StageBase {
 		dadosGrid.add(criaLabelNormal(Util.formataMoeda(controller.getTotalTransacoesCaixa(2))), 1, row++);
 
 		Button button = new Button("Adicionar Entrada / Saída");
+		boolean desativaButton=((Caixa)controller.getItem()).getDataFechamento()!=null;
+		button.setDisable(desativaButton);
 		button.setOnAction(evt -> {
 			abrirInterface("OperacaoCaixaGui");
 			try {

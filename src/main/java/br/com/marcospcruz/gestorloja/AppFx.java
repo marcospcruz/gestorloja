@@ -33,6 +33,7 @@ public class AppFx extends Application {
 	public void stop() throws Exception {
 		super.stop();
 		System.out.println("application stopped");
+		System.exit(0);
 	}
 
 	public static void main(String args[]) {

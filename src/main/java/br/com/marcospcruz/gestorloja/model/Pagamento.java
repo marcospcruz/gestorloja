@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
@@ -29,7 +30,7 @@ public class Pagamento implements Serializable {
 	private List<MeioPagamento> meiosPagamento;
 	private float valorPagamento;
 	private float trocoPagamento;
-	@ManyToOne
+	@OneToOne
 	@JoinColumn(name = "idVenda")
 	private Venda venda;
 
@@ -162,8 +163,8 @@ public class Pagamento implements Serializable {
 	}
 
 	public void setEstornado(boolean estornado) {
-		this.estornado=estornado;
-		
+		this.estornado = estornado;
+
 	}
 
 	public boolean isEstornado() {

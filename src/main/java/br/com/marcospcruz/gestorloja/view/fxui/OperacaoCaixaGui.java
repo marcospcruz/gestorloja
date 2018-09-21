@@ -166,7 +166,7 @@ public class OperacaoCaixaGui extends StageBase {
 				.setValorTransacaoFinanceira(txtValorTransacao.getText())
 				.getTransacaoFinanceira();
 		// .criaTransacao(radioReceita.isSelected())
-		caixa.getTransacoesCaixa().add(transacao);
+		((CaixaController)controller).adicionaTransacao(transacao);
 		
 //		salvaDados(e);
 		// hide();

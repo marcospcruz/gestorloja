@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -41,10 +42,12 @@ public class Venda implements Serializable {
 	private List<ItemVenda> itensVenda;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataVenda;
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.REMOVE })
+	@OneToOne(cascade = CascadeType.ALL)
+	// (cascade = { CascadeType.ALL})
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
+	// (cascade = CascadeType.ALL)
 	@JoinColumn(name = "idCaixa")
 	private Caixa caixa;
 	@ManyToOne(fetch = FetchType.LAZY)
