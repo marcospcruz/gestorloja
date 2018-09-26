@@ -23,7 +23,7 @@ public class TransacaoFinanceira implements Serializable {
 	 */
 	private static final long serialVersionUID = 6962908827365885221L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idTransacaoFinanceira;
 	@ManyToOne
 	@JoinColumn(name = "idCaixa")

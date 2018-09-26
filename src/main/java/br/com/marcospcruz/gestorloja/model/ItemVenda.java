@@ -22,7 +22,7 @@ public class ItemVenda implements Serializable {
 	 */
 	private static final long serialVersionUID = 7647914068901369106L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idItemVenda;
 	@ManyToOne
 	@JoinColumn(name = "idItemEstoque")

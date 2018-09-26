@@ -25,7 +25,7 @@ public class TipoMeioPagamento implements Serializable {
 	 */
 	private static final long serialVersionUID = 2192695069124255212L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idTipoMeioPagamento;
 	private String descricaoTipoMeioPagamento;
 

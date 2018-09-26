@@ -179,10 +179,11 @@ public class CaixaGui extends StageBase {
 		} catch (Exception e) {
 
 			e.printStackTrace();
-		} finally {
-			atualizaDadosCaixa();
-
 		}
+		// finally {
+		// atualizaDadosCaixa();
+		//
+		// }
 	}
 
 	/**
@@ -282,10 +283,11 @@ public class CaixaGui extends StageBase {
 				if (button.getText().contains("Abre"))
 					button.setDisable(true);
 				if (button.getText().contains("Fecha")) {
-					boolean desativa=false;
-					if(caixa.getDataFechamento()!=null)
-						desativa=true;
-					button.setDisable(desativa);}
+					boolean desativa = false;
+					if (caixa.getDataFechamento() != null)
+						desativa = true;
+					button.setDisable(desativa);
+				}
 			}
 		}
 
@@ -310,7 +312,7 @@ public class CaixaGui extends StageBase {
 		// caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
 		// caixa.setSaldoInicial(Util.parseStringDecimalToFloat(trocoInicial.getText()));
 
-		salvaDados(e);
+		 salvaDados(e);
 		// hide();
 		// reloadForm();
 
@@ -455,13 +457,13 @@ public class CaixaGui extends StageBase {
 		dadosGrid.add(criaLabelNormal(Util.formataMoeda(controller.getTotalTransacoesCaixa(2))), 1, row++);
 
 		Button button = new Button("Adicionar Entrada / Saída");
-		boolean desativaButton=((Caixa)controller.getItem()).getDataFechamento()!=null;
+		boolean desativaButton = ((Caixa) controller.getItem()).getDataFechamento() != null;
 		button.setDisable(desativaButton);
 		button.setOnAction(evt -> {
 			abrirInterface("OperacaoCaixaGui");
 			try {
 
-				controller.atualizaSaldoCaixa();
+//				controller.atualizaSaldoCaixa();
 
 			} catch (Exception e) {
 

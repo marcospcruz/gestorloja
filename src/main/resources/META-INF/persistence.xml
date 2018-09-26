@@ -20,7 +20,8 @@
 			
 			<!-- <property name="javax.persistence.jdbc.url" value="jdbc:mysql://dlink-bc19e7:3306/loja?useSSL=false" /> -->
 			<!--property name="javax.persistence.jdbc.url" value="jdbc:mysql://dlink-bc19e7:3306/loja?useSSL=false&amp;autoReconnect=true" /-->
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://dlink-bc19e7:3306/loja" />
+			<!--property name="javax.persistence.jdbc.url" value="jdbc:mysql://dlink-bc19e7:3306/loja" /-->
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/loja"/>
             <property name="javax.persistence.jdbc.user" value="admin" />
             <property name="javax.persistence.jdbc.password" value="admin" />
 				

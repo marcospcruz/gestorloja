@@ -99,6 +99,7 @@ public class CaixaController extends ControllerBase {
 		}
 		// ajustaSaldoFinalZeroCaixa();
 		// caixa.setSaldoFinal(atualizaSaldoCaixa());
+
 		return caixa;
 	}
 
@@ -162,7 +163,7 @@ public class CaixaController extends ControllerBase {
 		caixa.setUsuarioFechamento(getUsuarioLogado());
 
 		salva();
-		caixa = null;
+		caixa = new Caixa();
 	}
 
 	public void abreCaixa(String saldoAbertura) throws Exception {
@@ -294,11 +295,13 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public void novo() {
-		buscaUltimoCaixa();
+		Caixa ultimoCaixa = buscaUltimoCaixa();
 		float saldoInicial = 0;
-		if (caixa != null)
-			saldoInicial = caixa.getSaldoFinal();
-		caixa = new Caixa();
+		if (caixa == null)
+			caixa = new Caixa();
+		if (ultimoCaixa != null)
+			saldoInicial = ultimoCaixa.getSaldoFinal();
+
 		caixa.setSaldoInicial(saldoInicial);
 		caixa.setSaldoFinal(saldoInicial);
 	}
@@ -429,10 +432,14 @@ public class CaixaController extends ControllerBase {
 
 	}
 
-	public void buscaUltimoCaixa() {
+	public Caixa buscaUltimoCaixa() {
 		buscaTodos();
-		if (!caixaList.isEmpty())
-			caixa = caixaList.get(caixaList.size() - 1);
+		if (!caixaList.isEmpty()) {
+			return caixaList.get(caixaList.size() - 1);
+
+		}
+
+		return null;
 
 	}
 

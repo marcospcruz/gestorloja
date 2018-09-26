@@ -274,8 +274,8 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void busca(String text) throws Exception {
 		// busca(text, null, null);
-		if(itensEstoque==null)
-			itensEstoque=new ArrayList(getCacheMap().values());
+		if (itensEstoque == null)
+			itensEstoque = new ArrayList(getCacheMap().values());
 		itemEstoque = itensEstoque.stream()
 				.filter(item -> ((ItemEstoque) item).getCodigoDeBarras().equalsIgnoreCase(text)).findFirst()
 				.orElse(null);
@@ -463,6 +463,18 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void novo() {
 		itemEstoque = new ItemEstoque();
+
+	}
+
+	public ItemEstoque validaCodigoDeBarras(String codigoBarras) {
+		buscaTodos();
+		//@formatter:off
+		return itensEstoque
+				.stream()
+				.filter(item->codigoBarras.equals(item.getCodigoDeBarras()))
+				.findFirst()
+				.orElse(null);
+		//@formatter:on
 
 	}
 

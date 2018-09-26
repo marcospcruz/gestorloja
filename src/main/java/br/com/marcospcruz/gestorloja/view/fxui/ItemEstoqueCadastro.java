@@ -96,6 +96,7 @@ public class ItemEstoqueCadastro extends StageBase {
 			EstoqueController controller = getEstoqueController();
 			if (controller.getItem() != null) {
 				ItemEstoque item = controller.getItemEstoque();
+
 				Fabricante fabricante = item.getFabricante();
 				SubTipoProduto subCategoriaProduto = item.getTipoProduto();
 				Produto produto = item.getProduto();
@@ -139,7 +140,6 @@ public class ItemEstoqueCadastro extends StageBase {
 		try {
 			EstoqueController controller = getEstoqueController();
 			ProdutoController pController = getProdutoController();
-
 			Produto produto = (Produto) parseProduto(produtocombo.getValue());
 
 			Fabricante fabricante = (Fabricante) parseFabricante(comboFabricante.getValue());
@@ -189,15 +189,11 @@ public class ItemEstoqueCadastro extends StageBase {
 			if (codigoBarras.isEmpty()) {
 				throw new Exception("Código de Barras inválido!");
 			}
-			if (itemEstoque.getIdItemEstoque() == null) {
-				controller.buscaItemPorCodigoDeBarras(codigoBarras);
-				ItemEstoque teste = controller.getItemEstoque();
 
-				if (teste != null) {
-					controller.setItemEstoque(null);
-					throw new Exception("Código de Barras já cadastrado no estoque.");
-				}
-			}
+			ItemEstoque teste = controller.validaCodigoDeBarras(codigoBarras);
+			if (teste != null)
+				throw new Exception("Código de Barras já cadastrado no estoque.");
+
 			itemEstoque.setCodigoDeBarras(codigoBarras);
 
 			OperacaoEstoqueFacade operacaoEstoqueFacade = new OperacaoEstoqueFacade((EstoqueController) controller);
@@ -206,10 +202,10 @@ public class ItemEstoqueCadastro extends StageBase {
 			super.showMensagemSucesso("Dados salvos com sucesso no Estoque.");
 			// controller.criaItemEstoque(fabricante, txtQuantidadeInicial.getText());
 			controller.anulaAtributos();
-//			comboFabricante.getEditor(),
-//			comboCategoria.getEditor(),
-//			subCategoria.getEditor(),
-//			produtocombo.getEditor()
+			// comboFabricante.getEditor(),
+			// comboCategoria.getEditor(),
+			// subCategoria.getEditor(),
+			// produtocombo.getEditor()
 			hide();
 
 		} catch (Exception e1) {
@@ -225,7 +221,7 @@ public class ItemEstoqueCadastro extends StageBase {
 		SubTipoProduto subTipo = null;
 		try {
 			TipoProdutoController controller = getTipoProdutoController();
-//			controller.busca(value.toString());
+			// controller.busca(value.toString());
 			controller.buscaTipoProduto(value.toString());
 			subTipo = (SubTipoProduto) controller.getItem();
 		} catch (Exception e) {
@@ -243,10 +239,9 @@ public class ItemEstoqueCadastro extends StageBase {
 			try {
 				controller.buscaNome(value.toString());
 			} catch (NoResultException e) {
-				e.printStackTrace();
-			}
-			if (controller.getItem() == null)
 				return new Fabricante(value.toString());
+			}
+
 			return controller.getItem();
 		}
 	}

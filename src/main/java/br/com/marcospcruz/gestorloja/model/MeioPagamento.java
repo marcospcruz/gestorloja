@@ -27,7 +27,7 @@ public class MeioPagamento implements Serializable {
 	 */
 	private static final long serialVersionUID = 119407608316667340L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idMeioPagamento;
 
 	@ManyToOne(cascade = CascadeType.ALL)

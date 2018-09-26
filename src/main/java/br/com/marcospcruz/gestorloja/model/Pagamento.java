@@ -24,7 +24,7 @@ public class Pagamento implements Serializable {
 	 */
 	private static final long serialVersionUID = -2356444305643322916L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idPagamento;
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "pagamento", orphanRemoval = true)
 	private List<MeioPagamento> meiosPagamento;

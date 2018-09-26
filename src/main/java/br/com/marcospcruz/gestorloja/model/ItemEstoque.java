@@ -88,7 +88,7 @@ public class ItemEstoque implements Serializable {
 	private static final long serialVersionUID = 8193836692123395239L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idItemEstoque;
 
 	@ManyToOne(cascade = CascadeType.MERGE)

@@ -124,8 +124,8 @@ public class ControleCaixaGui extends StageBase {
 	@Override
 	protected void carregaDadosTable(TableView table) throws Exception {
 		List<CaixaModel> caixas = new ArrayList<>();
-		if (controller.getList().isEmpty())
-			controller.buscaTodos();
+		// if (controller.getList().isEmpty())
+		controller.buscaTodos();
 		boolean ativaBotaoAbrir = false;
 		for (Object item : controller.getList()) {
 			Caixa caixa = (Caixa) item;

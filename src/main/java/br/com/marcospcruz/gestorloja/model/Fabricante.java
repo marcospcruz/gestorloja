@@ -33,7 +33,7 @@ public class Fabricante implements Serializable {
 	 */
 	private static final long serialVersionUID = 1041277187240232341L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idFabricante;
 
 	private String nome;

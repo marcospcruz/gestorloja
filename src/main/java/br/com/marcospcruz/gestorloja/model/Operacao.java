@@ -23,7 +23,7 @@ public class Operacao implements Serializable {
 	 */
 	private static final long serialVersionUID = 2885276051452312103L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idOperacao;
 	private String descricao;
 	private Date dataCriacao;

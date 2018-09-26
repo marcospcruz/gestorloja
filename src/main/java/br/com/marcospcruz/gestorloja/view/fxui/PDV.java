@@ -689,7 +689,7 @@ public class PDV extends StageBase {
 		return getLayoutsMaxWidth() - (getLayoutsMaxWidth() * (percentage / 100d));
 	}
 
-	private TitledPane criaTablePane() {
+	private TitledPane criaTablePane() throws Exception {
 		TitledPane titledPane = criaTitledPane("Ítens da Venda");
 		// criaTablePane(title)
 		titledPane.setMaxHeight(height);
@@ -744,6 +744,7 @@ public class PDV extends StageBase {
 		} else {
 			Button button = new Button("Estornar Venda");
 			button.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
+
 			button.setOnAction(evt -> {
 				try {
 					if (showConfirmAtionMessage("Deseja estornar esta Venda?")) {
@@ -759,7 +760,9 @@ public class PDV extends StageBase {
 					e.printStackTrace();
 				}
 			});
-			children.add(button);
+			VendaController vendaController = getVendaController();
+			if (vendaController.getVenda().getCaixa().getUsuarioFechamento() != null)
+				children.add(button);
 
 		}
 		titledPane.setContent(pane);
@@ -1027,7 +1030,7 @@ public class PDV extends StageBase {
 	protected void atualizaSubTotal(VendaController controller) {
 		float subTotal = controller.getVenda().getTotalVendido();
 		subTotalTxt.setText(Util.formataStringDecimaisVirgula(subTotal));
-		
+
 		float valorBrutoVenda = controller.getValorBrutoVenda();
 		valorVendaLabel.setText(Util.formataMoeda(valorBrutoVenda));
 	}

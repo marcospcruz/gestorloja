@@ -30,7 +30,7 @@ public class Venda implements Serializable {
 	private static final long serialVersionUID = -90043730582596068L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idVenda;
 
 	private float totalVendido;
