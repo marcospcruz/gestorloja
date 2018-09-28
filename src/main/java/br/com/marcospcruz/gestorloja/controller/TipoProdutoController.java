@@ -380,7 +380,7 @@ public class TipoProdutoController extends ControllerBase {
 
 	@Override
 	public void salva() throws Exception {
-		tipoProdutoDao.update(tipoProduto);
+		tipoProduto = tipoProdutoDao.update(tipoProduto);
 	}
 
 	@Override
@@ -410,6 +410,13 @@ public class TipoProdutoController extends ControllerBase {
 
 	public void buscaTipoProduto(String string) {
 		tipoProduto = tipoProdutoDao.busca("tipoProduto.readParametro", "descricao", string.toLowerCase());
+	}
+
+	public void attachEntidade(SubTipoProduto tipoProduto) throws Exception {
+		setItem(tipoProduto);
+		if (tipoProduto.getIdTipoItem() != null)
+			salva();
+		
 	}
 
 	// public void iniciaTipoPecaRoupa() {

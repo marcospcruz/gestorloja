@@ -28,7 +28,7 @@ public class EstoqueController extends ControllerBase {
 
 	private ItemEstoque itemEstoque;
 
-	// private Crud<ItemEstoque> itemEstoqueDao;
+	private Crud<ItemEstoque> itemEstoqueDao;
 
 	private List<ItemEstoque> itensEstoque;
 
@@ -40,13 +40,15 @@ public class EstoqueController extends ControllerBase {
 
 	public EstoqueController() throws Exception {
 
-		// itemEstoqueDao = new CrudDao<>();
+		itemEstoqueDao = new CrudDao<>();
 		carregaItensEstoque();
 		produtoController = (ProdutoController) getController(ControllerAbstractFactory.PRODUTO);
 
 	}
 
 	public ItemEstoque getItemEstoque() {
+		if (itemEstoque.getIdItemEstoque() != 0)
+			itemEstoque = itemEstoqueDao.update(itemEstoque);
 		return itemEstoque;
 	}
 
@@ -70,7 +72,7 @@ public class EstoqueController extends ControllerBase {
 		if (cache == null || cache.isEmpty()) {
 
 			itensEstoque = null;
-			Crud<ItemEstoque> itemEstoqueDao = new CrudDao<>();
+
 			itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
 			setCacheMap(itensEstoque.stream()
 					.collect(Collectors.toMap(item -> ((ItemEstoque) item).getIdItemEstoque(), item -> item)));
@@ -78,11 +80,6 @@ public class EstoqueController extends ControllerBase {
 			itensEstoque = new ArrayList(cache.values());
 		// setList(itensEstoque);
 
-	}
-
-	private Crud<ItemEstoque> getDao() {
-
-		return new CrudDao<>();
 	}
 
 	public void setItensEstoque(List<ItemEstoque> itensEstoque) {
@@ -177,7 +174,7 @@ public class EstoqueController extends ControllerBase {
 				paramsMap.put("descricaoTipo", "%" + descricaoTipo.toUpperCase() + "%");
 				namedQuery = "itemestoque.readDescricaoPeca";
 			}
-			Crud<ItemEstoque> itemEstoqueDao = getDao();
+
 			setList(itemEstoqueDao.buscaList(namedQuery, paramsMap));
 		}
 		if (itensEstoque.size() == 1)
@@ -187,7 +184,7 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public void busca(int idItemEstoque) {
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
+
 		itemEstoque = itemEstoqueDao.busca(ItemEstoque.class, idItemEstoque);
 
 	}
@@ -200,7 +197,6 @@ public class EstoqueController extends ControllerBase {
 
 		}
 
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
 		try {
 			// itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
 			// itemEstoque.getProduto().getIdProduto(), "idFabricante",
@@ -253,7 +249,7 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void busca(Object object) throws Exception {
 		itemEstoque = (ItemEstoque) object;
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
+
 		itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
 				itemEstoque.getProduto().getIdProduto(), "idFabricante", itemEstoque.getFabricante().getIdFabricante());
 
@@ -280,9 +276,9 @@ public class EstoqueController extends ControllerBase {
 				.filter(item -> ((ItemEstoque) item).getCodigoDeBarras().equalsIgnoreCase(text)).findFirst()
 				.orElse(null);
 		if (itemEstoque == null) {
-			Crud<ItemEstoque> dao = getDao();
+
 			try {
-				itemEstoque = dao.busca("itemestoque.readCodigo", "codigo", text);
+				itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigo", "codigo", text);
 			} catch (NoResultException e) {
 				throw new Exception("Ítem código " + text + " não encontrado no estoque.");
 			}
@@ -384,7 +380,6 @@ public class EstoqueController extends ControllerBase {
 			namedQuery = "itemestoque.readTipoFabricante";
 		}
 
-		Crud<ItemEstoque> itemEstoqueDao = new CrudDao<>();
 		itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
 		consultaEstoque = itensEstoque;
 	}
@@ -432,7 +427,6 @@ public class EstoqueController extends ControllerBase {
 		itemEstoque.setOperador(getUsuarioLogado());
 		itemEstoque.setDataContagem(SingletonManager.getInstance().getData());
 
-		Crud<ItemEstoque> itemEstoqueDao = new CrudDao<>();
 		try {
 			itemEstoque = itemEstoqueDao.update(itemEstoque);
 			getCacheMap().put(itemEstoque.getIdItemEstoque(), itemEstoque);
@@ -445,12 +439,13 @@ public class EstoqueController extends ControllerBase {
 
 	@Override
 	public void registraHistoricoOperacao(Operacao operacao) {
-		Crud<HistoricoOperacao> historicoDao = new CrudDao<>();
+
 		HistoricoOperacao historicoOperacao = new HistoricoOperacao();
 		historicoOperacao.setDataOperacao(SingletonManager.getInstance().getData());
 		historicoOperacao.setItemEstoque(itemEstoque);
 		historicoOperacao.setOperador(getUsuarioLogado());
 		historicoOperacao.setOperacao(operacao);
+		Crud<HistoricoOperacao> historicoDao = new CrudDao<>();
 		historicoDao.update(historicoOperacao);
 	}
 

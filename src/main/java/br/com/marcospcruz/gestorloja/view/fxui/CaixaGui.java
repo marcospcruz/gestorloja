@@ -7,6 +7,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
+import br.com.marcospcruz.gestorloja.dao.Crud;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
@@ -24,7 +26,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
@@ -152,9 +153,20 @@ public class CaixaGui extends StageBase {
 		subTotalGrid.add(criaLabelBold("Diferença (Venda - Pagamentos):"), column++, row);
 		float diferenca = controller.getSubTotalVendas() - controller.getTotalPagamentosVendasRecebidoCaixa();
 		subTotalGrid.add(criaLabelNormal(Util.formataMoeda(diferenca)), column--, row++);
+		Crud<Caixa> dao = new CrudDao<>();
 		Caixa caixa = (Caixa) controller.getItem();
+		if (caixa.getIdCaixa() != 0)
+			caixa = dao.update(caixa);
 		Button button = new Button("Visualizar Vendas");
-		button.setDisable(caixa.getVendas() == null || caixa.getVendas().isEmpty());
+		boolean disableButton;
+		try {
+
+			disableButton = caixa.getVendas() == null || caixa.getVendas().isEmpty();
+		} catch (Exception e) {
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+			disableButton = qtVendas == 0;
+		}
+		button.setDisable(disableButton);
 		button.setOnAction(evt -> {
 			abrirInterface(INTERFACE_VENDAS_CAIXA);
 
@@ -178,7 +190,7 @@ public class CaixaGui extends StageBase {
 			populaGridContent();
 		} catch (Exception e) {
 
-			e.printStackTrace();
+			SingletonManager.getInstance().getLogger(this.getClass()).error(e.getMessage(), e);
 		}
 		// finally {
 		// atualizaDadosCaixa();
@@ -312,7 +324,7 @@ public class CaixaGui extends StageBase {
 		// caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
 		// caixa.setSaldoInicial(Util.parseStringDecimalToFloat(trocoInicial.getText()));
 
-		 salvaDados(e);
+		salvaDados(e);
 		// hide();
 		// reloadForm();
 
@@ -401,7 +413,7 @@ public class CaixaGui extends StageBase {
 		}, 0, 1000);
 		dadosGrid.add(criaLabelBold("Operador Abertura:"), 0, row);
 		String nomeOperador;
-		if (caixa != null && caixa.getIdCaixa() != 0)
+		if (caixa != null && caixa.getIdCaixa() != 0 || caixa.getUsuarioAbertura() != null)
 			nomeOperador = caixa.getUsuarioAbertura().getNomeCompleto();
 		else
 			nomeOperador = SingletonManager.getInstance().getUsuarioLogado().getNomeCompleto();
@@ -463,7 +475,7 @@ public class CaixaGui extends StageBase {
 			abrirInterface("OperacaoCaixaGui");
 			try {
 
-//				controller.atualizaSaldoCaixa();
+				// controller.atualizaSaldoCaixa();
 
 			} catch (Exception e) {
 

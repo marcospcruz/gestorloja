@@ -6,11 +6,15 @@ import java.util.List;
 
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.controller.VendaController;
+import br.com.marcospcruz.gestorloja.dao.Crud;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.CaixaModel;
 import br.com.marcospcruz.gestorloja.model.MeioPagamento;
+import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.view.fxui.model.VendaModel;
 import br.com.marcospcruz.gestorloja.view.util.VendaModelBuilder;
 import javafx.collections.FXCollections;
@@ -98,7 +102,7 @@ public class VendasCaixaGui extends StageBase {
 	}
 
 	protected void abreTelaCadastro() throws Exception {
-		Stage pdv=new PDV(true);
+		Stage pdv = new PDV(true);
 
 		abreTelaCadastro(pdv);
 	}
@@ -117,21 +121,24 @@ public class VendasCaixaGui extends StageBase {
 		List<VendaModel> dadoss = new ArrayList<>();
 		Caixa caixa = (Caixa) controller.getItem();
 		VendaController controller = getVendaController();
-		for (Venda venda : caixa.getVendas()) {
-			controller.setVenda(venda);
-			Date dataVenda = venda.getDataVenda();
-			Usuario vendedor = venda.getOperador();
-			float subTotalVendido = venda.getTotalVendido();
-			float totalRecebido = controller.getValorTotalPagamentoVenda();
-			float descontoConcedido = venda.getPorcentagemDesconto();
-			StringBuilder tiposMeioPagamentoString = new StringBuilder();
-			for (MeioPagamento meioPagamento : venda.getPagamento().getMeiosPagamento()) {
-				String tmp = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento() + ", ";
-				tiposMeioPagamentoString.append(tmp);
-			}
-			tiposMeioPagamentoString = new StringBuilder(
-					tiposMeioPagamentoString.toString().substring(0, tiposMeioPagamentoString.toString().length() - 2));
-			float totalVendaBruto = controller.getValorBrutoVenda();
+		try {
+			for (Venda venda : caixa.getVendas()) {
+				controller.setVenda(venda);
+				Date dataVenda = venda.getDataVenda();
+				Usuario vendedor = venda.getOperador();
+				float subTotalVendido = venda.getTotalVendido();
+				float totalRecebido = controller.getValorTotalPagamentoVenda();
+				float descontoConcedido = venda.getPorcentagemDesconto();
+				StringBuilder tiposMeioPagamentoString = new StringBuilder();
+				Crud<Pagamento> dao = new CrudDao<>();
+				Pagamento pagamento = dao.update(venda.getPagamento());
+				for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+					String tmp = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento() + ", ";
+					tiposMeioPagamentoString.append(tmp);
+				}
+				tiposMeioPagamentoString = new StringBuilder(tiposMeioPagamentoString.toString().substring(0,
+						tiposMeioPagamentoString.toString().length() - 2));
+				float totalVendaBruto = controller.getValorBrutoVenda();
 			//@formatter:off
 			VendaModelBuilder builder=new VendaModelBuilder();
 			VendaModel vendaModel = builder
@@ -146,7 +153,11 @@ public class VendasCaixaGui extends StageBase {
 					.setStatus(venda.isEstornado())
 					.getVendaModel();
 			//@formatter:on
-			dadoss.add(vendaModel);
+				dadoss.add(vendaModel);
+			}
+
+		} catch (Exception e) {
+			SingletonManager.getInstance().getLogger(getClass()).warn(e);
 		}
 		ObservableList<VendaModel> dados = FXCollections.observableArrayList(dadoss);
 		table.setItems(dados);
@@ -181,7 +192,7 @@ public class VendasCaixaGui extends StageBase {
 		int idVenda = Integer.parseInt(getTableViewSelectedValueId(event));
 		Caixa caixa = (Caixa) controller.getItem();
 		Venda venda = caixa.getVendas().stream().filter(v -> v.getIdVenda() == idVenda).findFirst().orElse(null);
-	
+
 		try {
 			getVendaController().setVenda(venda);
 			abreTelaCadastro();

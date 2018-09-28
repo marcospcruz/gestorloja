@@ -1,12 +1,13 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
 import java.time.LocalDate;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.com.marcospcruz.gestorloja.dao.Crud;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.facade.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
 import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
@@ -47,11 +48,13 @@ public class PrincipalFxGui extends StageBase {
 		btnPane.setHgap(4);
 		btnPane.setPrefWrapLength(300);
 		btnPane.setAlignment(Pos.CENTER);
-		Usuario usuarioLogado = SingletonManager.getInstance().getUsuarioLogado();
+		Usuario usuarioLogado = new CrudDao<Usuario>().update(SingletonManager.getInstance().getUsuarioLogado());
+
 		List<PerfilUsuario> perfis = usuarioLogado.getPerfisUsuario();
 		List<Button> btns = new ArrayList<>();
 
 		perfis.stream().forEach(perfil -> {
+			perfil=new CrudDao<PerfilUsuario>().update(perfil);
 			perfil.getInterfaces().stream().forEach(gui -> {
 				Button btn = criaActionButton(gui);
 				interfaces.put(gui.getNomeModulo(), gui);

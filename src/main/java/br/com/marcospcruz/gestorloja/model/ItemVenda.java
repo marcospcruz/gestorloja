@@ -15,7 +15,7 @@ import javax.persistence.TemporalType;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
-//@Table(name = "ItemVenda")
+// @Table(name = "ItemVenda")
 public class ItemVenda implements Serializable {
 	/**
 	 * 
@@ -164,7 +164,7 @@ public class ItemVenda implements Serializable {
 	@Override
 	public String toString() {
 		return "ItemVenda [idItemVenda=" + idItemVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
-				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda;
+				+ quantidade + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda;
 	}
 
 	public void setDevolvido(boolean devolido) {

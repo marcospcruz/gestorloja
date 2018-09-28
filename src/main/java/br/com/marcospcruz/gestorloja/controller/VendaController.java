@@ -412,8 +412,6 @@ public class VendaController extends ControllerBase {
 		Usuario operador = venda.getOperador();
 		pagamento.setUsuarioLogado(operador);
 
-		// caixaController.recebePagamento(pagamento);
-		Caixa caixa = venda.getCaixa() == null ? (Caixa) caixaController.getItem() : venda.getCaixa();
 		if (pagamento.getMeiosPagamento() == null || pagamento.getMeiosPagamento().isEmpty())
 			throw new Exception("Cobrar a venda antes de finalizar.");
 		// pagamento.getMeiosPagamento().stream().forEach(meioPagamento -> {
@@ -437,7 +435,7 @@ public class VendaController extends ControllerBase {
 			}
 		}
 		venda.setPagamento(pagamento);
-		caixaController.setItem(caixa);
+
 	}
 
 	private void salvaItemVenda(ItemVenda itemVenda) {
@@ -622,8 +620,17 @@ public class VendaController extends ControllerBase {
 
 	public float getValorTotalPagamentoVenda() {
 		float valorPagamentoVenda = 0;
-		for (MeioPagamento meio : venda.getPagamento().getMeiosPagamento())
-			valorPagamentoVenda += meio.getValorPago();
+		Crud<Pagamento> dao = new CrudDao<>();
+		try {
+			Pagamento pagamento = venda.getPagamento();
+			if (pagamento.getIdPagamento() != 0)
+				pagamento = dao.update(pagamento);
+			for (MeioPagamento meio : pagamento.getMeiosPagamento())
+				valorPagamentoVenda += meio.getValorPago();
+		} catch (Exception e) {
+			SingletonManager.getInstance().getLogger(getClass()).warn(e);
+		}
+
 		return valorPagamentoVenda;
 	}
 

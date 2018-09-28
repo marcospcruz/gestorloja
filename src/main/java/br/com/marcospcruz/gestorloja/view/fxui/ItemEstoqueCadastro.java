@@ -12,6 +12,7 @@ import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.NumberTextField;
@@ -103,8 +104,12 @@ public class ItemEstoqueCadastro extends StageBase {
 				comboFabricante.setValue(fabricante);
 				comboCategoria.setValue(subCategoriaProduto.getSuperTipoProduto());
 				ObservableList<TipoProduto> itemsList = subCategoria.getItems();
+				TipoProdutoController tipoProdutoController = getTipoProdutoController();
+				SubTipoProduto superCategoria = subCategoriaProduto.getSuperTipoProduto();
+				tipoProdutoController.busca(superCategoria.getIdTipoItem());
+				superCategoria=(SubTipoProduto) tipoProdutoController.getItem();
 				itemsList = FXCollections
-						.observableArrayList(subCategoriaProduto.getSuperTipoProduto().getSubTiposProduto());
+						.observableArrayList(superCategoria.getSubTiposProduto());
 				subCategoria.setItems(itemsList);
 				subCategoria.setValue(subCategoriaProduto);
 				produtocombo.setValue(produto);
@@ -115,8 +120,8 @@ public class ItemEstoqueCadastro extends StageBase {
 				btnExcluir.setDisable(false);
 			}
 		} catch (Exception e) {
-
 			e.printStackTrace();
+			SingletonManager.getInstance().getLogger(getClass()).warn(e);
 		}
 
 	}
@@ -209,7 +214,6 @@ public class ItemEstoqueCadastro extends StageBase {
 			hide();
 
 		} catch (Exception e1) {
-
 			e1.printStackTrace();
 			super.showErrorMessage(e1.getMessage());
 		}

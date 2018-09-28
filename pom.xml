@@ -35,7 +35,7 @@
 			</dependency -->
 
 		<!-- https://mvnrepository.com/artifact/org.jdatepicker/jdatepicker -->
-		
+
 		<dependency>
 			<groupId>org.jdatepicker</groupId>
 			<artifactId>jdatepicker</artifactId>
@@ -60,12 +60,9 @@
 			<version>5.1.6</version>
 		</dependency>
 
-<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java >
-<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>8.0.11</version>
-</dependency-->
+		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java > <dependency> 
+			<groupId>mysql</groupId> <artifactId>mysql-connector-java</artifactId> <version>8.0.11</version> 
+			</dependency -->
 
 
 
@@ -104,7 +101,11 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.7</version>
 		</dependency>
-
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
 		<dependency>
 			<groupId>antlr</groupId>
 			<artifactId>antlr</artifactId>

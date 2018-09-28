@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.model.Usuario;
@@ -22,7 +24,8 @@ public class SingletonManager {
 	private Usuario usuarioLogado;
 	private Map<String, ControllerBase> controllersMap;
 	private LocalDate dataManutencao;
-
+	
+	
 	private SingletonManager() {
 
 	}
@@ -134,6 +137,11 @@ public class SingletonManager {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public Logger getLogger(Class clazz) {
+		
+		return Logger.getLogger(clazz);
 	}
 
 }

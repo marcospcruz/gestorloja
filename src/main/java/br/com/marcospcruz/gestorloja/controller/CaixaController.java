@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.LazyInitializationException;
+
 import br.com.marcospcruz.gestorloja.builder.TransacaoFinanceiraBuilder;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -26,23 +28,23 @@ import br.com.marcospcruz.gestorloja.util.Util;
 
 public class CaixaController extends ControllerBase {
 
-	public CaixaController() {
-		super();
-
-	}
-
 	private static final String QUERY_BUSCA_TODOS = "caixa.findAll";
 	private static final String BUSCA_CAIXA_ABERTO = "caixa.findCaixaAberto";
 	private static final String MOTIVO_TRANSACAO = "Entrada da Venda ";
-	// private Crud<Caixa> dao = new CrudDao<>();
+
 	private List<Caixa> caixaList;
 	private Caixa caixa;
-
+	private Crud<Caixa> dao;
 	private Pagamento pagamento;
+
+	public CaixaController() {
+		super();
+		dao = new CrudDao<>();
+	}
 
 	@Override
 	public void busca(Object id) {
-		Crud<Caixa> dao = new CrudDao<>();
+
 		caixa = dao.busca(Caixa.class, Integer.parseInt(id.toString()));
 
 	}
@@ -50,17 +52,11 @@ public class CaixaController extends ControllerBase {
 	@Override
 	public List buscaTodos() {
 
-		Crud<Caixa> dao = getDao();
 		caixaList = null;
 		// if (caixaList == null || caixaList.isEmpty())
 		caixaList = dao.busca(QUERY_BUSCA_TODOS);
 
 		return caixaList;
-	}
-
-	private Crud<Caixa> getDao() {
-
-		return new CrudDao<>();
 	}
 
 	@Override
@@ -92,6 +88,8 @@ public class CaixaController extends ControllerBase {
 				// busca(BUSCA_CAIXA_ABERTO);
 				if (!caixaList.isEmpty())
 					caixa = caixaList.get(0);
+			} else {
+
 			}
 		} catch (Exception e) {
 
@@ -129,9 +127,10 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public void salva() throws Exception {
-		caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
+		if (caixa.getUsuarioAbertura() == null)
+			caixa.setUsuarioAbertura(SingletonManager.getInstance().getUsuarioLogado());
 		// atualizaSaldoCaixa();
-		Crud<Caixa> dao = new CrudDao<>();
+
 		caixa = dao.update(caixa);
 
 	}
@@ -236,10 +235,13 @@ public class CaixaController extends ControllerBase {
 
 	public Float getSubTotalVendas() {
 		float subTotalVendas = 0;
-		if (caixa != null && caixa.getVendas() != null)
+		try {
 			for (Venda venda : caixa.getVendas()) {
 				subTotalVendas += venda.getTotalVendido();
 			}
+		} catch (Exception e) {
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+		}
 		return subTotalVendas;
 	}
 
@@ -295,6 +297,7 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public void novo() {
+		caixa = new Caixa();
 		Caixa ultimoCaixa = buscaUltimoCaixa();
 		float saldoInicial = 0;
 		if (caixa == null)
@@ -309,17 +312,26 @@ public class CaixaController extends ControllerBase {
 	public Float getTotalPagamentosVendasRecebidoCaixa() {
 
 		float totalRecebido = 0;
-		if (caixa != null && caixa.getVendas() != null)
-			for (Venda venda : caixa.getVendas()) {
-				if (venda.isEstornado())
-					continue;
-				Pagamento pagamento = venda.getPagamento();
-				for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
-					totalRecebido += meioPagamento.getValorPago();
+		try {
 
+			Crud<Pagamento> dao = new CrudDao<>();
+			if (caixa != null && caixa.getVendas() != null)
+				for (Venda venda : caixa.getVendas()) {
+
+					if (venda.isEstornado())
+						continue;
+					Pagamento pagamento = dao.update(venda.getPagamento());
+
+					for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+						totalRecebido += meioPagamento.getValorPago();
+
+					}
+					totalRecebido -= pagamento.getTrocoPagamento();
 				}
-				totalRecebido -= pagamento.getTrocoPagamento();
-			}
+
+		} catch (Exception e) {
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+		}
 		return totalRecebido;
 	}
 
@@ -331,15 +343,25 @@ public class CaixaController extends ControllerBase {
 		Map<String, Float> subTotais = inicializaSubTotaisMap();
 		if (caixa != null && caixa.getVendas() != null) {
 			Set<Venda> vendas = caixa.getVendas();
+			Crud<Pagamento> pagamentoDao = new CrudDao<>();
 
-			for (Venda venda : vendas) {
-				if (!venda.isEstornado())
-					for (MeioPagamento meioPagamento : venda.getPagamento().getMeiosPagamento()) {
-						String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
-						float value = subTotais.get(key) + meioPagamento.getValorPago();
+			dao.update(caixa);
+			try {
+				for (Venda venda : vendas) {
+					if (!venda.isEstornado()) {
 
-						subTotais.put(key, value);
+						Pagamento pagamento = pagamentoDao.update(venda.getPagamento());
+						for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+							String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
+							float value = subTotais.get(key) + meioPagamento.getValorPago();
+
+							subTotais.put(key, value);
+						}
 					}
+				}
+
+			} catch (Exception e) {
+				SingletonManager.getInstance().getLogger(getClass()).warn(e);
 			}
 		}
 		return subTotais;
@@ -355,10 +377,14 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public int getQuantidadeVendasEstornadas() {
-		if (caixa == null || caixa.getVendas() == null)
-			return 0;
-		Set<Venda> vendas = caixa.getVendas();
-		int qtVendas = vendas.stream().filter(venda -> venda.isEstornado()).collect(Collectors.toList()).size();
+		int qtVendas = 0;
+		try {
+			Set<Venda> vendas = caixa.getVendas();
+
+			qtVendas = vendas.stream().filter(venda -> venda.isEstornado()).collect(Collectors.toList()).size();
+		} catch (Exception e) {
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+		}
 
 		return qtVendas;
 	}
@@ -366,7 +392,16 @@ public class CaixaController extends ControllerBase {
 	public int getQuantidadeVendasEfetivadas() {
 		if (caixa == null || caixa.getVendas() == null)
 			return 0;
-		return caixa.getVendas().size() - getQuantidadeVendasEstornadas();
+
+		if (caixa.getIdCaixa() != 0)
+			caixa = dao.update(caixa);
+		int qtVendas = 0;
+		try {
+			qtVendas = caixa.getVendas().size() - getQuantidadeVendasEstornadas();
+		} catch (LazyInitializationException e) {
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+		}
+		return qtVendas;
 	}
 
 	public List<String> getTiposMeioPagamentoOutros() {
@@ -393,13 +428,14 @@ public class CaixaController extends ControllerBase {
 
 		//@formatter:on
 		meioPagamento.setTransacaoFinanceira(tf);
+		salva();
 		caixa.getTransacoesCaixa().add(tf);
 		atualizaSaldoCaixa();
 
 	}
 
 	public void atualizaSaldoCaixa() {
-		float saldoCaixa = caixa.getSaldoFinal();
+		float saldoCaixa = caixa.getSaldoInicial();
 
 		for (TransacaoFinanceira transacaoFinanceira : caixa.getTransacoesCaixa()) {
 
@@ -414,7 +450,10 @@ public class CaixaController extends ControllerBase {
 
 	public Float getTotalTransacoesCaixa(int idOperacao) {
 		float totalReceitas = 0;
+
 		//@formatter:off
+		if(caixa.getIdCaixa()!=0)
+			caixa=dao.update(caixa);
 		Set<TransacaoFinanceira> transacoes = caixa.getTransacoesCaixa()
 				.stream()
 				.filter(tf->tf.getOperacao().getIdOperacao()==idOperacao)
@@ -427,6 +466,7 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public void adicionaTransacao(TransacaoFinanceira transacao) {
+
 		caixa.getTransacoesCaixa().add(transacao);
 		atualizaSaldoCaixa();
 

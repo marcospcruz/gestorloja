@@ -4,17 +4,19 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -28,8 +30,8 @@ import javax.persistence.TemporalType;
 				+ "and u.password=:password"),
 		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u "
 				+ "LEFT JOIN u.operador o "
-//				+ "JOIN FETCH u.perfisUsuario p "
-//				+ "LEFT JOIN FETCH u.interfaces i "				
+				+ "JOIN FETCH u.perfisUsuario p "
+//				+ "LEFT JOIN FETCH p.interfaces i "				
 				+ "where u.nomeUsuario=:nomeUsuario") })
 //@formatter:on
 public class Usuario implements Serializable {
@@ -48,8 +50,8 @@ public class Usuario implements Serializable {
 	private Date ultimoAcesso;
 	private String nomeCompleto;
 	private boolean primeiroAcesso;
-	@OneToMany
-	@JoinTable(name = "Perfil_usuario", joinColumns = { @JoinColumn(name = "idUsuario") }, inverseJoinColumns = {
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinTable(name = "PerfilUsuario_usuario", joinColumns = { @JoinColumn(name = "idUsuario") }, inverseJoinColumns = {
 			@JoinColumn(name = "idPerfilUsuario") })
 	private List<PerfilUsuario> perfisUsuario;
 	@ManyToOne

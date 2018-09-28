@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.view.fxui;
 import javax.persistence.PersistenceException;
 
 import br.com.marcospcruz.gestorloja.facade.LoginFacade;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -93,7 +94,7 @@ public class LogIn extends Stage {
 				e.printStackTrace();
 			} catch (Exception e1) {
 
-				e1.printStackTrace();
+				SingletonManager.getInstance().getLogger(getClass()).error(e1.getMessage(), e1);
 				actiontarget.setText(e1.getMessage());
 			}
 

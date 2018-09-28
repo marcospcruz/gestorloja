@@ -9,11 +9,13 @@ import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 public class CrudDao<T> implements Crud<T> {
 
 	private static final String PERSISTENCE_UNITY = "controlePU";
 
-	private EntityManagerFactory entityManagerFactory;
+	private static EntityManagerFactory entityManagerFactory;
 
 	private EntityManager entityManager;
 
@@ -33,9 +35,9 @@ public class CrudDao<T> implements Crud<T> {
 
 		if (entityManager == null || !entityManager.isOpen()) {
 
-			// if (entityManagerFactory == null)
+			if (entityManagerFactory == null)
 
-			entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNITY);
+				entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNITY);
 
 			entityManager = entityManagerFactory.createEntityManager();
 
@@ -59,10 +61,10 @@ public class CrudDao<T> implements Crud<T> {
 			entity = entityManager.merge(entity);
 
 			entityManager.getTransaction().commit();
-
+			SingletonManager.getInstance().getLogger(this.getClass()).info("Salvando entidade " + entity);
 		} catch (PersistenceException e) {
 
-			e.printStackTrace();
+			SingletonManager.getInstance().getLogger(this.getClass()).error(e);
 
 			throw e;
 
@@ -88,11 +90,11 @@ public class CrudDao<T> implements Crud<T> {
 
 			entityManager.getTransaction().commit();
 		} catch (Exception e) {
-		
+
 			e.printStackTrace();
-			
+
 			throw e;
-		
+
 		} finally {
 
 			closeEntityManager();
@@ -103,7 +105,7 @@ public class CrudDao<T> implements Crud<T> {
 	private void closeEntityManager() {
 		entityManager.close();
 
-		entityManagerFactory.close();
+		// entityManagerFactory.close();
 	}
 
 	public T busca(Class clazz, int id) {
@@ -111,7 +113,7 @@ public class CrudDao<T> implements Crud<T> {
 		inicializaEntityManager();
 
 		T entity = (T) entityManager.find(clazz, id);
-		// closeEntityManager();
+		closeEntityManager();
 		return entity;
 
 	}
@@ -139,7 +141,7 @@ public class CrudDao<T> implements Crud<T> {
 		query.setParameter(parametro, value);
 
 		T entity = (T) query.getSingleResult();
-		// closeEntityManager();
+		closeEntityManager();
 		return entity;
 
 	}
@@ -151,7 +153,7 @@ public class CrudDao<T> implements Crud<T> {
 		Query query = entityManager.createNamedQuery(namedQuery);
 
 		List<T> objetos = query.getResultList();
-		// closeEntityManager();
+		closeEntityManager();
 		return objetos;
 
 	}
@@ -165,7 +167,7 @@ public class CrudDao<T> implements Crud<T> {
 		// query.setParameter(params[2].toString(), params[3].toString());
 
 		T entity = (T) query.getSingleResult();
-		// closeEntityManager();
+		closeEntityManager();
 		return entity;
 	}
 
@@ -184,8 +186,9 @@ public class CrudDao<T> implements Crud<T> {
 			Object param = params[i++];
 			query.setParameter(variable, param);
 		}
-
-		return (List<T>) query.getResultList();
+		List<T> results = (List<T>) query.getResultList();
+		closeEntityManager();
+		return results;
 
 	}
 
@@ -197,8 +200,9 @@ public class CrudDao<T> implements Crud<T> {
 		paramsMap.keySet().stream().forEach(key -> {
 			query.setParameter(key, paramsMap.get(key));
 		});
-
-		return (List<T>) query.getResultList();
+		List<T> results = (List<T>) query.getResultList();
+		closeEntityManager();
+		return results;
 	}
 
 }

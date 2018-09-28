@@ -14,6 +14,7 @@ import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.view.fxui.LogIn;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -32,7 +33,7 @@ public class AppFx extends Application {
 	@Override
 	public void stop() throws Exception {
 		super.stop();
-		System.out.println("application stopped");
+		SingletonManager.getInstance().getLogger(this.getClass()).info("application stopped");
 		System.exit(0);
 	}
 

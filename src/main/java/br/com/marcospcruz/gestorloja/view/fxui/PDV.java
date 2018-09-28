@@ -28,7 +28,9 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -116,14 +118,7 @@ public class PDV extends StageBase {
 	public PDV(boolean editaVenda) throws Exception {
 		super();
 		this.editaVenda = editaVenda;
-		setOnCloseRequest(event -> {
-			try {
-				if (!editaVenda)
-					limpaFormularioPdv();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
+		setOnCloseRequest(this::closingAction);
 		if (!editaVenda) {
 			novaVenda = true;
 			String dataAtual = Util.formataData(SingletonManager.getInstance().getData());
@@ -177,7 +172,22 @@ public class PDV extends StageBase {
 
 		}
 	}
+	
+	private void closingAction(Event event) {
+		Scene scene=getScene();
+		try {
+			scene.setCursor(Cursor.WAIT);
+			if (!editaVenda)
+				limpaFormularioPdv();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			scene.setCursor(Cursor.NONE);
+		}
 
+	}
+	
+	
 	private GridPane criaGridPane() throws Exception {
 		GridPane gridPane = new GridPane();
 		// gridPane.setPadding(new Insets(0, 15, 5, 0));
@@ -726,11 +736,7 @@ public class PDV extends StageBase {
 				try {
 					boolean confirmaFinalizacao = showConfirmAtionMessage("Deseja finalizar esta Venda?");
 					if (confirmaFinalizacao) {
-						VendaController controller = getVendaController();
-						controller.getVenda().setTotalVendido(Util.parseStringDecimalToFloat(subTotalTxt.getText()));
-						controller.finalizaVenda();
-						carregaDadosTable(table);
-						limpaFormularioPdv();
+						finalizarVenda();
 						showMensagemSucesso("Venda finalizada com sucesso!");
 					}
 				} catch (Exception e) {
@@ -767,6 +773,15 @@ public class PDV extends StageBase {
 		}
 		titledPane.setContent(pane);
 		return titledPane;
+	}
+
+	protected void finalizarVenda() throws Exception {
+
+		VendaController controller = getVendaController();
+		controller.getVenda().setTotalVendido(Util.parseStringDecimalToFloat(subTotalTxt.getText()));
+		controller.finalizaVenda();
+		carregaDadosTable(table);
+		limpaFormularioPdv();
 	}
 
 	private void limpaFormularioPdv() throws Exception {

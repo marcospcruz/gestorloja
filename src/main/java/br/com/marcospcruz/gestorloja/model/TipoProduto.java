@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ import javax.persistence.TemporalType;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @MappedSuperclass
-//@Entity
+// @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "idSuperTipo")
 public abstract class TipoProduto implements Serializable {
@@ -39,7 +40,7 @@ public abstract class TipoProduto implements Serializable {
 	@Column(unique = true)
 	private String descricaoTipo;
 
-	@OneToMany(mappedBy = "superTipoProduto")
+	@OneToMany(mappedBy = "superTipoProduto", cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@OrderBy("descricaoTipo")
 	private Collection<SubTipoProduto> subTiposProduto;
 

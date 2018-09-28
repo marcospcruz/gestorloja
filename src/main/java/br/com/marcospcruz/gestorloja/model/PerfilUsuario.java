@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,25 +11,35 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
 @Entity
-@NamedQuery(name = "perfilusuario.findperfil", query = "select p from PerfilUsuario p where p.descricao=:descricao")
+@NamedQueries({
+		@NamedQuery(name = "perfilusuario.findperfil", query = "select p from PerfilUsuario p where p.descricao=:descricao"),
+		@NamedQuery(name = "perfilusuario.findperfilUsuario", query = "select p " + "from PerfilUsuario p "
+				+ "join p.usuarios u " + "where u.idUsuario=:idUsuario") })
 public class PerfilUsuario implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idPerfilusuario;
 	private String descricao;
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@JoinTable(name = "Perfis_interfaces", joinColumns = {
 			@JoinColumn(name = "idPerfilUsuario") }, inverseJoinColumns = { @JoinColumn(name = "idInterface") })
-	@OrderBy(value="nomeModulo")
+	@OrderBy(value = "nomeModulo")
 	private List<InterfaceGrafica> interfaces;
 
-	@ManyToOne
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "PerfilUsuario_usuario", joinColumns = {
+			@JoinColumn(name = "idPerfilUsuario") }, inverseJoinColumns = { @JoinColumn(name = "idUsuario") })
+	private List<Usuario> usuarios;
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
 
@@ -46,6 +57,14 @@ public class PerfilUsuario implements Serializable {
 
 	public int getIdPerfilusuario() {
 		return idPerfilusuario;
+	}
+
+	public List<Usuario> getUsuarios() {
+		return usuarios;
+	}
+
+	public void setUsuarios(List<Usuario> usuarios) {
+		this.usuarios = usuarios;
 	}
 
 	public void setIdPerfilusuario(int idPerfilusuario) {
@@ -118,8 +137,8 @@ public class PerfilUsuario implements Serializable {
 
 	@Override
 	public String toString() {
-		return "PerfilUsuario [idPerfilusuario=" + idPerfilusuario + ", descricao=" + descricao + ", interfaces="
-				+ interfaces + ", operador=" + operador + "]";
+		return "PerfilUsuario [idPerfilusuario=" + idPerfilusuario + ", descricao=" + descricao + ", operador="
+				+ operador + "]";
 	}
 
 }

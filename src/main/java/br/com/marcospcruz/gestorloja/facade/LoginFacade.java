@@ -3,6 +3,8 @@ package br.com.marcospcruz.gestorloja.facade;
 import javax.persistence.NoResultException;
 import javax.swing.JDialog;
 
+import org.apache.log4j.Logger;
+
 import br.com.marcospcruz.gestorloja.builder.SessaoUsuario;
 import br.com.marcospcruz.gestorloja.builder.SessaoUsuarioBuilder;
 import br.com.marcospcruz.gestorloja.builder.UsuarioBuilder;
@@ -89,6 +91,7 @@ public class LoginFacade {
 	}
 
 	private void validaDadosInputados(String nomeUsuario, String senha) throws Exception {
+		logInfo("Autenticando usuario "+nomeUsuario);
 		if (nomeUsuario == null || nomeUsuario.length() == 0)
 			throw new Exception("Informar usuário!");
 		if (senha == null || senha.length() == 0)
@@ -126,8 +129,13 @@ public class LoginFacade {
 		StringBuilder logMessage = new StringBuilder("Finalizando sessão do usuário ");
 		logMessage.append(sessao.getUsuario().getNomeUsuario());
 		logMessage.append(" em " + sessao.getDataFim());
-
+		logInfo(logMessage.toString());
 		return this;
+	}
+
+	protected void logInfo(String string) {
+		Logger logger=SingletonManager.getInstance().getLogger(this.getClass());
+		logger.info(string);
 	}
 
 	public Usuario getUsuarioLogado() {

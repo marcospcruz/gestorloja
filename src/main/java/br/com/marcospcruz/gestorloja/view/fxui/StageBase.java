@@ -147,7 +147,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 		} catch (Exception e) {
 
-			e.printStackTrace();
+			SingletonManager.getInstance().getLogger(getClass()).warn(e);
 
 		} finally {
 
@@ -411,12 +411,12 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	public void showMensagemSucesso(String message) {
 		showMessage(message, AlertType.INFORMATION, "Operação realizada com sucesso!");
-
+		SingletonManager.getInstance().getLogger(this.getClass()).info(message);
 	}
 
 	public boolean showConfirmAtionMessage(String string) {
 		Alert alert = showMessage(string, AlertType.CONFIRMATION, "Confirma Operação.", ButtonType.YES, ButtonType.NO);
-
+		SingletonManager.getInstance().getLogger(this.getClass()).warn(string);
 		return alert.getResult() == ButtonType.YES;
 	}
 
@@ -540,8 +540,19 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		return criaLabel(string, false);
 	}
 
-	public void showErrorMessage(String string, String message) {
+	private void showErrorMessage(String string, String message) {
 		showMessage(message, AlertType.ERROR, string);
+
+	}
+
+	public void showErrorMessage(String string, Exception e) {
+		showMessage(e.getMessage(), AlertType.ERROR, string);
+		SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	public void showErrorMessage(Exception e) {
+		showErrorMessage(e.getMessage());
+		SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
 
 	}
 

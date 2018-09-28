@@ -26,7 +26,7 @@ public class Pagamento implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idPagamento;
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "pagamento", orphanRemoval = true)
+	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST }, mappedBy = "pagamento", orphanRemoval = true)
 	private List<MeioPagamento> meiosPagamento;
 	private float valorPagamento;
 	private float trocoPagamento;
@@ -85,13 +85,6 @@ public class Pagamento implements Serializable {
 
 	public void setVenda(Venda venda) {
 		this.venda = venda;
-	}
-
-	@Override
-	public String toString() {
-		return "Pagamento [idPagamento=" + idPagamento + ", meiosPagamento=" + meiosPagamento + ", valorPagamento="
-				+ valorPagamento + ", trocoPagamento=" + trocoPagamento + ", venda=" + venda + ", dataVenda="
-				+ dataVenda + ", usuarioLogado=" + usuarioLogado + "]";
 	}
 
 	@Override

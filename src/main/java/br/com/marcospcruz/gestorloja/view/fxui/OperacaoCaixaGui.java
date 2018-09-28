@@ -95,7 +95,7 @@ public class OperacaoCaixaGui extends StageBase {
 
 			} catch (Exception e) {
 				
-				super.showErrorMessage("Falha ao registrar operação.",e.getMessage());
+				super.showErrorMessage("Falha ao registrar operação.",e);
 				e.printStackTrace();
 			} finally {
 

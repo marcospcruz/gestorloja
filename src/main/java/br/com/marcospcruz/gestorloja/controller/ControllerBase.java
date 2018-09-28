@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
@@ -100,5 +102,12 @@ public abstract class ControllerBase {
 	public abstract void validaExistente(String text) throws Exception;
 
 	public abstract void novo();
+
+	protected void logDebug(String message) {
+		final Logger logger = SingletonManager.getInstance().getLogger(this.getClass());
+		if (logger.isDebugEnabled()) {
+			logger.debug(message);
+		}
+	}
 
 }

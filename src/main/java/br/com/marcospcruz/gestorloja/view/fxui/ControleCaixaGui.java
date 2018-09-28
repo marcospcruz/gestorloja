@@ -8,6 +8,7 @@ import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.CaixaModel;
 import br.com.marcospcruz.gestorloja.model.Venda;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -86,7 +87,7 @@ public class ControleCaixaGui extends StageBase {
 
 			openCaixaGui();
 		} catch (Exception e) {
-			showErrorMessage(e.getMessage());
+			super.showErrorMessage(e);
 			e.printStackTrace();
 		}
 	}
@@ -100,7 +101,7 @@ public class ControleCaixaGui extends StageBase {
 
 		} catch (Exception e) {
 
-			e.printStackTrace();
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
 		} finally {
 			reloadForm();
 		}
@@ -162,6 +163,11 @@ public class ControleCaixaGui extends StageBase {
 		button.setDisable(ativaBotaoAbrir);
 	}
 
+	/**
+	 * 
+	 * @param vendas
+	 * @return
+	 */
 	private Float sumarizaVendasCaixa(Set<Venda> vendas) {
 		float totalVendas = 0;
 		for (Venda venda : vendas) {
@@ -203,7 +209,7 @@ public class ControleCaixaGui extends StageBase {
 			abreTelaCadastro();
 			reloadForm();
 		} catch (Exception e) {
-			e.printStackTrace();
+			showErrorMessage(e);
 		} finally {
 
 		}
