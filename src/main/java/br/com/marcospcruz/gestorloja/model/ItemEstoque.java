@@ -266,8 +266,9 @@ public class ItemEstoque implements Serializable {
 		if (operador == null) {
 			if (other.operador != null)
 				return false;
-		} else if (!operador.equals(other.operador))
-			return false;
+		} 
+//		else if (!operador.equals(other.operador))
+//			return false;
 		if (produto == null) {
 			if (other.produto != null)
 				return false;

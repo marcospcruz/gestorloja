@@ -4,10 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 
@@ -43,6 +45,8 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 		BufferedReader reader = null;
 		reader = new BufferedReader(new InputStreamReader(inputStream));
 		dadosEstoqueMap = new HashMap<>();
+		SingletonManager.getInstance().getLogger(getClass())
+				.info("Iniciando importação de arquivo de estoque em " + LocalDateTime.now());
 		try {
 			int rowIndex = 0;
 			while (reader.ready()) {
@@ -55,7 +59,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 					while (token.hasMoreTokens()) {
 						columns[x++] = token.nextToken();
 					}
-
+					SingletonManager.getInstance().getLogger(getClass()).info("Lendo linha " + rowIndex);
 					ItemEstoque item = parseRow(columns);
 					if (!dadosEstoqueMap.containsKey(item.getCodigoDeBarras())) {
 						dadosEstoqueMap.put(item.getCodigoDeBarras(), item);
@@ -74,29 +78,34 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 			setMensagemRetorno(rowIndex + " linhas lidas.");
 		} catch (IOException e) {
 
-			e.printStackTrace();
+			SingletonManager.getInstance().getLogger(getClass()).error(e);
 
 		} finally {
 			reader.close();
 
 			inputStream.close();
+
+			SingletonManager.getInstance().getLogger(getClass())
+					.info("Leitura de arquivo de estoque concluído em " + LocalDateTime.now());
 		}
 
 	}
 
 	private ItemEstoque parseRow(String[] columns) throws Exception {
 		ItemEstoqueBuilder builder = new ItemEstoqueBuilder();
-
+		if (columns[CATEGORIA_PRODUTO].contains("FORCE"))
+			System.out.println();
 		//@formatter:off
 		ItemEstoque item=null; 
 		try{
-			item=builder.setCodigoDeBarras(columns[CODIGO_BARRAS].trim())
-				.setCategoriaProduto(columns[CATEGORIA_PRODUTO].trim())
-				.setSuperCategoriaProduto(columns[SUPER_CATEGORIA_PRODUTO].trim())
-				.setFabricante(columns[FABRICANTE].trim())
-				.setProduto(columns[PRODUTO].trim())
-				.setValorUnitario(columns[VALOR_UNITARIO]!=null?columns[VALOR_UNITARIO].trim():"0")
+			item=builder.setCodigoDeBarras(columns[CODIGO_BARRAS])
+				.setCategoriaProduto(columns[CATEGORIA_PRODUTO])
+				.setSuperCategoriaProduto(columns[SUPER_CATEGORIA_PRODUTO])
+				.setFabricante(columns[FABRICANTE])
+				.setProduto(columns[PRODUTO])
+				.setValorUnitario(columns[VALOR_UNITARIO]!=null?columns[VALOR_UNITARIO]:"0")
 				.getItemEstoque();
+			
 			//@formatter:on
 		} catch (ArrayIndexOutOfBoundsException e) {
 			// e.printStackTrace();
@@ -104,6 +113,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 		} catch (NumberFormatException e) {
 			return parseRow(Util.diminueArray(columns));
 		} catch (NullPointerException e) {
+			e.printStackTrace();
 			throw new Exception("Dados Inválidos.");
 		}
 		return item;
@@ -117,7 +127,12 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 					.getController(ControllerAbstractFactory.ESTOQUE);
 
 			for (String codigoBarras : dadosEstoqueMap.keySet()) {
-				controller.buscaItemPorCodigoDeBarras(codigoBarras);
+				try {
+					controller.buscaItemPorCodigoDeBarras(codigoBarras);
+				} catch (NoResultException e) {
+					e.printStackTrace();
+					SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage());
+				}
 				if (controller.getItem() == null) {
 					ItemEstoque item = dadosEstoqueMap.get(codigoBarras);
 					Fabricante fabricante = item.getFabricante();
@@ -134,7 +149,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 				controller.salva();
 
 				controller.setItem(null);
-				System.out.println("Registro: " + i);
+				SingletonManager.getInstance().getLogger(getClass()).info("Salvando registro: " + (i + 1));
 				i++;
 			}
 
@@ -150,7 +165,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 
 	private Produto buscaProduto(Produto produto) {
 		try {
-			System.out.print(produto);
+
 			ProdutoController controller = (ProdutoController) SingletonManager.getInstance()
 					.getController(ControllerAbstractFactory.PRODUTO);
 			controller.setItem(null);
@@ -187,7 +202,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 			if (controller.getItem() != null)
 				return (Fabricante) controller.getItem();
 		} catch (Exception e) {
-			// e.printStackTrace();
+			SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
 		}
 		return fabricante;
 	}

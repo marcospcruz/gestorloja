@@ -15,23 +15,6 @@ public abstract class ControllerBase {
 
 	static final String BUSCA_INVALIDA = "Busca Invïálida";
 
-	private Map<Object, Object> cacheMap;
-
-	private List cacheList;
-
-	public Map<Object, Object> getCacheMap() {
-		return cacheMap;
-	}
-
-	public void setCacheMap(Map<Object, Object> cacheMap) {
-		this.cacheMap = cacheMap;
-	}
-
-	public ControllerBase() {
-		cacheMap = new HashMap<>();
-		cacheList = new ArrayList<>();
-	}
-
 	/**
 	 * 
 	 * @return

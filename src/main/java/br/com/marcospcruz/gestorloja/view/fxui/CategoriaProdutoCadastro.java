@@ -3,9 +3,13 @@ package br.com.marcospcruz.gestorloja.view.fxui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.LazyInitializationException;
+
 import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.model.TipoProdutoModel;
 import javafx.beans.value.ChangeListener;
@@ -193,7 +197,7 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 	@Override
 	protected void carregaDadosTable(TableView table) throws Exception {
 		TipoProdutoController controller = getTipoProdutoController();
-		
+
 		ObservableList<TipoProdutoModel> items = table.getItems();
 		controller.buscaTodos();
 		carregaTiposProduto(controller.getList(), items);
@@ -204,17 +208,28 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 
 	protected void carregaTiposProduto(List<TipoProduto> list, ObservableList<TipoProdutoModel> items) {
 		list.stream().forEach(f -> {
-			SubTipoProduto tipoProduto = (SubTipoProduto) f;
+			SubTipoProduto tipoProduto = new CrudDao<SubTipoProduto>().update((SubTipoProduto) f);
 			String descricaoSuper = tipoProduto.getSuperTipoProduto() == null ? ""
 					: tipoProduto.getSuperTipoProduto().getDescricaoTipo();
-			int qtItensEstoque = tipoProduto.getItensEstoque().size();
+			int qtItensEstoque = 0;
+			try {
+				qtItensEstoque = tipoProduto.getItensEstoque().size();
+			} catch (LazyInitializationException e) {
+				SingletonManager.getInstance().getLogger(getClass())
+						.warn("LazyInitializationException para " + tipoProduto, e);
+			}
 			TipoProdutoModel model = new TipoProdutoModel(tipoProduto.getIdTipoItem(), tipoProduto.getDescricaoTipo(),
 					descricaoSuper, qtItensEstoque);
 
 			items.add(model);
-			List subTipos = (List<SubTipoProduto>) f.getSubTiposProduto();
-			if (subTipos != null) {
-				carregaTiposProduto(subTipos, items);
+			List subTipos = (List<SubTipoProduto>) tipoProduto.getSubTiposProduto();
+			try {
+				if (subTipos != null && !subTipos.isEmpty()) {
+					carregaTiposProduto(subTipos, items);
+				}
+			} catch (LazyInitializationException e) {
+				SingletonManager.getInstance().getLogger(getClass())
+						.warn("LazyInitializationException para " + tipoProduto, e);
 			}
 		});
 
@@ -225,7 +240,7 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 		populaForm();
 		reloadTableView(CATEGORIAS_PRODUTO);
 		super.criaObservableList(tiposProduto.getItems(), controller);
-//		tiposProduto.getEditor().setText("");
+		// tiposProduto.getEditor().setText("");
 
 		super.criaObservableList(superTiposProduto.getItems(), controller);
 

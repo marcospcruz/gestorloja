@@ -62,9 +62,9 @@ public class CrudDao<T> implements Crud<T> {
 
 			entityManager.getTransaction().commit();
 			SingletonManager.getInstance().getLogger(this.getClass()).info("Salvando entidade " + entity);
-		} catch (PersistenceException e) {
+		} catch (Exception e) {
 
-			SingletonManager.getInstance().getLogger(this.getClass()).error(e);
+			SingletonManager.getInstance().getLogger(this.getClass()).error(e.getMessage(),e);
 
 			throw e;
 
@@ -85,13 +85,14 @@ public class CrudDao<T> implements Crud<T> {
 
 		try {
 			entityManager.getTransaction().begin();
-
+			entity = entityManager.merge(entity);
+			SingletonManager.getInstance().getLogger(getClass()).info("Removendo " + entity);
 			entityManager.remove(entity);
 
 			entityManager.getTransaction().commit();
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			entityManager.getTransaction().rollback();
+			SingletonManager.getInstance().getLogger(getClass()).error(e);
 
 			throw e;
 

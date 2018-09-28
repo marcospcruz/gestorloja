@@ -141,7 +141,7 @@ public class EstoquePrincipalGui extends StageBase {
 					reloadForm();
 				} catch (Exception e) {
 					showErrorMessage(e.getMessage());
-					e.printStackTrace();
+					SingletonManager.getInstance().getLogger(getClass()).error(e);
 				}
 
 				return null;
@@ -214,7 +214,7 @@ public class EstoquePrincipalGui extends StageBase {
 		subCategoriaProduto.getEditor().setText("");
 		reloadComboFabricantes();
 		reloadComboCategoria();
-		controller.setCacheMap(null);
+		
 		controller.buscaTodos();
 		reloadTableView();
 		controller.setItem(null);

@@ -20,12 +20,15 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 //@formatter:off
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "produto.readall", query = "select distinct p from Produto p " 
+		@NamedQuery(name = "produto.readall", query = "select distinct p from Produto p "
+				+ "LEFT JOIN FETCH p.estoqueProduto " 
 ),
 		@NamedQuery(name = "produto.readparametrolike", query = "select distinct p from Produto p "
 //				+ "JOIN fetch p.tiposProduto t "
+				+ "LEFT JOIN FETCH p.estoqueProduto "
 				+ "where upper(p.descricaoProduto) like :descricao"),
 		@NamedQuery(name = "produto.readparametro", query = "select distinct p from Produto p "
+				+ "LEFT JOIN FETCH p.estoqueProduto "
 				+"where upper(p.descricaoProduto) = :descricao")
 		})
 		

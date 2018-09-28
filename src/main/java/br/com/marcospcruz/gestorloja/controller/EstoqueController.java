@@ -47,7 +47,7 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public ItemEstoque getItemEstoque() {
-		if (itemEstoque.getIdItemEstoque() != 0)
+		if (itemEstoque != null && itemEstoque.getIdItemEstoque() != null)
 			itemEstoque = itemEstoqueDao.update(itemEstoque);
 		return itemEstoque;
 	}
@@ -68,17 +68,8 @@ public class EstoqueController extends ControllerBase {
 
 	private void carregaItensEstoque() {
 		// if (itensEstoque == null || itensEstoque.isEmpty())
-		Map<Object, Object> cache = getCacheMap();
-		if (cache == null || cache.isEmpty()) {
 
-			itensEstoque = null;
-
-			itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
-			setCacheMap(itensEstoque.stream()
-					.collect(Collectors.toMap(item -> ((ItemEstoque) item).getIdItemEstoque(), item -> item)));
-		} else
-			itensEstoque = new ArrayList(cache.values());
-		// setList(itensEstoque);
+		itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
 
 	}
 
@@ -143,22 +134,7 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public void buscaItemPorCodigoDeBarras(String codigoProduto) {
-		try {
-			buscaTodos();
-			// if(itensEstoque==)
-			// Crud<ItemEstoque> itemEstoqueDao = getDao();
-			// itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo",
-			// codigoProduto);
-			itensEstoque = new ArrayList(getCacheMap().values().stream()
-					.filter(item -> ((ItemEstoque) item).getCodigoDeBarras().equals(codigoProduto))
-
-					.collect(Collectors.toList()));
-			if (itensEstoque.size() == 1) {
-				itemEstoque = itensEstoque.get(0);
-			}
-		} catch (Exception e) {
-			itemEstoque = null;
-		}
+		itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigo", "codigo", codigoProduto);
 
 	}
 
@@ -202,9 +178,9 @@ public class EstoqueController extends ControllerBase {
 			// itemEstoque.getProduto().getIdProduto(), "idFabricante",
 			// itemEstoque.getFabricante().getIdFabricante(), "idTipoProduto",
 			// itemEstoque.getTipoProduto().getIdTipoItem());
-			itemEstoque = itemEstoqueDao.busca(ItemEstoque.class, itemEstoque.getIdItemEstoque());
+
 			itemEstoqueDao.delete(itemEstoque);
-			getCacheMap().remove(itemEstoque.getIdItemEstoque());
+
 		} catch (NoResultException e) {
 			e.printStackTrace();
 		} finally {
@@ -270,18 +246,11 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void busca(String text) throws Exception {
 		// busca(text, null, null);
-		if (itensEstoque == null)
-			itensEstoque = new ArrayList(getCacheMap().values());
-		itemEstoque = itensEstoque.stream()
-				.filter(item -> ((ItemEstoque) item).getCodigoDeBarras().equalsIgnoreCase(text)).findFirst()
-				.orElse(null);
-		if (itemEstoque == null) {
 
-			try {
-				itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigo", "codigo", text);
-			} catch (NoResultException e) {
-				throw new Exception("Ítem código " + text + " não encontrado no estoque.");
-			}
+		try {
+			itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigo", "codigo", text);
+		} catch (NoResultException e) {
+			throw new Exception("Ítem código " + text + " não encontrado no estoque.");
 		}
 	}
 
@@ -429,9 +398,9 @@ public class EstoqueController extends ControllerBase {
 
 		try {
 			itemEstoque = itemEstoqueDao.update(itemEstoque);
-			getCacheMap().put(itemEstoque.getIdItemEstoque(), itemEstoque);
+
 		} catch (PersistenceException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			throw e;
 		}
 

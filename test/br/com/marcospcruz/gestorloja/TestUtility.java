@@ -26,7 +26,7 @@ public class TestUtility {
 
 	@Test
 	public void planilhaEstoqueReaderTest() throws Exception {
-		File arquivo = new File("C:\\gestorLoja\\cadastro_produtos.csv");
+		File arquivo = new File("\\Users\\MarcosPereiradaCruz\\Desktop\\cadastro_produtos.csv");
 		ImportadorArquivo loader = new ImportadorArquivoCsv(arquivo);
 
 		loader.carregaDados();

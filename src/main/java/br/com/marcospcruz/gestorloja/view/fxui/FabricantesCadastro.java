@@ -2,6 +2,7 @@ package br.com.marcospcruz.gestorloja.view.fxui;
 
 import java.util.ArrayList;
 
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.model.FabricanteModel;
@@ -125,7 +126,7 @@ public class FabricantesCadastro extends CadastroBase {
 		ObservableList<FabricanteModel> items = table.getItems();
 		// items.removeAll(items);
 		controller.getList().stream().forEach(f -> {
-			Fabricante fabricante = (Fabricante) f;
+			Fabricante fabricante = new CrudDao<Fabricante>().update((Fabricante) f);
 			FabricanteModel model = new FabricanteModel(fabricante.getIdFabricante(), fabricante.getNome(),
 					fabricante.getItensEstoque().size());
 			items.add(model);

@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,7 +41,8 @@ public abstract class TipoProduto implements Serializable {
 	@Column(unique = true)
 	private String descricaoTipo;
 
-	@OneToMany(mappedBy = "superTipoProduto", cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@OneToMany(orphanRemoval = true, mappedBy = "superTipoProduto", cascade = {
+			CascadeType.MERGE }, fetch = FetchType.LAZY)
 	@OrderBy("descricaoTipo")
 	private Collection<SubTipoProduto> subTiposProduto;
 

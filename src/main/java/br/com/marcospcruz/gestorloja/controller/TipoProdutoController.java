@@ -234,27 +234,15 @@ public class TipoProdutoController extends ControllerBase {
 
 			buscaInWorkAround(parametro);
 
-		} else {
-			Map<Object, Object> cache = getCacheMap();
-			if (cache != null && !cache.isEmpty()) {
-				tiposProdutos = new ArrayList(cache.values());
-			}
-
 		}
-		if (tiposProdutos != null)
-			tiposProdutos = (List) tiposProdutos.stream()
-					.filter(tp -> ((SubTipoProduto) tp).getDescricaoTipo().equalsIgnoreCase(parametro))
-					.collect(Collectors.toList());
-		// if (tiposProdutos.isEmpty())
-		else {
-			String valor = "%" + parametro.toUpperCase() + "%";
 
-			tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike", "descricao", valor);
-			// setCacheMap((Map<Object, Object>) tiposProdutos.stream()
-			// .collect(Collectors.toMap(tipo -> ((SubTipoProduto) tipo).getIdTipoItem(),
-			// tipo -> tipo)));
+		String valor = "%" + parametro.toUpperCase() + "%";
 
-		}
+		tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike", "descricao", valor);
+		// setCacheMap((Map<Object, Object>) tiposProdutos.stream()
+		// .collect(Collectors.toMap(tipo -> ((SubTipoProduto) tipo).getIdTipoItem(),
+		// tipo -> tipo)));
+
 		if (!tiposProdutos.isEmpty())
 
 			tipoProduto = (SubTipoProduto) tiposProdutos.get(0);
@@ -301,7 +289,7 @@ public class TipoProdutoController extends ControllerBase {
 	 * 
 	 */
 	public void excluir() throws Exception {
-
+		tipoProduto = tipoProdutoDao.update(tipoProduto);
 		if (tipoProduto == null || tipoProduto.getIdTipoItem() == null) {
 
 			throw new Exception(REMOCAO_INVALIDA_EXCEPTION);
@@ -316,7 +304,14 @@ public class TipoProdutoController extends ControllerBase {
 		if (tipoProduto.getSubTiposProduto().size() > 0)
 			throw new Exception(REMOCAO_SUPERTIPO_POPULADO);
 
+		tipoProduto = tipoProdutoDao.busca(tipoProduto.getClass(), tipoProduto.getIdTipoItem());
+
+//		SubTipoProduto superTipoProduto = tipoProdutoDao.update(tipoProduto.getSuperTipoProduto());
+//
+//		superTipoProduto.getSubTiposProduto().remove(tipoProduto);
+
 		tipoProdutoDao.delete(tipoProduto);
+//		tipoProdutoDao.update(superTipoProduto);
 
 		setItem(null);
 
@@ -416,7 +411,7 @@ public class TipoProdutoController extends ControllerBase {
 		setItem(tipoProduto);
 		if (tipoProduto.getIdTipoItem() != null)
 			salva();
-		
+
 	}
 
 	// public void iniciaTipoPecaRoupa() {

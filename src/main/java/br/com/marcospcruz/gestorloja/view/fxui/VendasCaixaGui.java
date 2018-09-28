@@ -61,8 +61,8 @@ public class VendasCaixaGui extends StageBase {
 		super.setLayoutsMaxWidth(layoutsMaxWidth);
 
 		tablePane = super.criaTablePane("Vendas");
-		TitledPane buttonPane = criaButtonPane();
-		getvBox().getChildren().addAll(buttonPane, tablePane);
+//		TitledPane buttonPane = criaButtonPane();
+		getvBox().getChildren().addAll(tablePane);
 		((Group) scene.getRoot()).getChildren().add(getvBox());
 		setScene(scene);
 	}

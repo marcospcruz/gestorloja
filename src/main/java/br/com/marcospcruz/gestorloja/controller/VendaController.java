@@ -670,4 +670,11 @@ public class VendaController extends ControllerBase {
 		salva();
 		iniciaVenda();
 	}
+
+	public Pagamento getPagamentoVenda() {
+		Pagamento pagamento=venda.getPagamento();
+		if(pagamento.getIdPagamento()!=0)
+			pagamento=new CrudDao<Pagamento>().update(pagamento);
+		return pagamento;
+	}
 }

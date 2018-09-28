@@ -147,7 +147,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 		} catch (Exception e) {
 
-			SingletonManager.getInstance().getLogger(getClass()).warn(e);
+			SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
 
 		} finally {
 

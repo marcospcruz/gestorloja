@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.view.fxui;
 import java.util.ArrayList;
 
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import javafx.collections.ObservableList;
@@ -149,11 +150,11 @@ public class ProdutoCadastro extends CadastroBase {
 	@Override
 	protected void carregaDadosTable(TableView table) throws Exception {
 		ProdutoController controller = getProdutoController();
-		
+
 		ObservableList<ProdutoModel> items = table.getItems();
 		items.removeAll(items);
 		controller.getList().stream().forEach(produto -> {
-
+//			produto = new CrudDao<Produto>().update(produto);
 			ProdutoModel model = new ProdutoModel(produto.getIdProduto(), produto.getDescricaoProduto(),
 					produto.getEstoqueProduto().size());
 

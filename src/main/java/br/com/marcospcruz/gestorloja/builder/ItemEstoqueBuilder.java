@@ -4,6 +4,7 @@ import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 
 public class ItemEstoqueBuilder {
@@ -15,7 +16,7 @@ public class ItemEstoqueBuilder {
 	}
 
 	public ItemEstoqueBuilder setCodigoDeBarras(String string) {
-		itemEstoque.setCodigoDeBarras(string);
+		itemEstoque.setCodigoDeBarras(string.trim());
 		return this;
 	}
 
@@ -26,34 +27,39 @@ public class ItemEstoqueBuilder {
 
 	public ItemEstoqueBuilder setCategoriaProduto(String string) {
 		SubTipoProduto tipo = new SubTipoProduto();
-		tipo.setDescricaoTipo(string);
+		tipo.setDescricaoTipo(string.trim());
 		itemEstoque.setTipoProduto(tipo);
 		return this;
 	}
 
 	public ItemEstoqueBuilder setSuperCategoriaProduto(String string) {
 		SubTipoProduto tipo = new SubTipoProduto();
-		tipo.setDescricaoTipo(string);
+		tipo.setDescricaoTipo(string.trim());
 		itemEstoque.getTipoProduto().setSuperTipoProduto(tipo);
 		return this;
 	}
 
 	public ItemEstoqueBuilder setFabricante(String string) {
 		Fabricante fabricante = new Fabricante();
-		fabricante.setNome(string);
+		fabricante.setNome(string.trim());
 		itemEstoque.setFabricante(fabricante);
 		return this;
 	}
 
 	public ItemEstoqueBuilder setProduto(String string) {
-		Produto produto = new Produto();
-		produto.setDescricaoProduto(string);
-		itemEstoque.setProduto(produto);
+		try {
+			Produto produto = new Produto();
+			produto.setDescricaoProduto(string.trim());
+			itemEstoque.setProduto(produto);
+
+		} catch (NullPointerException e) {
+			SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
+		}
 		return this;
 	}
 
 	public ItemEstoqueBuilder setValorUnitario(String string) {
-		float valorUnitario=Util.parseStringDecimalToFloat(string);
+		float valorUnitario = Util.parseStringDecimalToFloat(string.trim());
 		itemEstoque.setValorUnitario(valorUnitario);
 		return this;
 	}

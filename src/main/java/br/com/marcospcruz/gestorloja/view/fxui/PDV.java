@@ -9,6 +9,7 @@ import java.util.Map;
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.VendaController;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.ItemVenda;
@@ -141,7 +142,7 @@ public class PDV extends StageBase {
 			naoAtualizaDesconto = true;
 			atualizaSubTotal(controller);
 			atualizaSubTotalDesconto(controller);
-			Pagamento pagamento = controller.getVenda().getPagamento();
+			Pagamento pagamento = new CrudDao<Pagamento>().update(controller.getVenda().getPagamento());
 			for (MeioPagamento mp : pagamento.getMeiosPagamento()) {
 				TipoMeioPagamento tipoMeioPagamento = mp.getTipoMeioPagamento();
 				//@formatter:off
@@ -315,7 +316,7 @@ public class PDV extends StageBase {
 		try {
 			VendaController controller = getVendaController();
 
-			Pagamento pagamento = controller.getVenda().getPagamento();
+			Pagamento pagamento = controller.getPagamentoVenda();
 			if (pagamento == null)
 				pagamento = new Pagamento();
 			String descricaoTipoMeioPagamento = checkBox.getText();
@@ -389,7 +390,7 @@ public class PDV extends StageBase {
 			//
 
 		} catch (Exception e) {
-
+			SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(),e);
 			e.printStackTrace();
 		}
 
@@ -767,7 +768,7 @@ public class PDV extends StageBase {
 				}
 			});
 			VendaController vendaController = getVendaController();
-			if (vendaController.getVenda().getCaixa().getUsuarioFechamento() != null)
+			if (vendaController.getVenda().getCaixa().getUsuarioFechamento() == null)
 				children.add(button);
 
 		}

@@ -6,6 +6,7 @@ import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.FabricanteController;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
 import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
+import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.facade.OperacaoEstoqueFacade;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
@@ -105,11 +106,10 @@ public class ItemEstoqueCadastro extends StageBase {
 				comboCategoria.setValue(subCategoriaProduto.getSuperTipoProduto());
 				ObservableList<TipoProduto> itemsList = subCategoria.getItems();
 				TipoProdutoController tipoProdutoController = getTipoProdutoController();
-				SubTipoProduto superCategoria = subCategoriaProduto.getSuperTipoProduto();
-				tipoProdutoController.busca(superCategoria.getIdTipoItem());
-				superCategoria=(SubTipoProduto) tipoProdutoController.getItem();
-				itemsList = FXCollections
-						.observableArrayList(superCategoria.getSubTiposProduto());
+				SubTipoProduto superCategoria = new CrudDao<SubTipoProduto>()
+						.update(subCategoriaProduto.getSuperTipoProduto());
+
+				itemsList = FXCollections.observableArrayList(superCategoria.getSubTiposProduto());
 				subCategoria.setItems(itemsList);
 				subCategoria.setValue(subCategoriaProduto);
 				produtocombo.setValue(produto);
@@ -120,7 +120,7 @@ public class ItemEstoqueCadastro extends StageBase {
 				btnExcluir.setDisable(false);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			// e.printStackTrace();
 			SingletonManager.getInstance().getLogger(getClass()).warn(e);
 		}
 
@@ -136,7 +136,7 @@ public class ItemEstoqueCadastro extends StageBase {
 				hide();
 			}
 		} catch (Exception e) {
-
+			SingletonManager.getInstance().getLogger(getClass()).error(e);
 			e.printStackTrace();
 		}
 	}
@@ -196,7 +196,8 @@ public class ItemEstoqueCadastro extends StageBase {
 			}
 
 			ItemEstoque teste = controller.validaCodigoDeBarras(codigoBarras);
-			if (teste != null)
+
+			if (teste != null && teste.getIdItemEstoque() != itemEstoque.getIdItemEstoque())
 				throw new Exception("Código de Barras já cadastrado no estoque.");
 
 			itemEstoque.setCodigoDeBarras(codigoBarras);
@@ -214,7 +215,6 @@ public class ItemEstoqueCadastro extends StageBase {
 			hide();
 
 		} catch (Exception e1) {
-			e1.printStackTrace();
 			super.showErrorMessage(e1.getMessage());
 		}
 	}
