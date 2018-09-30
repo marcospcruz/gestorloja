@@ -245,6 +245,7 @@ public class VendaController extends ControllerBase {
 		float valorTotal = 0f;
 		for (ItemVenda item : venda.getItensVenda()) {
 			float valorItemVenda = item.getItemEstoque().getValorUnitario();
+			System.out.println(valorItemVenda);
 			// valorTotal += valorItemVenda;
 
 			float desconto = Float.isNaN(venda.getPorcentagemDesconto()) ? 0 : (venda.getPorcentagemDesconto() / 100f);
@@ -350,6 +351,7 @@ public class VendaController extends ControllerBase {
 	}
 
 	public void resetVenda() {
+		venda = null;
 		venda = new Venda();
 		itemVendaMap = new HashMap<>();
 
@@ -672,9 +674,9 @@ public class VendaController extends ControllerBase {
 	}
 
 	public Pagamento getPagamentoVenda() {
-		Pagamento pagamento=venda.getPagamento();
-		if(pagamento!=null && pagamento.getIdPagamento()!=0)
-			pagamento=new CrudDao<Pagamento>().update(pagamento);
+		Pagamento pagamento = venda.getPagamento();
+		if (pagamento != null && pagamento.getIdPagamento() != 0)
+			pagamento = new CrudDao<Pagamento>().update(pagamento);
 		return pagamento;
 	}
 }

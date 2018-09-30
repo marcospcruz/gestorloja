@@ -42,7 +42,7 @@ public class Venda implements Serializable {
 	private List<ItemVenda> itensVenda;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataVenda;
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.MERGE)
 	// (cascade = { CascadeType.ALL})
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;

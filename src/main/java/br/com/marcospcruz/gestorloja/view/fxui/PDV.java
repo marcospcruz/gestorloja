@@ -390,7 +390,7 @@ public class PDV extends StageBase {
 			//
 
 		} catch (Exception e) {
-			SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(),e);
+			SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
 			e.printStackTrace();
 		}
 
@@ -722,8 +722,12 @@ public class PDV extends StageBase {
 			buttonLimpar.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
 			buttonLimpar.setOnAction(evt -> {
 				try {
-					if (showConfirmAtionMessage("Deseja cancelar esta venda?"))
+					if (showConfirmAtionMessage("Deseja cancelar esta venda?")) {
+						
 						limpaFormularioPdv();
+						getVendaController().resetVenda();
+						
+					}
 
 				} catch (Exception e) {
 					showErrorMessage("Falha ao limpar formulário.");

@@ -139,9 +139,8 @@ public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoPro
 
 	@Override
 	public String toString() {
-		String toString = (superTipoProduto == null ? "" : superTipoProduto.getDescricaoTipo() + " - ")
-				+ getDescricaoTipo();
-		return toString;
+		
+		return getDescricaoTipo();
 	}
 
 	@Override
