@@ -61,7 +61,7 @@ public class CrudDao<T> implements Crud<T> {
 			entity = entityManager.merge(entity);
 
 			entityManager.getTransaction().commit();
-			SingletonManager.getInstance().getLogger(this.getClass()).info("Salvando entidade " + entity);
+			SingletonManager.getInstance().getLogger(this.getClass()).info("Carregando entidade " + entity);
 		} catch (Exception e) {
 
 			SingletonManager.getInstance().getLogger(this.getClass()).error(e.getMessage(),e);

@@ -20,18 +20,22 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 @NamedQueries({
 		@NamedQuery(name = "tipoProduto.readAll", query = "select distinct t from SubTipoProduto t "
 				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
 				+ "order by t.descricaoTipo"),
 		@NamedQuery(name = "tipoProduto.readtiposabstratos", query = "select distinct t from SubTipoProduto t "
-				+ "LEFT JOIN FETCH t.subTiposProduto " 
+				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
 //				+ "LEFT JOIN FETCH t.itensEstoque "
 				+ "where t.superTipoProduto is null "
 				+ "order by t.descricaoTipo"),
 		@NamedQuery(name = "tipoProduto.readParametro", query = "select distinct t from SubTipoProduto t "
 				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "JOIN FETCH t.superTipoProduto "
 //				+ "LEFT JOIN FETCH t.itensEstoque "
 				+ "where lower(t.descricaoTipo) = :descricao"),
 		@NamedQuery(name = "tipoProduto.readParametroLike", query = "select distinct t from SubTipoProduto t "
 				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
 				+ "where UPPER(t.descricaoTipo) like :descricao "
 		// + "and t.superTipoProduto is null"
 		) })
@@ -47,7 +51,7 @@ public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoPro
 	@JoinColumn(name = "idSuperTipoProduto")
 	private SubTipoProduto superTipoProduto;
 
-	@OneToMany(mappedBy = "tipoProduto", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "tipoProduto", fetch = FetchType.EAGER)
 	// @Fetch(FetchMode.JOIN)
 	private List<ItemEstoque> itensEstoque;
 
@@ -96,8 +100,6 @@ public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoPro
 		this.itensEstoque = itensEstoque;
 	}
 
-	
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -137,7 +139,9 @@ public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoPro
 
 	@Override
 	public String toString() {
-		return getDescricaoTipo();
+		String toString = (superTipoProduto == null ? "" : superTipoProduto.getDescricaoTipo() + " - ")
+				+ getDescricaoTipo();
+		return toString;
 	}
 
 	@Override

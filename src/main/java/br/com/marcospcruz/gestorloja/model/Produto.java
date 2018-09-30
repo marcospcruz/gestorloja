@@ -15,6 +15,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 //@formatter:off
@@ -60,7 +63,7 @@ public class Produto implements Serializable {
 	private Date dataInsercao;
 
 	@OneToMany(mappedBy = "produto")
-	// @Fetch(FetchMode.JOIN)
+	@Fetch(FetchMode.JOIN)
 	private Collection<ItemEstoque> estoqueProduto;
 
 	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida) {

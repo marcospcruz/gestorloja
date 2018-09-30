@@ -150,7 +150,7 @@ public class ProdutoCadastro extends CadastroBase {
 	@Override
 	protected void carregaDadosTable(TableView table) throws Exception {
 		ProdutoController controller = getProdutoController();
-
+		controller.buscaTodos();
 		ObservableList<ProdutoModel> items = table.getItems();
 		items.removeAll(items);
 		controller.getList().stream().forEach(produto -> {

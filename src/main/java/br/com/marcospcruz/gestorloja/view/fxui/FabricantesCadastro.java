@@ -153,7 +153,7 @@ public class FabricantesCadastro extends CadastroBase {
 			reloadForm();
 		} catch (Exception e) {
 
-			e.printStackTrace();
+			showErrorMessage(e);
 		}
 
 	}

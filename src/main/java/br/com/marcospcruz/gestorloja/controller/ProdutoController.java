@@ -154,7 +154,12 @@ public class ProdutoController extends ControllerBase {
 
 	@Override
 	public void excluir() throws Exception {
-
+		produto = produtoDao.busca(Produto.class, produto.getIdProduto());
+		if (!produto.getEstoqueProduto().isEmpty()) {
+			int qtEstoque = produto.getEstoqueProduto().size();
+			throw new Exception("Não é possível excluir este produto! Há " + qtEstoque
+					+ (qtEstoque > 1 ? " itens cadastrados" : " ítem cadastrado") + " no estoque.");
+		}
 		produtoDao.delete(produto);
 
 	}
@@ -207,8 +212,8 @@ public class ProdutoController extends ControllerBase {
 	}
 
 	public void buscaProduto(String descricaoProduto) {
-		produto=produtoDao.busca("produto.readparametro", "descricao",descricaoProduto.toUpperCase());
-		
+		produto = produtoDao.busca("produto.readparametro", "descricao", descricaoProduto.toUpperCase());
+
 	}
 
 }

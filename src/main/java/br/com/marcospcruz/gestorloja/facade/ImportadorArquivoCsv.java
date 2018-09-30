@@ -34,6 +34,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 	private static final int FABRICANTE = 4;
 	private static final int PRODUTO = 5;
 	private static final int VALOR_UNITARIO = 6;
+	private static final int QUANTIDADE_ITEM = 7;
 	private Map<String, ItemEstoque> dadosEstoqueMap;
 
 	public ImportadorArquivoCsv(File arquivo) {
@@ -104,6 +105,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 				.setFabricante(columns[FABRICANTE])
 				.setProduto(columns[PRODUTO])
 				.setValorUnitario(columns[VALOR_UNITARIO]!=null?columns[VALOR_UNITARIO]:"0")
+				.setQuantidade(columns[QUANTIDADE_ITEM])
 				.getItemEstoque();
 			
 			//@formatter:on

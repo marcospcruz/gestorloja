@@ -306,12 +306,19 @@ public class TipoProdutoController extends ControllerBase {
 
 		tipoProduto = tipoProdutoDao.busca(tipoProduto.getClass(), tipoProduto.getIdTipoItem());
 
-//		SubTipoProduto superTipoProduto = tipoProdutoDao.update(tipoProduto.getSuperTipoProduto());
-//
-//		superTipoProduto.getSubTiposProduto().remove(tipoProduto);
+		// SubTipoProduto superTipoProduto =
+		// tipoProdutoDao.update(tipoProduto.getSuperTipoProduto());
+		//
+		// superTipoProduto.getSubTiposProduto().remove(tipoProduto);
 
+		if (tipoProduto.getSuperTipoProduto() != null && tipoProduto.getItensEstoque() != null
+				&& !tipoProduto.getItensEstoque().isEmpty()) {
+			int qtEstoque = tipoProduto.getItensEstoque().size();
+			throw new Exception("Não é possível excluir esta categoria! Há " + qtEstoque
+					+ (qtEstoque > 1 ? " itens cadastrados" : " ítem cadastrado") + " no estoque.");
+		}
 		tipoProdutoDao.delete(tipoProduto);
-//		tipoProdutoDao.update(superTipoProduto);
+		// tipoProdutoDao.update(superTipoProduto);
 
 		setItem(null);
 
@@ -325,7 +332,12 @@ public class TipoProdutoController extends ControllerBase {
 	 */
 	public void busca(Object id) {
 		Integer idSubProduto = Integer.valueOf(id.toString());
-		tipoProduto = tipoProdutoDao.busca(SubTipoProduto.class, idSubProduto);
+		try {
+			tipoProduto = tipoProdutoDao.busca(SubTipoProduto.class, idSubProduto);
+			tipoProduto = tipoProdutoDao.update(tipoProduto);
+		} catch (Exception e) {
+			SingletonManager.getInstance().getLogger(getClass()).warn(e.getMessage());
+		}
 
 	}
 

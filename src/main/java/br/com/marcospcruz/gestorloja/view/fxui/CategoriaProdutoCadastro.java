@@ -206,18 +206,23 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 
 	}
 
-	protected void carregaTiposProduto(List<TipoProduto> list, ObservableList<TipoProdutoModel> items) {
-		list.stream().forEach(f -> {
-			SubTipoProduto tipoProduto = new CrudDao<SubTipoProduto>().update((SubTipoProduto) f);
+	protected void carregaTiposProduto(List<TipoProduto> list, ObservableList<TipoProdutoModel> items)
+			throws Exception {
+		for (TipoProduto f : list) {
+			TipoProdutoController subtipoController = getTipoProdutoController();
+			subtipoController.busca(f.getIdTipoItem());
+			SubTipoProduto tipoProduto = (SubTipoProduto) subtipoController.getItem();
 			String descricaoSuper = tipoProduto.getSuperTipoProduto() == null ? ""
 					: tipoProduto.getSuperTipoProduto().getDescricaoTipo();
-			int qtItensEstoque = 0;
-			try {
+			Integer qtItensEstoque = 0;
+			if (tipoProduto.getSuperTipoProduto() != null) {
 				qtItensEstoque = tipoProduto.getItensEstoque().size();
-			} catch (LazyInitializationException e) {
-				SingletonManager.getInstance().getLogger(getClass())
-						.warn("LazyInitializationException para " + tipoProduto, e);
+			} else {
+				for (SubTipoProduto subTipo : tipoProduto.getSubTiposProduto()) {
+					qtItensEstoque += subTipo.getItensEstoque().size();
+				}
 			}
+
 			TipoProdutoModel model = new TipoProdutoModel(tipoProduto.getIdTipoItem(), tipoProduto.getDescricaoTipo(),
 					descricaoSuper, qtItensEstoque);
 
@@ -231,7 +236,8 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 				SingletonManager.getInstance().getLogger(getClass())
 						.warn("LazyInitializationException para " + tipoProduto, e);
 			}
-		});
+
+		}
 
 	}
 

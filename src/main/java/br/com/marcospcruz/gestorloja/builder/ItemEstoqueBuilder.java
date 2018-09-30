@@ -64,4 +64,12 @@ public class ItemEstoqueBuilder {
 		return this;
 	}
 
+	public ItemEstoqueBuilder setQuantidade(String string) {
+		int qt = 0;
+		if (string != null && !string.isEmpty())
+			qt = Integer.parseInt(string.trim());
+		itemEstoque.setQuantidade(qt);
+		return this;
+	}
+
 }

@@ -155,7 +155,7 @@ public abstract class CadastroBase extends StageBase {
 			}
 			reloadForm();
 		} catch (Exception e) {
-			showErrorMessage(e.getMessage());
+
 			throw e;
 		}
 

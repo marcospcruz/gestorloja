@@ -494,7 +494,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 				excluiDados(arg0);
 			} catch (Exception e) {
 
-				e.printStackTrace();
+				showErrorMessage(e.getMessage());
 			}
 		});
 		pane.setHgap(10);
