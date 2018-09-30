@@ -30,7 +30,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 				+ "order by t.descricaoTipo"),
 		@NamedQuery(name = "tipoProduto.readParametro", query = "select distinct t from SubTipoProduto t "
 				+ "LEFT JOIN FETCH t.subTiposProduto "
-				+ "JOIN FETCH t.superTipoProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
 //				+ "LEFT JOIN FETCH t.itensEstoque "
 				+ "where lower(t.descricaoTipo) = :descricao"),
 		@NamedQuery(name = "tipoProduto.readParametroLike", query = "select distinct t from SubTipoProduto t "
