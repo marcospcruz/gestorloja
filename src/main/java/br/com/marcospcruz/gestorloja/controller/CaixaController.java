@@ -444,7 +444,8 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public void atualizaSaldoCaixa() {
-		caixa = dao.busca("caixa.findCaixa", "id", caixa.getIdCaixa());
+		if (caixa.getIdCaixa() != 0)
+			caixa = dao.busca("caixa.findCaixa", "id", caixa.getIdCaixa());
 		float saldoCaixa = caixa.getSaldoInicial();
 
 		for (TransacaoFinanceira transacaoFinanceira : caixa.getTransacoesCaixa()) {
