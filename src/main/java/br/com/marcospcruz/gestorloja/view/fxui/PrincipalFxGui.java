@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.facade.LoginFacade;
 import br.com.marcospcruz.gestorloja.model.InterfaceGrafica;
@@ -40,7 +39,7 @@ public class PrincipalFxGui extends StageBase {
 	public PrincipalFxGui() {
 		super();
 		interfaces = new HashMap<>();
-		Scene scene = new Scene(new Group());
+		Scene scene = new Scene(new Group(),800,600);
 		FlowPane btnPane = new FlowPane(Orientation.HORIZONTAL);
 		btnPane.setBorder(new Border(
 				new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
