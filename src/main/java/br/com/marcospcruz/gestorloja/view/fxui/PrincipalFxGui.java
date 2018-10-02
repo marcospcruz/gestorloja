@@ -39,7 +39,7 @@ public class PrincipalFxGui extends StageBase {
 	public PrincipalFxGui() {
 		super();
 		interfaces = new HashMap<>();
-		Scene scene = new Scene(new Group(),800,600);
+		Scene scene = new Scene(new Group());
 		FlowPane btnPane = new FlowPane(Orientation.HORIZONTAL);
 		btnPane.setBorder(new Border(
 				new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
