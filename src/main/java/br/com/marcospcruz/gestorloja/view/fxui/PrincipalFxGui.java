@@ -54,7 +54,7 @@ public class PrincipalFxGui extends StageBase {
 		List<Button> btns = new ArrayList<>();
 
 		perfis.stream().forEach(perfil -> {
-			perfil=new CrudDao<PerfilUsuario>().update(perfil);
+			perfil = new CrudDao<PerfilUsuario>().update(perfil);
 			perfil.getInterfaces().stream().forEach(gui -> {
 				Button btn = criaActionButton(gui);
 				interfaces.put(gui.getNomeModulo(), gui);
@@ -65,8 +65,12 @@ public class PrincipalFxGui extends StageBase {
 			btnPane.getChildren().add(btn);
 		});
 		// btnPane.getChildren().add(maintenancePane());
-		TitledPane manutencaoPane = (TitledPane) maintenancePane();
-		btnPane.getChildren().add(manutencaoPane);
+		boolean isAdministrador = usuarioLogado.getPerfisUsuario().stream()
+				.anyMatch(perfil -> perfil.getDescricao().equalsIgnoreCase("Administrador"));
+		if (isAdministrador) {
+			TitledPane manutencaoPane = (TitledPane) maintenancePane();
+			btnPane.getChildren().add(manutencaoPane);
+		}
 		scene.setRoot(btnPane);
 		setScene(scene);
 		LoginFacade facade = new LoginFacade(this);

@@ -152,7 +152,10 @@ public class AppFx extends Application {
 				.asList(new PerfilUsuario[] { dao.busca("perfilusuario.findperfil", DESCRICAO, "Administrador") });
 
 		List<Usuario> usuarios = Arrays
-				.asList(new Usuario[] { new Usuario("Marcos Pereira da Cruz", "marcos", "123456", perfilUsuario) });
+				.asList(new Usuario[] { new Usuario("Marcos Pereira da Cruz", "marcos", "123456", perfilUsuario)
+//						new Usuario("Cibele Pereira Bellini", "cibele", "ci@2018", perfilUsuario),
+//						new Usuario("Nadia", "nadia", "123456", perfilUsuario) 
+						});
 
 		usuarios.stream().forEach(usuario -> {
 			Crud<Usuario> userdao = new CrudDao<>();
