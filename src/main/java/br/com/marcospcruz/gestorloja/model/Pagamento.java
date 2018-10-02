@@ -7,11 +7,13 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -26,12 +28,13 @@ public class Pagamento implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idPagamento;
-	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST }, mappedBy = "pagamento", orphanRemoval = true)
+	@OneToMany(cascade = { CascadeType.ALL }, mappedBy = "pagamento", fetch = FetchType.EAGER)
 	private List<MeioPagamento> meiosPagamento;
 	private float valorPagamento;
 	private float trocoPagamento;
-	@OneToOne(cascade = CascadeType.MERGE)
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "idVenda")
+
 	private Venda venda;
 
 	private Date dataVenda;

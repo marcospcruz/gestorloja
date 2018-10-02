@@ -28,7 +28,7 @@ public class VendaController extends ControllerBase {
 	public static final String PRODUTO_INVALIDO = "Selecão de Produto inválida.";
 	private EstoqueController estoqueController;
 	private Map<String, ItemVenda> itemVendaMap;
-
+	private Crud<Venda> vendaDao;
 	private Crud<ItemVenda> itemVendaDao;
 	private Venda venda;
 	private ItemVenda itemVendaBackup;
@@ -38,20 +38,12 @@ public class VendaController extends ControllerBase {
 
 	public VendaController() throws Exception {
 		super();
+		vendaDao = new CrudDao<>();
 		estoqueController = (EstoqueController) getController(ControllerAbstractFactory.ESTOQUE);
 		caixaController = (CaixaController) getController(ControllerAbstractFactory.CONTROLE_CAIXA);
-		iniciaVenda();
+		resetVenda();
 		// vendaDao = new CrudDao<>();
 		itemVendaDao = new CrudDao<>();
-	}
-
-	private void iniciaVenda() {
-		venda = new Venda();
-		venda.setOperador(getUsuarioLogado());
-		venda.setCaixa((Caixa) caixaController.getItem());
-
-		resetItemVenda();
-
 	}
 
 	public void buscaProduto(String codigoProduto) throws Exception {
@@ -245,7 +237,7 @@ public class VendaController extends ControllerBase {
 		float valorTotal = 0f;
 		for (ItemVenda item : venda.getItensVenda()) {
 			float valorItemVenda = item.getItemEstoque().getValorUnitario();
-			System.out.println(valorItemVenda);
+			// System.out.println(valorItemVenda);
 			// valorTotal += valorItemVenda;
 
 			float desconto = Float.isNaN(venda.getPorcentagemDesconto()) ? 0 : (venda.getPorcentagemDesconto() / 100f);
@@ -353,6 +345,11 @@ public class VendaController extends ControllerBase {
 	public void resetVenda() {
 		venda = null;
 		venda = new Venda();
+		venda.setOperador(getUsuarioLogado());
+		venda.setCaixa((Caixa) caixaController.getItem());
+
+		resetItemVenda();
+
 		itemVendaMap = new HashMap<>();
 
 	}
@@ -385,18 +382,18 @@ public class VendaController extends ControllerBase {
 				estoqueController.registraHistoricoOperacao(OperacaoEstoqueFacade.SAIDA_ESTOQUE);
 				// salvaItemVenda(itemVenda);
 			}
-		if (venda.getCaixa() == null)
-			venda.setCaixa((Caixa) caixaController.getItem());
 		salva();
-
-		iniciaVenda();
+		// SingletonManager.getInstance().getLogger(getClass())
+		// .info("Total de Vendas salvas no Caixa: " +
+		// venda.getCaixa().getVendas().size());
+		resetVenda();
 		estoqueController.anulaAtributos();
 
 		itemVendaMap = new HashMap<>();
 	}
 
 	public void salva() {
-		Crud<Venda> vendaDao = new CrudDao<>();
+
 		venda = vendaDao.update(venda);
 		// venda.getPagamento().setVenda(venda);
 		// caixaController.atualizaPagamento(venda.getPagamento());
@@ -425,10 +422,11 @@ public class VendaController extends ControllerBase {
 			TipoMeioPagamento tipoMeioPagamento = meioPagamento.getTipoMeioPagamento();
 			tipoMeioPagamento = caixaController.buscaTipoMeioPagamento(tipoMeioPagamento);
 			meioPagamento.setTipoMeioPagamento(tipoMeioPagamento);
+			meioPagamento.setPagamento(pagamento);
 			// meioPagamento = meioPagamentoDao.update(meioPagamento);
 
 			// pagamento.getMeiosPagamento().add(meioPagamento);
-			meioPagamento.setPagamento(pagamento);
+			// meioPagamento.setPagamento(pagamento);
 			if (meioPagamento.getIdMeioPagamento() == 0
 					&& meioPagamento.getTipoMeioPagamento().getIdTipoMeioPagamento() == 1) {
 
@@ -670,7 +668,7 @@ public class VendaController extends ControllerBase {
 
 		venda.setEstornado(true);
 		salva();
-		iniciaVenda();
+		resetVenda();
 	}
 
 	public Pagamento getPagamentoVenda() {

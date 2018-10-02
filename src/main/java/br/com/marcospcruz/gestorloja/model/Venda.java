@@ -46,7 +46,8 @@ public class Venda implements Serializable {
 	// (cascade = { CascadeType.ALL})
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@ManyToOne
+	// (cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	// (cascade = CascadeType.ALL)
 	@JoinColumn(name = "idCaixa")
 	private Caixa caixa;

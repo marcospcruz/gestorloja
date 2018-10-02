@@ -24,14 +24,17 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 @Entity
 //@formatter:off
 @NamedQueries({
+	@NamedQuery(name = "caixa.findCaixa", query = "select distinct c from Caixa c " 
+			+ "LEFT JOIN fetch c.vendas "
+			+ "LEFT JOIN fetch c.transacoesCaixa "
+			+ "where c.idCaixa=:id"),
 		@NamedQuery(name = "caixa.findCaixaAberto", query = "select distinct c from Caixa c " 
-				+ "LEFT JOIN c.vendas "
-				+ "LEFT JOIN c.transacoesCaixa t "
+				+ "LEFT JOIN fetch c.vendas "
+				+ "LEFT JOIN fetch c.transacoesCaixa "
 				+ "where c.dataFechamento=null"),
 		@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c "
-				+ "LEFT JOIN fetch c.vendas v "
-				+ "LEFT JOIN c.transacoesCaixa t "
-				+ "LEFT JOIN fetch v.pagamento p "
+				+ "LEFT JOIN FETCH c.vendas "
+				+ "LEFT JOIN FETCH c.transacoesCaixa "
 				+ "ORDER BY c.dataAbertura desc") })
 //@formatter:on
 public class Caixa extends AbstractModel {
@@ -54,7 +57,7 @@ public class Caixa extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "idUsuarioFechamento")
 	private Usuario usuarioFechamento;
-	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST }, fetch = FetchType.LAZY, mappedBy = "caixa")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa")
 	@OrderBy(value = "idVenda")
 	private Set<Venda> vendas;
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa", orphanRemoval = true, cascade = CascadeType.ALL)

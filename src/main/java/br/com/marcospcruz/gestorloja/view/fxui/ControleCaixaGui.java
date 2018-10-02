@@ -138,6 +138,7 @@ public class ControleCaixaGui extends StageBase {
 						? Util.formataDataHora(caixa.getDataFechamento())
 						: "";
 				String totalVendido = Util.formataMoeda(sumarizaVendasCaixa(caixa.getVendas()));
+				
 				String trocoFinal = Util.formataMoeda(caixa != null ? caixa.getSaldoFinal() : 0f);
 				String status = caixa != null && caixa.getDataFechamento() == null ? "Aberto" : "Fechado";
 				String operadorFechamento = caixa != null && caixa.getUsuarioFechamento() != null

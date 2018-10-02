@@ -30,7 +30,7 @@ public class MeioPagamento implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idMeioPagamento;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade= {CascadeType.MERGE})
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
 

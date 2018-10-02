@@ -474,6 +474,7 @@ public class PDV extends StageBase {
 			mp.setValorPago(Util.parseStringDecimalToFloat(newValue));
 			//// pagamento.setValorPagamento(controller.getValorTotalPagamentoVenda());
 			calculaTroco();
+			
 			// }
 		}
 	}

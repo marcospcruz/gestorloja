@@ -56,6 +56,13 @@ public class CaixaController extends ControllerBase {
 		// if (caixaList == null || caixaList.isEmpty())
 		caixaList = dao.busca(QUERY_BUSCA_TODOS);
 
+		for (int index = 0; index < caixaList.size();) {
+			this.caixa = caixaList.remove(index);
+
+			atualizaSaldoCaixa();
+			caixaList.add(index, this.caixa);
+			index++;
+		}
 		return caixaList;
 	}
 
@@ -137,10 +144,10 @@ public class CaixaController extends ControllerBase {
 
 	public void validateCaixaAberto() throws Exception {
 		//@formatter:off
-		int size = caixaList.stream()
-				.filter(caixa -> caixa.getDataFechamento() == null)
-				.collect(Collectors.toList())
-				.size();
+		int size = 0;
+		for(Caixa caixa:caixaList)
+			if(caixa.getDataFechamento() == null)
+				size++;
 		//@formatter:on
 		if (size > 0) {
 			throw new Exception("Caixa já aberto.");
@@ -297,8 +304,9 @@ public class CaixaController extends ControllerBase {
 
 	@Override
 	public void novo() {
-		caixa = new Caixa();
 		Caixa ultimoCaixa = buscaUltimoCaixa();
+		caixa = new Caixa();
+
 		float saldoInicial = 0;
 		if (caixa == null)
 			caixa = new Caixa();
@@ -320,7 +328,7 @@ public class CaixaController extends ControllerBase {
 
 					if (venda.isEstornado())
 						continue;
-					Pagamento pagamento = dao.update(venda.getPagamento());
+					Pagamento pagamento = dao.busca(Pagamento.class, venda.getPagamento().getIdPagamento());
 
 					for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
 						totalRecebido += meioPagamento.getValorPago();
@@ -345,12 +353,13 @@ public class CaixaController extends ControllerBase {
 			Set<Venda> vendas = caixa.getVendas();
 			Crud<Pagamento> pagamentoDao = new CrudDao<>();
 
-			dao.update(caixa);
+			// dao.update(caixa);
 			try {
 				for (Venda venda : vendas) {
 					if (!venda.isEstornado()) {
 
-						Pagamento pagamento = pagamentoDao.update(venda.getPagamento());
+						Pagamento pagamento = pagamentoDao.busca(Pagamento.class,
+								venda.getPagamento().getIdPagamento());
 						for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
 							String key = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento();
 							float value = subTotais.get(key) + meioPagamento.getValorPago();
@@ -393,8 +402,8 @@ public class CaixaController extends ControllerBase {
 		if (caixa == null || caixa.getVendas() == null)
 			return 0;
 
-		if (caixa.getIdCaixa() != 0)
-			caixa = dao.update(caixa);
+		// if (caixa.getIdCaixa() != 0)
+		// caixa = dao.update(caixa);
 		int qtVendas = 0;
 		try {
 			qtVendas = caixa.getVendas().size() - getQuantidadeVendasEstornadas();
@@ -428,13 +437,14 @@ public class CaixaController extends ControllerBase {
 
 		//@formatter:on
 		meioPagamento.setTransacaoFinanceira(tf);
-		salva();
+		// salva();
 		caixa.getTransacoesCaixa().add(tf);
 		atualizaSaldoCaixa();
 
 	}
 
 	public void atualizaSaldoCaixa() {
+		caixa = dao.busca("caixa.findCaixa", "id", caixa.getIdCaixa());
 		float saldoCaixa = caixa.getSaldoInicial();
 
 		for (TransacaoFinanceira transacaoFinanceira : caixa.getTransacoesCaixa()) {
@@ -452,8 +462,7 @@ public class CaixaController extends ControllerBase {
 		float totalReceitas = 0;
 
 		//@formatter:off
-		if(caixa.getIdCaixa()!=0)
-			caixa=dao.update(caixa);
+		
 		Set<TransacaoFinanceira> transacoes = caixa.getTransacoesCaixa()
 				.stream()
 				.filter(tf->tf.getOperacao().getIdOperacao()==idOperacao)
