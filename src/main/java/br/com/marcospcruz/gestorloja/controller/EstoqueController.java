@@ -361,7 +361,8 @@ public class EstoqueController extends ControllerBase {
 	public void busca(String tipoProduto, String produto, String fabricante) throws Exception {
 		buscaTodos();
 		List<ItemEstoque> tmpItensEstoque = new ArrayList<>(itensEstoque);
-
+		List<ItemEstoque> backup = new ArrayList<>(itensEstoque);
+		;
 		if (fabricante != null) {
 			itensEstoque = tmpItensEstoque.stream()
 					.filter(itemEstoque -> fabricante.equals(itemEstoque.getFabricante().getNome()))
@@ -370,25 +371,36 @@ public class EstoqueController extends ControllerBase {
 
 		if (tipoProduto != null) {
 			tmpItensEstoque = new ArrayList<>(itensEstoque);
-			itensEstoque = tmpItensEstoque.stream()
-					.filter(itemEstoque -> itemEstoque.getTipoProduto().getDescricaoTipo().contains(tipoProduto))
-					.collect(Collectors.toList());
-			if (itensEstoque.isEmpty()) {
-				if (tipoProduto != null) {
-					itensEstoque = tmpItensEstoque.stream()
-							.filter(itemEstoque -> itemEstoque.getTipoProduto().getSuperTipoProduto() != null
-									&& itemEstoque.getTipoProduto().getSuperTipoProduto().getDescricaoTipo()
-											.equals(tipoProduto))
+			backup = new ArrayList<>(itensEstoque);
+			if (tipoProduto != null) {
+				itensEstoque = tmpItensEstoque.stream()
+						.filter(itemEstoque -> itemEstoque.getTipoProduto().getSuperTipoProduto() != null && itemEstoque
+								.getTipoProduto().getSuperTipoProduto().getDescricaoTipo().equals(tipoProduto))
+						.collect(Collectors.toList());
+				if (itensEstoque.isEmpty()) {
+					tmpItensEstoque = new ArrayList<>(itensEstoque);
+					if (tmpItensEstoque.isEmpty())
+						tmpItensEstoque = new ArrayList<>(backup);
+					itensEstoque = tmpItensEstoque.stream().filter(
+							itemEstoque -> itemEstoque.getTipoProduto().getDescricaoTipo().contains(tipoProduto))
 							.collect(Collectors.toList());
+					
+
 				}
 			}
 		}
 		if (produto != null) {
 			tmpItensEstoque = new ArrayList<>(itensEstoque);
-			itensEstoque = tmpItensEstoque.stream()
-					.filter(itemEstoque -> itemEstoque.getProduto().getDescricaoProduto().contains(produto))
-					.collect(Collectors.toList());
 
+			itensEstoque = tmpItensEstoque.stream()
+					.filter(itemEstoque -> itemEstoque.getCodigoDeBarras().equals(produto))
+					.collect(Collectors.toList());
+			if (itensEstoque.isEmpty()) {
+				tmpItensEstoque = new ArrayList<>(itensEstoque);
+				itensEstoque = tmpItensEstoque.stream()
+						.filter(itemEstoque -> itemEstoque.getProduto().getDescricaoProduto().contains(produto))
+						.collect(Collectors.toList());
+			}
 		}
 
 		if (itensEstoque.isEmpty())

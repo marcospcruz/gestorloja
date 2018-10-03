@@ -19,6 +19,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.model.ItemEstoqueModel;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -393,51 +394,82 @@ public class EstoquePrincipalGui extends StageBase {
 
 	@Override
 	protected void pesquisaItem(ActionEvent event) {
-		try {
-			// ProdutoController produtoController = getProdutoController();
-			EstoqueController estoqueController = getEstoqueController();
-			Object fabricanteValue = comboFabricantes.getValue();
-			Object produtoValue = infoProduto.getValue();
-			Object categoriaValue = subCategoriaProduto.getValue() == null ? categoriaProduto.getValue()
-					: subCategoriaProduto.getValue();
-			
-			String fabricante = null;
-			String produto = null;
-			String categoria = null;
-			
-			if (fabricanteValue != null)
-				if ((fabricanteValue instanceof Fabricante))
-					fabricante = ((Fabricante) fabricanteValue).getNome();
-				else {
-					fabricante = fabricanteValue.toString();
-				}
+		Platform.runLater(() -> {
+			// if (counter == 0)
+			try {
+				// ProdutoController produtoController = getProdutoController();
+				EstoqueController estoqueController = getEstoqueController();
+				Object fabricanteValue = comboFabricantes.getValue();
+				Object produtoValue = infoProduto.getValue();
+				Object categoriaValue = subCategoriaProduto.getValue() == null ? categoriaProduto.getValue()
+						: subCategoriaProduto.getValue();
 
-			if (produtoValue != null)
-				if ((produtoValue instanceof Produto))
-					produto = ((Produto) produtoValue).getDescricaoProduto();
-				else {
-					produto = produtoValue.toString();
+				String fabricante = null;
+				String produto = null;
+				String categoria = null;
+
+				if (fabricanteValue != null)
+					if ((fabricanteValue instanceof Fabricante))
+						fabricante = ((Fabricante) fabricanteValue).getNome();
+					else {
+						fabricante = fabricanteValue.toString();
+					}
+
+				if (produtoValue != null)
+					if ((produtoValue instanceof Produto))
+						produto = ((Produto) produtoValue).getDescricaoProduto();
+					else {
+						produto = produtoValue.toString();
+					}
+				if (categoriaValue != null)
+					if (categoriaValue instanceof TipoProduto) {
+						SubTipoProduto tipoProduto = (SubTipoProduto) categoriaValue;
+						categoria = tipoProduto.getDescricaoTipo();
+						if (tipoProduto.getSuperTipoProduto() == null) {
+							ObservableList<SubTipoProduto> list = subCategoriaProduto.getItems();
+							list.addAll(tipoProduto.getSubTiposProduto());
+							subCategoriaProduto.setItems(list);
+						}
+					} else {
+						categoria = categoriaValue.toString();
+					}
+				if ((fabricanteValue != null && (fabricanteValue instanceof Fabricante))
+						|| (categoriaValue != null && (categoriaValue instanceof TipoProduto))
+						|| (produtoValue != null && !produto.isEmpty())
+
+				) {
+
+					estoqueController.busca(categoria, produto, fabricante);
+
 				}
-			if (categoriaValue != null)
-				if (categoriaValue instanceof TipoProduto)
-					categoria = ((SubTipoProduto) categoriaValue).getDescricaoTipo();
-				else {
-					categoria = categoriaValue.toString();
+			} catch (Exception e) {
+
+				comboFabricantes.getEditor().setText("");
+				infoProduto.getEditor().setText("");
+				categoriaProduto.getEditor().setText("");
+				subCategoriaProduto.getEditor().setText("");
+				subCategoriaProduto.getItems().removeAll(subCategoriaProduto.getItems());
+				comboFabricantes.setValue(null);
+				infoProduto.setValue(null);
+				categoriaProduto.setValue(null);
+				subCategoriaProduto.setValue(null);
+				subCategoriaProduto.setValue(null);
+
+				//
+
+				showErrorMessage("Dados não encontrados.");
+				e.printStackTrace();
+
+			} finally {
+				try {
+					reloadTableView();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			if (produtoValue != null)
-				if ((produtoValue instanceof Produto))
-					produto = ((Produto) produtoValue).getDescricaoProduto();
-				else {
-					produto = produtoValue.toString();
-				}
-			if (fabricante != null || produto != null) {
-				estoqueController.busca(categoria, produto, fabricante);
-				reloadTableView();
 			}
-		} catch (Exception e) {
-			showErrorMessage("Dados não encontrados.");
-			e.printStackTrace();
-		}
+
+		});
 	}
 
 }
