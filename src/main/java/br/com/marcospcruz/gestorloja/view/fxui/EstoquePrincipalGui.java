@@ -239,29 +239,7 @@ public class EstoquePrincipalGui extends StageBase {
 
 		categoriaProduto = super.createCategoriaProdutoAutotextFieldBox();
 		subCategoriaProduto = new AutoCompleteTextField<>();
-		categoriaProduto.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event) {
-				// ((TextField)subCategoriaProduto.getEditor()).setText("");
-				if (!(categoriaProduto.getValue() instanceof TipoProduto))
-					return;
-				TipoProduto categoria = categoriaProduto.getValue();
-				List<SubTipoProduto> subCategorias = (List<SubTipoProduto>) categoria.getSubTiposProduto();
-				subCategoriaProduto.setItems(subCategorias);
-
-				try {
-					reloadDadosEstoque(categoria);
-					// StageBase.autoResizeColumns(table);
-					// carregaDadosTable(table);
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		});
+		categoriaProduto.setOnAction(this::pesquisaItem);
 		subCategoriaProduto.setOnAction(this::pesquisaItem);
 		comboFabricantes = super.criaFabricanteComboBox(true);
 		comboFabricantes.setOnAction(

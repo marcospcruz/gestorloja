@@ -358,7 +358,7 @@ public class EstoqueController extends ControllerBase {
 	// itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
 	// consultaEstoque = itensEstoque;
 	// }
-	public void busca(String tipoProduto, String produto, String fabricante) {
+	public void busca(String tipoProduto, String produto, String fabricante) throws Exception {
 		buscaTodos();
 		List<ItemEstoque> tmpItensEstoque = new ArrayList<>(itensEstoque);
 
@@ -390,6 +390,9 @@ public class EstoqueController extends ControllerBase {
 					.collect(Collectors.toList());
 
 		}
+
+		if (itensEstoque.isEmpty())
+			throw new Exception("Dados não encontrados");
 	}
 
 	private void buscaComAcentuacao(String... params) {
