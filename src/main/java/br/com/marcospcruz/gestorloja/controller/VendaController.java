@@ -109,7 +109,7 @@ public class VendaController extends ControllerBase {
 
 		if (venda.getItensVenda() == null)
 			return new ArrayList<>();
-
+		venda=vendaDao.busca("venda.findVenda", "id",venda.getIdVenda());
 		return new ArrayList<>(venda.getItensVenda());
 	}
 
@@ -624,7 +624,7 @@ public class VendaController extends ControllerBase {
 		try {
 			Pagamento pagamento = venda.getPagamento();
 			if (pagamento.getIdPagamento() != 0)
-				pagamento = dao.update(pagamento);
+				pagamento = dao.busca(Pagamento.class, pagamento.getIdPagamento());
 			for (MeioPagamento meio : pagamento.getMeiosPagamento())
 				valorPagamentoVenda += meio.getValorPago();
 		} catch (Exception e) {
@@ -636,6 +636,7 @@ public class VendaController extends ControllerBase {
 
 	public float getValorBrutoVenda() {
 		float total = 0;
+		venda = vendaDao.busca("venda.findVenda", "id", venda.getIdVenda());
 		for (ItemVenda item : venda.getItensVenda()) {
 			total += item.getQuantidade() * item.getItemEstoque().getValorUnitario();
 		}

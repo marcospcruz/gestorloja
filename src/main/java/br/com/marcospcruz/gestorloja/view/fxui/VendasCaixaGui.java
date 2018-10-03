@@ -61,7 +61,7 @@ public class VendasCaixaGui extends StageBase {
 		super.setLayoutsMaxWidth(layoutsMaxWidth);
 
 		tablePane = super.criaTablePane("Vendas");
-//		TitledPane buttonPane = criaButtonPane();
+		// TitledPane buttonPane = criaButtonPane();
 		getvBox().getChildren().addAll(tablePane);
 		((Group) scene.getRoot()).getChildren().add(getvBox());
 		setScene(scene);
@@ -131,7 +131,7 @@ public class VendasCaixaGui extends StageBase {
 				float descontoConcedido = venda.getPorcentagemDesconto();
 				StringBuilder tiposMeioPagamentoString = new StringBuilder();
 				Crud<Pagamento> dao = new CrudDao<>();
-				Pagamento pagamento = dao.update(venda.getPagamento());
+				Pagamento pagamento = dao.busca(Pagamento.class, venda.getPagamento().getIdPagamento());
 				for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
 					String tmp = meioPagamento.getTipoMeioPagamento().getDescricaoTipoMeioPagamento() + ", ";
 					tiposMeioPagamentoString.append(tmp);

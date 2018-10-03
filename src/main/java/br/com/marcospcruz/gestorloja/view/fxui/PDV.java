@@ -142,7 +142,8 @@ public class PDV extends StageBase {
 			naoAtualizaDesconto = true;
 			atualizaSubTotal(controller);
 			atualizaSubTotalDesconto(controller);
-			Pagamento pagamento = new CrudDao<Pagamento>().update(controller.getVenda().getPagamento());
+			Pagamento pagamento = new CrudDao<Pagamento>().busca(Pagamento.class,
+					controller.getVenda().getPagamento().getIdPagamento());
 			for (MeioPagamento mp : pagamento.getMeiosPagamento()) {
 				TipoMeioPagamento tipoMeioPagamento = mp.getTipoMeioPagamento();
 				//@formatter:off
@@ -474,7 +475,7 @@ public class PDV extends StageBase {
 			mp.setValorPago(Util.parseStringDecimalToFloat(newValue));
 			//// pagamento.setValorPagamento(controller.getValorTotalPagamentoVenda());
 			calculaTroco();
-			
+
 			// }
 		}
 	}
@@ -724,10 +725,10 @@ public class PDV extends StageBase {
 			buttonLimpar.setOnAction(evt -> {
 				try {
 					if (showConfirmAtionMessage("Deseja cancelar esta venda?")) {
-						
+
 						limpaFormularioPdv();
 						getVendaController().resetVenda();
-						
+
 					}
 
 				} catch (Exception e) {

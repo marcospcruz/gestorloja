@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -23,6 +24,9 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @Table(name = "Venda")
+@NamedQuery(name="venda.findVenda",query="select v from Venda v "
+		+ "join fetch v.itensVenda "
+		+ "where v.idVenda=:id")
 public class Venda implements Serializable {
 	/**
 	 * 
@@ -36,7 +40,6 @@ public class Venda implements Serializable {
 	private float totalVendido;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "venda")
-
 	// @MapKeyJoinColumn(name = "codigoDeBarras", table = "estoque")
 	// private Map<String, ItemVenda> itensVenda;
 	private List<ItemVenda> itensVenda;
