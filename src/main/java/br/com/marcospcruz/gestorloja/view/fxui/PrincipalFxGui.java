@@ -65,7 +65,7 @@ public class PrincipalFxGui extends StageBase {
 		});
 		// btnPane.getChildren().add(maintenancePane());
 		boolean isAdministrador = usuarioLogado.getPerfisUsuario().stream()
-				.anyMatch(perfil -> perfil.getDescricao().equalsIgnoreCase("Administrador"));
+				.anyMatch(perfil -> perfil.getIdPerfilusuario() == 1);
 		if (isAdministrador) {
 			TitledPane manutencaoPane = (TitledPane) maintenancePane();
 			btnPane.getChildren().add(manutencaoPane);

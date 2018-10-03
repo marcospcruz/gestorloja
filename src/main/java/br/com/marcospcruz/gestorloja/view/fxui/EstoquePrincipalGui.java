@@ -1,15 +1,18 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
+import java.awt.Desktop.Action;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.FabricanteController;
+import br.com.marcospcruz.gestorloja.controller.ProdutoController;
 import br.com.marcospcruz.gestorloja.facade.ImportadorArquivo;
 import br.com.marcospcruz.gestorloja.facade.ImportadorArquivoCsv;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
+import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
@@ -58,6 +61,8 @@ public class EstoquePrincipalGui extends StageBase {
 
 	private AutoCompleteTextField<SubTipoProduto> subCategoriaProduto;
 
+	private AutoCompleteTextField<Produto> infoProduto;
+
 	public EstoquePrincipalGui() throws Exception {
 		super();
 		super.setLabelColunas(COLUNAS_JTABLE);
@@ -81,7 +86,7 @@ public class EstoquePrincipalGui extends StageBase {
 	protected void handleTableClick(Event event) {
 		super.handleTableClick(event);
 		ItemEstoque item = (ItemEstoque) controller.getItem();
-		
+
 		try {
 			abreTelaCadastro(new ItemEstoqueCadastro());
 
@@ -154,12 +159,13 @@ public class EstoquePrincipalGui extends StageBase {
 	private TitledPane criaCadastroPanel() {
 
 		FlowPane flowPane = createHorizontalFlowPane();
-		TitledPane pane = criaTitledPane("Cadastros");
+		TitledPane pane = criaTitledPane("Operações / Cadastros");
 		//
 		Button itemEstoqueCadastro = criaButton("Novo Item Estoque");
 		Button fabricantesCadBtn = criaButton("Fabricantes / Marca");
 		Button categoriaProduto = criaButton("Categoria Produto");
 		Button produto = criaButton("Produto");
+
 		flowPane.getChildren().addAll(fabricantesCadBtn, categoriaProduto, produto, itemEstoqueCadastro);
 
 		//
@@ -214,14 +220,20 @@ public class EstoquePrincipalGui extends StageBase {
 		subCategoriaProduto.getEditor().setText("");
 		reloadComboFabricantes();
 		reloadComboCategoria();
-		
+
 		controller.buscaTodos();
 		reloadTableView();
 		controller.setItem(null);
 	}
 
 	private TitledPane criaPesquisaPanel() throws Exception {
+
+		FlowPane contentPane = super.createHorizontalFlowPane();
+		// verticalPane.setMaxWidth(Double.MAX_VALUE);
 		FlowPane flowPane = createHorizontalFlowPane();
+		FlowPane produtoPane = createHorizontalFlowPane();
+		produtoPane.setMinWidth(Double.MAX_VALUE);
+		flowPane.setMinWidth(Double.MAX_VALUE);
 		TitledPane pane = new TitledPane("Pesquisa de Produto", new Button(""));
 		pane.setCollapsible(false);
 
@@ -250,64 +262,66 @@ public class EstoquePrincipalGui extends StageBase {
 			}
 
 		});
-		subCategoriaProduto.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event) {
-				try {
-					SubTipoProduto categoria = subCategoriaProduto.getValue();
-					if (categoria != null) {
-						reloadDadosEstoque(categoria);
-					}
-				} catch (Exception e) {
-					try {
-						reloadDadosEstoque(categoriaProduto.getValue());
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-			}
-		});
+		subCategoriaProduto.setOnAction(this::pesquisaItem);
 		comboFabricantes = super.criaFabricanteComboBox(true);
-		comboFabricantes.setOnAction(new EventHandler<ActionEvent>() {
-
-			private boolean showAlert = true;
-
-			@Override
-			public void handle(ActionEvent event) {
-				try {
-					EstoqueController controller = getEstoqueController();
-					if (!(comboFabricantes.getValue() instanceof Fabricante))
-						return;
-					showAlert = true;
-					Fabricante fabricante = comboFabricantes.getValue();
-					controller.busca(null, null, fabricante.getNome());
-					reloadTableView();
-					// carregaDadosTable(table);
-				} catch (Exception e) {
-					if (showAlert) {
-						showErrorMessage("Dados não encontrados.");
-						showAlert = false;
-					}
-					e.printStackTrace();
-				}
-
-			}
-
-		});
-		flowPane.getChildren().addAll(new Label("Fabricante"), comboFabricantes, new Label("Categoria:"),
-				categoriaProduto, new Label("Sub-Categoria:"), subCategoriaProduto);
-		pane.setContent(flowPane);
+		comboFabricantes.setOnAction(
+				// new EventHandler<ActionEvent>() {
+				//
+				// private boolean showAlert = true;
+				//
+				// @Override
+				// public void handle(ActionEvent event) {
+				// try {
+				// EstoqueController controller = getEstoqueController();
+				// if (!(comboFabricantes.getValue() instanceof Fabricante))
+				// return;
+				// showAlert = true;
+				// Fabricante fabricante = comboFabricantes.getValue();
+				// controller.busca(null, null, fabricante.getNome());
+				// reloadTableView();
+				// // carregaDadosTable(table);
+				// } catch (Exception e) {
+				// if (showAlert) {
+				// showErrorMessage("Dados não encontrados.");
+				// showAlert = false;
+				// }
+				// e.printStackTrace();
+				// }
+				//
+				// }
+				//
+				// }
+				this::pesquisaItem);
+		infoProduto = super.criaProdutoAutoComboBox();
+		infoProduto.setOnAction(this::pesquisaItem);
+		//@formatter:off
+		flowPane.getChildren().addAll(
+				new Label("Fabricante:"), comboFabricantes, 
+				new Label("Categoria:"), categoriaProduto, 
+				new Label("Sub-Categoria:"), subCategoriaProduto
+				);
+		produtoPane.getChildren().addAll(new Label("Descricao / Codigo Produto:"),infoProduto);
+		contentPane.getChildren().addAll(flowPane,produtoPane
+//		
+//		new Label("Descricao / Codigo Produto:"), infoProduto
+				);
+		//@formatter:on
+		pane.setContent(contentPane);
 
 		// flowPane.prefWidthProperty().bind(new
 		// SimpleDoubleProperty(teste).subtract(teste * (50d / 100d)));
 		// flowPane.prefWidthProperty().bind(new SimpleDoubleProperty(teste));
 		pane.setMinWidth(getLayoutsMaxWidth());
 		pane.setMaxWidth(getLayoutsMaxWidth());
+
 		return pane;
 	}
 
+	/**
+	 * 
+	 * @param categoria
+	 * @throws Exception
+	 */
 	private void reloadDadosEstoque(TipoProduto categoria) throws Exception {
 		EstoqueController estoqueController = StageBase.getEstoqueController();
 
@@ -401,8 +415,51 @@ public class EstoquePrincipalGui extends StageBase {
 
 	@Override
 	protected void pesquisaItem(ActionEvent event) {
-		// TODO Auto-generated method stub
+		try {
+			// ProdutoController produtoController = getProdutoController();
+			EstoqueController estoqueController = getEstoqueController();
+			Object fabricanteValue = comboFabricantes.getValue();
+			Object produtoValue = infoProduto.getValue();
+			Object categoriaValue = subCategoriaProduto.getValue() == null ? categoriaProduto.getValue()
+					: subCategoriaProduto.getValue();
+			
+			String fabricante = null;
+			String produto = null;
+			String categoria = null;
+			
+			if (fabricanteValue != null)
+				if ((fabricanteValue instanceof Fabricante))
+					fabricante = ((Fabricante) fabricanteValue).getNome();
+				else {
+					fabricante = fabricanteValue.toString();
+				}
 
+			if (produtoValue != null)
+				if ((produtoValue instanceof Produto))
+					produto = ((Produto) produtoValue).getDescricaoProduto();
+				else {
+					produto = produtoValue.toString();
+				}
+			if (categoriaValue != null)
+				if (categoriaValue instanceof TipoProduto)
+					categoria = ((SubTipoProduto) categoriaValue).getDescricaoTipo();
+				else {
+					categoria = categoriaValue.toString();
+				}
+			if (produtoValue != null)
+				if ((produtoValue instanceof Produto))
+					produto = ((Produto) produtoValue).getDescricaoProduto();
+				else {
+					produto = produtoValue.toString();
+				}
+			if (fabricante != null || produto != null) {
+				estoqueController.busca(categoria, produto, fabricante);
+				reloadTableView();
+			}
+		} catch (Exception e) {
+			showErrorMessage("Dados não encontrados.");
+			e.printStackTrace();
+		}
 	}
 
 }

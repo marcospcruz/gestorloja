@@ -75,15 +75,7 @@ public class CaixaController extends ControllerBase {
 	@Override
 	public void busca(String query) throws Exception {
 		// Crud<Caixa> dao = getDao();
-		// caixaList = dao.busca(query);
-		caixa = caixaList.stream().filter(c -> {
-			Date data = c.getDataAbertura();
-
-			String formattedDate = Util.formataDataHora(data);
-			boolean mesmaDataAbertura = query.equals(formattedDate);
-			return mesmaDataAbertura;
-
-		}).findFirst().orElse(null);
+		caixaList = dao.busca(query);
 
 	}
 
@@ -161,6 +153,7 @@ public class CaixaController extends ControllerBase {
 		if (caixaList == null || caixaList.isEmpty()) {
 			throw new Exception("Não há caixa aberto.");
 		}
+
 		caixa = caixaList.get(0);
 	}
 

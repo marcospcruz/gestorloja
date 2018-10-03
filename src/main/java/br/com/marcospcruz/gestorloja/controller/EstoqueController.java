@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
@@ -17,7 +18,6 @@ import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
-import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.Util;
@@ -203,7 +203,9 @@ public class EstoqueController extends ControllerBase {
 			return;
 		if (quantidade < 1 && !SingletonManager.getInstance().isPermiteVendaSemControlarEstoque())
 			throw new Exception("Quantidade inválida!");
-		if (itemEstoque.isEstoqueDedutivel() && quantidade > 0) {
+		if (itemEstoque.isEstoqueDedutivel()
+		// && quantidade > 0
+		) {
 			itemEstoque.setQuantidade(itemEstoque.getQuantidade() + quantidade);
 
 			salva();
@@ -298,59 +300,96 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public void decrementaItem(int quantidade) throws Exception {
-		itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidade);
+		// itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidade);
 
-		salva();
-
+		// salva();
+		incrementaItem(quantidade * -1);
 		anulaAtributos();
 
 	}
 
+	// public void busca(String tipoProduto, String produto, String fabricante) {
+	// buscaTodos();
+	// if (tipoProduto != null) {
+	// List<ItemEstoque> itens = itensEstoque.stream()
+	// .filter(item -> ((ItemEstoque)
+	// item).getTipoProduto().getSuperTipoProduto().getDescricaoTipo()
+	// .equalsIgnoreCase(tipoProduto)
+	// || ((ItemEstoque)
+	// item).getTipoProduto().getDescricaoTipo().equalsIgnoreCase(tipoProduto))
+	// .collect(Collectors.toList());
+	// if (!itens.isEmpty() && itens != itensEstoque) {
+	// itensEstoque = itens;
+	// return;
+	// }
+	//
+	// } else if (fabricante != null) {
+	// List<ItemEstoque> itens = itensEstoque.stream()
+	// .filter(item -> ((ItemEstoque)
+	// item).getFabricante().getNome().equals(fabricante))
+	// .collect(Collectors.toList());
+	// if (!itens.isEmpty() && itens != itensEstoque) {
+	// itensEstoque = itens;
+	// return;
+	// }
+	// }
+	//
+	// if (tipoProduto != null && Util.isPalavraAcentuada(tipoProduto)) {
+	// buscaComAcentuacao(tipoProduto);
+	//
+	// return;
+	// }
+	// String namedQuery = "itemestoque.readDescricaoTipo";
+	// Map<String, String> paramsMap = new HashMap<>();
+	// if (tipoProduto != null) {
+	// // paramsMap.put("descricaoTipo", "%" + tipoProduto.trim().toUpperCase() +
+	// "%");
+	// }
+	// if (produto != null) {
+	// paramsMap.put("descricaoProduto", "%" + produto.trim().toUpperCase() + "%");
+	// namedQuery = "itemestoque.readDescricaoPeca";
+	// }
+	//
+	// if (fabricante != null) {
+	// paramsMap.put("nomeFabricante", "%" + fabricante.trim().toUpperCase() + "%");
+	// namedQuery = "itemestoque.readTipoFabricante";
+	// }
+	//
+	// itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
+	// consultaEstoque = itensEstoque;
+	// }
 	public void busca(String tipoProduto, String produto, String fabricante) {
 		buscaTodos();
-		if (tipoProduto != null) {
-			List<ItemEstoque> itens = itensEstoque.stream()
-					.filter(item -> ((ItemEstoque) item).getTipoProduto().getSuperTipoProduto().getDescricaoTipo()
-							.equalsIgnoreCase(tipoProduto)
-							|| ((ItemEstoque) item).getTipoProduto().getDescricaoTipo().equalsIgnoreCase(tipoProduto))
-					.collect(Collectors.toList());
-			if (!itens.isEmpty() && itens != itensEstoque) {
-				itensEstoque = itens;
-				return;
-			}
-
-		} else if (fabricante != null) {
-			List<ItemEstoque> itens = itensEstoque.stream()
-					.filter(item -> ((ItemEstoque) item).getFabricante().getNome().equals(fabricante))
-					.collect(Collectors.toList());
-			if (!itens.isEmpty() && itens != itensEstoque) {
-				itensEstoque = itens;
-				return;
-			}
-		}
-
-		if (tipoProduto != null && Util.isPalavraAcentuada(tipoProduto)) {
-			buscaComAcentuacao(tipoProduto);
-
-			return;
-		}
-		String namedQuery = "itemestoque.readDescricaoTipo";
-		Map<String, String> paramsMap = new HashMap<>();
-		if (tipoProduto != null) {
-			// paramsMap.put("descricaoTipo", "%" + tipoProduto.trim().toUpperCase() + "%");
-		}
-		if (produto != null) {
-			paramsMap.put("descricaoProduto", "%" + produto.trim().toUpperCase() + "%");
-			namedQuery = "itemestoque.readDescricaoPeca";
-		}
+		List<ItemEstoque> tmpItensEstoque = new ArrayList<>(itensEstoque);
 
 		if (fabricante != null) {
-			paramsMap.put("nomeFabricante", "%" + fabricante.trim().toUpperCase() + "%");
-			namedQuery = "itemestoque.readTipoFabricante";
+			itensEstoque = tmpItensEstoque.stream()
+					.filter(itemEstoque -> fabricante.equals(itemEstoque.getFabricante().getNome()))
+					.collect(Collectors.toList());
 		}
 
-		itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
-		consultaEstoque = itensEstoque;
+		if (tipoProduto != null) {
+			tmpItensEstoque = new ArrayList<>(itensEstoque);
+			itensEstoque = tmpItensEstoque.stream()
+					.filter(itemEstoque -> itemEstoque.getTipoProduto().getDescricaoTipo().contains(tipoProduto))
+					.collect(Collectors.toList());
+			if (itensEstoque.isEmpty()) {
+				if (tipoProduto != null) {
+					itensEstoque = tmpItensEstoque.stream()
+							.filter(itemEstoque -> itemEstoque.getTipoProduto().getSuperTipoProduto() != null
+									&& itemEstoque.getTipoProduto().getSuperTipoProduto().getDescricaoTipo()
+											.equals(tipoProduto))
+							.collect(Collectors.toList());
+				}
+			}
+		}
+		if (produto != null) {
+			tmpItensEstoque = new ArrayList<>(itensEstoque);
+			itensEstoque = tmpItensEstoque.stream()
+					.filter(itemEstoque -> itemEstoque.getProduto().getDescricaoProduto().contains(produto))
+					.collect(Collectors.toList());
+
+		}
 	}
 
 	private void buscaComAcentuacao(String... params) {
@@ -400,7 +439,7 @@ public class EstoqueController extends ControllerBase {
 			itemEstoque = itemEstoqueDao.update(itemEstoque);
 
 		} catch (PersistenceException e) {
-//			e.printStackTrace();
+			// e.printStackTrace();
 			throw e;
 		}
 

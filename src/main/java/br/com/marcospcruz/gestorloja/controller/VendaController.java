@@ -61,14 +61,13 @@ public class VendaController extends ControllerBase {
 
 	public void subtraiEstoque(int quantidade) throws Exception {
 
-		ItemEstoque itemEstoque =
-				// estoqueController.getItemEstoque() != null ?
-				// estoqueController.getItemEstoque()
-				estoqueController.getItemEstoque();
+		ItemEstoque itemEstoque = estoqueController.getItemEstoque();
+
 		if (!itemEstoque.isEstoqueDedutivel())
 			return;
 
 		boolean permiteVendaSemControlarEstoque = SingletonManager.getInstance().isPermiteVendaSemControlarEstoque();
+
 		if (itemEstoque.getQuantidade() < quantidade && !permiteVendaSemControlarEstoque) {
 
 			// devolveProduto(itemEstoque.getCodigoDeBarras(), quantidade);
@@ -77,15 +76,9 @@ public class VendaController extends ControllerBase {
 					"Quantidade de ítens no estoque é insuficiente para a venda! Total em estoque: "
 							+ itemEstoque.getQuantidade());
 		}
-		itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidade);
 		if (!permiteVendaSemControlarEstoque) {
-			estoqueController.setItemEstoque(itemEstoque);
-
-			estoqueController.salva();
+			estoqueController.decrementaItem(quantidade);
 		}
-		// venda.setItemEstoque(itemEstoque);
-		estoqueController.anulaAtributos();
-
 	}
 
 	@Override
@@ -107,10 +100,13 @@ public class VendaController extends ControllerBase {
 	@Override
 	public List getList() {
 
-		if (venda.getItensVenda() == null)
-			return new ArrayList<>();
-		venda=vendaDao.busca("venda.findVenda", "id",venda.getIdVenda());
-		return new ArrayList<>(venda.getItensVenda());
+		try {
+			venda = vendaDao.busca("venda.findVenda", "id", venda.getIdVenda());
+			return venda.getItensVenda();
+		} catch (NoResultException e) {
+			return venda.getItensVenda();
+		}
+
 	}
 
 	@Override
@@ -343,7 +339,7 @@ public class VendaController extends ControllerBase {
 	}
 
 	public void resetVenda() {
-		venda = null;
+ 		venda = null;
 		venda = new Venda();
 		venda.setOperador(getUsuarioLogado());
 		venda.setCaixa((Caixa) caixaController.getItem());
@@ -635,10 +631,17 @@ public class VendaController extends ControllerBase {
 	}
 
 	public float getValorBrutoVenda() {
+
 		float total = 0;
-		venda = vendaDao.busca("venda.findVenda", "id", venda.getIdVenda());
-		for (ItemVenda item : venda.getItensVenda()) {
-			total += item.getQuantidade() * item.getItemEstoque().getValorUnitario();
+		try {
+
+			venda = vendaDao.busca("venda.findVenda", "id", venda.getIdVenda());
+			for (ItemVenda item : venda.getItensVenda()) {
+				total += item.getQuantidade() * item.getItemEstoque().getValorUnitario();
+			}
+
+		} catch (NoResultException e) {
+			return total;
 		}
 		return total;
 	}

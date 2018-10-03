@@ -112,8 +112,15 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	}
 
 	protected FlowPane createHorizontalFlowPane() {
-		FlowPane flowPane = new FlowPane(Orientation.HORIZONTAL);
+		FlowPane flowPane = createFlowPane(Orientation.HORIZONTAL);
 		flowPane.setHgap(10);
+		flowPane.setVgap(10);
+		return flowPane;
+	}
+
+	protected FlowPane createFlowPane(Orientation orientation) {
+		FlowPane flowPane = new FlowPane(orientation);
+
 		return flowPane;
 	}
 
@@ -554,6 +561,11 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		showErrorMessage(e.getMessage());
 		SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
 
+	}
+
+	public FlowPane createVerticalFlowPane() {
+
+		return createFlowPane(Orientation.VERTICAL);
 	}
 
 }
