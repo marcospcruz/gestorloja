@@ -38,6 +38,7 @@ public class PrincipalFxGui extends StageBase {
 
 	public PrincipalFxGui() {
 		super();
+		setMinWidth(width * 0.50);
 		String title = "Gestor Loja - Usuário logado: "
 				+ SingletonManager.getInstance().getUsuarioLogado().getNomeCompleto();
 		setTitle(title);

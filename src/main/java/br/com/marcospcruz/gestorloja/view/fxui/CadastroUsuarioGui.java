@@ -20,11 +20,10 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
 
 public class CadastroUsuarioGui extends StageBase {
 
-	private static final String CSS_COLOR_BLACK = "-fx-text-inner-color: red;";
+	private static final String CSS_COLOR_BLACK = "-fx-text-inner-color: black;";
 	private GridPane grid;
 	private List<CheckBox> perfilBoxes;
 	private TextField nomeUsuarioField;

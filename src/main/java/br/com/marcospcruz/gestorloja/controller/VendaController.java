@@ -339,7 +339,7 @@ public class VendaController extends ControllerBase {
 	}
 
 	public void resetVenda() {
- 		venda = null;
+		venda = null;
 		venda = new Venda();
 		venda.setOperador(getUsuarioLogado());
 		venda.setCaixa((Caixa) caixaController.getItem());
@@ -636,12 +636,12 @@ public class VendaController extends ControllerBase {
 		try {
 
 			venda = vendaDao.busca("venda.findVenda", "id", venda.getIdVenda());
-			for (ItemVenda item : venda.getItensVenda()) {
-				total += item.getQuantidade() * item.getItemEstoque().getValorUnitario();
-			}
 
 		} catch (NoResultException e) {
-			return total;
+			e.printStackTrace();
+		}
+		for (ItemVenda item : venda.getItensVenda()) {
+			total += item.getQuantidade() * item.getItemEstoque().getValorUnitario();
 		}
 		return total;
 	}

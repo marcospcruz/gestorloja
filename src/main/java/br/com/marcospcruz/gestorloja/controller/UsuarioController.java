@@ -129,7 +129,9 @@ public class UsuarioController extends ControllerBase {
 		return perfilDao.busca("perfilusuario.findperfisUsuario");
 	}
 
-	public void setPerfisUsuario(List<String> perfis) {
+	public void setPerfisUsuario(List<String> perfis) throws Exception {
+		if(perfis.isEmpty())
+			throw new Exception("Selecionar ao menos um Perfil para o Usuário.");
 		usuario.setPerfisUsuario(new ArrayList<>());
 		boolean adm = perfis.contains("Administrador");
 		for (String descricao : perfis) {
