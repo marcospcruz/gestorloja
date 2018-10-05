@@ -609,7 +609,7 @@ public class VendaController extends ControllerBase {
 	}
 
 	@Override
-	public void novo() {
+	public void novoUsuario() {
 		// TODO Auto-generated method stub
 
 	}

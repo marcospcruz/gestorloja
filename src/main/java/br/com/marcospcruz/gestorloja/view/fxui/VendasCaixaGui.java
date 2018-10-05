@@ -96,7 +96,7 @@ public class VendasCaixaGui extends StageBase {
 
 	protected void openCaixaGui() throws Exception {
 		((CaixaController) controller).validateCaixaAberto();
-		controller.novo();
+		controller.novoUsuario();
 		abreTelaCadastro();
 		reloadForm();
 	}
@@ -104,7 +104,7 @@ public class VendasCaixaGui extends StageBase {
 	protected void abreTelaCadastro() throws Exception {
 		Stage pdv = new PDV(true);
 
-		abreTelaCadastro(pdv);
+		abreJanelaModal(pdv);
 	}
 
 	@Override

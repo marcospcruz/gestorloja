@@ -11,6 +11,7 @@ import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.FabricanteController;
 import br.com.marcospcruz.gestorloja.controller.ProdutoController;
 import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
+import br.com.marcospcruz.gestorloja.controller.UsuarioController;
 import br.com.marcospcruz.gestorloja.controller.VendaController;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.Produto;
@@ -191,7 +192,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	abstract void reloadForm() throws Exception;
 
-	void abreTelaCadastro(Stage stage) throws Exception {
+	void abreJanelaModal(Stage stage) throws Exception {
 		stage.initOwner(this);
 		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.showAndWait();
@@ -270,6 +271,10 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	protected static EstoqueController getEstoqueController() throws Exception {
 
 		return (EstoqueController) getController(ControllerAbstractFactory.ESTOQUE);
+	}
+
+	protected static UsuarioController getUsuarioController() throws Exception {
+		return (UsuarioController) getController(ControllerAbstractFactory.USUARIOS);
 	}
 
 	/**
@@ -403,7 +408,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	}
 
 	private Alert showMessage(String message, AlertType alertType, String title, ButtonType... buttonType) {
-
+		SingletonManager.getInstance().getLogger(this.getClass()).info(message);
 		Alert alert;
 		if (buttonType != null)
 			alert = new Alert(alertType, message, buttonType);
@@ -418,7 +423,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	public void showMensagemSucesso(String message) {
 		showMessage(message, AlertType.INFORMATION, "Operação realizada com sucesso!");
-		SingletonManager.getInstance().getLogger(this.getClass()).info(message);
+
 	}
 
 	public boolean showConfirmAtionMessage(String string) {
@@ -511,7 +516,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	protected void novo(ActionEvent event) {
 		btnExcluir.setDisable(true);
-		controller.novo();
+		controller.novoUsuario();
 		populaForm();
 	}
 

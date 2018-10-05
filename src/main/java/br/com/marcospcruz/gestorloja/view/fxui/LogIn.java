@@ -28,6 +28,7 @@ public class LogIn extends Stage {
 
 	public LogIn() {
 		super();
+		setMaxWidth(400);
 		setTitle("Gestão Loja - Login de Usuário");
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);

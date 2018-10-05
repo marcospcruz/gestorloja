@@ -10,20 +10,17 @@
 
 		<properties>
 			<!-- SQLITE -->
-			<property name="javax.persistence.jdbc.driver"
-				value="org.sqlite.JDBC" />
+			<property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC" />
 
 
-			<property name="javax.persistence.jdbc.url"
-				value="jdbc:sqlite:c:\gestorLoja\loja.db" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:sqlite:c:\gestorLoja\loja.db" />
 			<!-- MYSQL -->
 			<!--property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/> 
 				<property name="javax.persistence.jdbc.url" value="jdbc:mysql://dlink-bc19e7:3306/loja" 
 				/> <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/loja" 
 				/> <property name="javax.persistence.jdbc.user" value="admin" /> <property 
 				name="javax.persistence.jdbc.password" value="admin" / -->
-			<property name="hibernate.event.merge.entity_copy_observer"
-				value="allow" />
+			<property name="hibernate.event.merge.entity_copy_observer" value="allow" />
 			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.dialect"

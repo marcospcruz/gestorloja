@@ -11,6 +11,7 @@ public class ControllerAbstractFactory {
 	public static final String ESTOQUE = PACKAGE + "EstoqueController";
 	public static final String CONTROLE_CAIXA = PACKAGE + "CaixaController";
 	public static final String CONTROLE_VENDA = PACKAGE + "VendaController";
+	public static final String USUARIOS = PACKAGE + "UsuarioController";
 
 	private ControllerAbstractFactory() {
 	}
@@ -18,7 +19,7 @@ public class ControllerAbstractFactory {
 	public static ControllerBase createController(String string) throws Exception {
 
 		Class controllerClass = Class.forName(string);
-		
+
 		return (ControllerBase) controllerClass.newInstance();
 
 	}

@@ -207,7 +207,7 @@ public class ProdutoController extends ControllerBase {
 	}
 
 	@Override
-	public void novo() {
+	public void novoUsuario() {
 		produto = new Produto();
 	}
 

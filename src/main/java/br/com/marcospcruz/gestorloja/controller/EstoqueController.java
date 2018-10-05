@@ -479,7 +479,7 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	@Override
-	public void novo() {
+	public void novoUsuario() {
 		itemEstoque = new ItemEstoque();
 
 	}

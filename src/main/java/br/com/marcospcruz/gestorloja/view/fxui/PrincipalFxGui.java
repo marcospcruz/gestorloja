@@ -38,6 +38,9 @@ public class PrincipalFxGui extends StageBase {
 
 	public PrincipalFxGui() {
 		super();
+		String title = "Gestor Loja - Usuário logado: "
+				+ SingletonManager.getInstance().getUsuarioLogado().getNomeCompleto();
+		setTitle(title);
 		interfaces = new HashMap<>();
 		Scene scene = new Scene(new Group());
 		FlowPane btnPane = new FlowPane(Orientation.HORIZONTAL);
@@ -55,17 +58,21 @@ public class PrincipalFxGui extends StageBase {
 		perfis.stream().forEach(perfil -> {
 			perfil = new CrudDao<PerfilUsuario>().update(perfil);
 			perfil.getInterfaces().stream().forEach(gui -> {
-				Button btn = criaActionButton(gui);
-				interfaces.put(gui.getNomeModulo(), gui);
+				Button btn = criaBotao(gui);
 				btns.add(btn);
 			});
 		});
+		InterfaceGrafica tela = new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_PASSWORD);
+		tela.setNomeModulo(InterfaceGrafica.PASSWORD);
+		Button alteraSenha = criaBotao(tela);
+
+		btns.add(alteraSenha);
 		btns.stream().forEach(btn -> {
 			btnPane.getChildren().add(btn);
 		});
 		// btnPane.getChildren().add(maintenancePane());
 		boolean isAdministrador = usuarioLogado.getPerfisUsuario().stream()
-				.anyMatch(perfil -> perfil.getIdPerfilusuario() == 1);
+				.anyMatch(perfil -> perfil.getIdPerfilUsuario() == 1);
 		if (isAdministrador) {
 			TitledPane manutencaoPane = (TitledPane) maintenancePane();
 			btnPane.getChildren().add(manutencaoPane);
@@ -77,6 +84,12 @@ public class PrincipalFxGui extends StageBase {
 			facade.fechaSessaoUsuario();
 		});
 
+	}
+
+	protected Button criaBotao(InterfaceGrafica gui) {
+		Button btn = criaActionButton(gui);
+		interfaces.put(gui.getNomeModulo(), gui);
+		return btn;
 	}
 
 	private Node maintenancePane() {

@@ -79,7 +79,8 @@ public class EstoquePrincipalGui extends StageBase {
 		TitledPane operacoes = criaOperacoesPanel();
 		TitledPane tablePane = super.criaTablePane("Estoque de Produtos");
 		getvBox().getChildren().addAll(cadastroPane, pesquisaPane, tablePane);
-		getvBox().getChildren().add(operacoes);
+		if (SingletonManager.getInstance().isManutencao())
+			getvBox().getChildren().add(operacoes);
 
 	}
 
@@ -89,7 +90,7 @@ public class EstoquePrincipalGui extends StageBase {
 		ItemEstoque item = (ItemEstoque) controller.getItem();
 
 		try {
-			abreTelaCadastro(new ItemEstoqueCadastro());
+			abreJanelaModal(new ItemEstoqueCadastro());
 
 			reloadForm();
 		} catch (Exception e) {
@@ -199,12 +200,12 @@ public class EstoquePrincipalGui extends StageBase {
 				stage = new ProdutoCadastro();
 				break;
 			default:
-				getTipoProdutoController().novo();
-				getFabricanteController().novo();
-				getEstoqueController().novo();
+				getTipoProdutoController().novoUsuario();
+				getFabricanteController().novoUsuario();
+				getEstoqueController().novoUsuario();
 				stage = new ItemEstoqueCadastro();
 			}
-			abreTelaCadastro(stage);
+			abreJanelaModal(stage);
 
 			reloadForm();
 		} catch (Exception e) {

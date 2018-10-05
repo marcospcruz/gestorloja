@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -25,6 +27,23 @@ public class Util {
 	private static final Character VIRGULA = ',';
 	private static final Character PONTO = '.';
 	private static final String CONFIG_FILE_PATH = AppFx.CONTROLE_ESTOQUE_HOME + "/config/config.properties";
+
+	public static String encryptaPassword(String password) throws NoSuchAlgorithmException {
+		// Create MessageDigest instance for MD5
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		// Add password bytes to digest
+		md.update(password.getBytes());
+		// Get the hash's bytes
+		byte[] bytes = md.digest();
+		// This bytes[] has bytes in decimal format;
+		// Convert it to hexadecimal format
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < bytes.length; i++) {
+			sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+		}
+		// Get complete hashed password in hex format
+		return sb.toString();
+	}
 
 	public static String formataDataAtual() {
 
@@ -228,7 +247,7 @@ public class Util {
 	}
 
 	public static String formataMoedaSemSimbolo(float valor) {
-		NumberFormat numberFormat=NumberFormat.getCurrencyInstance(CURRENT_LOCALE);
+		NumberFormat numberFormat = NumberFormat.getCurrencyInstance(CURRENT_LOCALE);
 		DecimalFormatSymbols decimalFormatSymbols = ((DecimalFormat) numberFormat).getDecimalFormatSymbols();
 		decimalFormatSymbols.setCurrencySymbol("");
 		((DecimalFormat) numberFormat).setDecimalFormatSymbols(decimalFormatSymbols);

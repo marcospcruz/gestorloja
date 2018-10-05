@@ -96,7 +96,7 @@ public class ControleCaixaGui extends StageBase {
 		((CaixaController) controller).validateCaixaAberto();
 		try {
 
-			controller.novo();
+			controller.novoUsuario();
 			abreTelaCadastro();
 
 		} catch (Exception e) {
@@ -110,7 +110,7 @@ public class ControleCaixaGui extends StageBase {
 	protected void abreTelaCadastro() throws Exception {
 		Stage caixa = new CaixaGui();
 
-		abreTelaCadastro(caixa);
+		abreJanelaModal(caixa);
 	}
 
 	@Override

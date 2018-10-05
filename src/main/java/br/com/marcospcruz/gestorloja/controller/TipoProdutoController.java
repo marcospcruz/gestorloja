@@ -403,7 +403,7 @@ public class TipoProdutoController extends ControllerBase {
 	}
 
 	@Override
-	public void novo() {
+	public void novoUsuario() {
 		tipoProduto = new SubTipoProduto();
 
 	}

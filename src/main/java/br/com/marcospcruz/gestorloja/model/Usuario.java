@@ -1,6 +1,7 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,16 +24,30 @@ import javax.persistence.TemporalType;
 @Entity
 //@formatter:off
 @NamedQueries({
+	@NamedQuery(name = "usuario.findUserName", query = "select u from Usuario u "
+//			+ "JOIN FETCH u.perfisUsuario "
+//			+ "LEFT JOIN u.operador o "						
+			+ "where u.nomeUsuario=:nomeUsuario "
+			),
 		@NamedQuery(name = "usuario.findLogin", query = "select u from Usuario u "
-				+ "JOIN FETCH u.perfisUsuario "
+//				+ "JOIN FETCH u.perfisUsuario "
 //				+ "LEFT JOIN u.operador o "						
 				+ "where u.nomeUsuario=:nomeUsuario "
 				+ "and u.password=:password"),
 		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u "
-				+ "LEFT JOIN u.operador o "
-				+ "JOIN FETCH u.perfisUsuario p "
+//				+ "LEFT JOIN u.operador o "
+				+ "JOIN FETCH u.perfisUsuario "
 //				+ "LEFT JOIN FETCH p.interfaces i "				
-				+ "where u.nomeUsuario=:nomeUsuario") })
+				+ "where u.nomeUsuario=:nomeUsuario"),@NamedQuery(name = "usuario.findUsuario", query = "select u from Usuario u "
+//				+ "LEFT JOIN u.operador o "
+				+ "JOIN FETCH u.perfisUsuario "
+//				+ "LEFT JOIN FETCH p.interfaces i "				
+				+ "where u.idUsuario=:id"),
+		@NamedQuery (name="usuario.findAll", query="select distinct u from Usuario u "
+				+ "JOIN FETCH u.perfisUsuario "
+				+ "where u.idUsuario !=1"
+//				+ "JOIN FETCH pu.interfaces "
+				)})
 //@formatter:on
 public class Usuario implements Serializable {
 
@@ -50,13 +65,16 @@ public class Usuario implements Serializable {
 	private Date ultimoAcesso;
 	private String nomeCompleto;
 	private boolean primeiroAcesso;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE })
 	@JoinTable(name = "PerfilUsuario_usuario", joinColumns = { @JoinColumn(name = "idUsuario") }, inverseJoinColumns = {
 			@JoinColumn(name = "idPerfilUsuario") })
 	private List<PerfilUsuario> perfisUsuario;
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
+	@Column
+	@Temporal(value = TemporalType.TIMESTAMP)
+	private Date dataCriacao;
 
 	public Usuario() {
 
@@ -83,12 +101,12 @@ public class Usuario implements Serializable {
 		this.operador = operador;
 	}
 
-	private void setNomeCompleto(String nomeCompleto) {
+	public void setNomeCompleto(String nomeCompleto) {
 		this.nomeCompleto = nomeCompleto;
 
 	}
 
-	private void setPerfisUsuario(List<PerfilUsuario> perfisUsuario) {
+	public void setPerfisUsuario(List<PerfilUsuario> perfisUsuario) {
 		this.perfisUsuario = perfisUsuario;
 
 	}
@@ -98,6 +116,7 @@ public class Usuario implements Serializable {
 	}
 
 	public List<PerfilUsuario> getPerfisUsuario() {
+
 		return perfisUsuario;
 	}
 
@@ -206,6 +225,15 @@ public class Usuario implements Serializable {
 		return "Usuario [idUsuario=" + idUsuario + ", nomeUsuario=" + nomeUsuario + ", password=" + password
 				+ ", ultimoAcesso=" + ultimoAcesso + ", nomeCompleto=" + nomeCompleto + ", primeiroAcesso="
 				+ primeiroAcesso + ", perfisUsuario=" + perfisUsuario + "]";
+	}
+
+	public void setDataCriacao(Date now) {
+		this.dataCriacao = now;
+
+	}
+
+	public Date getDataCriacao() {
+		return dataCriacao;
 	}
 
 }

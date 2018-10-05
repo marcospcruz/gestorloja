@@ -36,12 +36,12 @@ public abstract class CadastroBase extends StageBase {
 	public CadastroBase(Object[] colunas, ControllerBase controller) {
 		this.controller = controller;
 		if (controller != null)
-			controller.novo();
+			controller.novoUsuario();
 		if (colunas != null)
 			super.setLabelColunas(colunas);
 		super.setDimension(WIDTH, HEIGHT);
 		// double thisWidth = (double) WIDTH - ((double) WIDTH * 10 / 100);
-		setLayoutsMaxWidth(width-(width*5/100));
+		setLayoutsMaxWidth(width - (width * 5 / 100));
 		resizableProperty().setValue(Boolean.FALSE);
 		Group root = new Group();
 		scene = new Scene(root, WIDTH, HEIGHT);
@@ -60,7 +60,7 @@ public abstract class CadastroBase extends StageBase {
 		column2.setHgrow(Priority.ALWAYS);
 		column2.setFillWidth(true);
 		populaGridContent();
-	
+
 		populaForm();
 		grid.getColumnConstraints().add(column1);
 		grid.getColumnConstraints().add(column2);
@@ -89,6 +89,21 @@ public abstract class CadastroBase extends StageBase {
 	}
 
 	abstract void populaTableView();
+
+	void populaTableView(String titlePane) {
+		try {
+			// controller = getFabricanteController();
+
+			TitledPane tablePane = super.criaTablePane(titlePane);
+			// tablePane.setMaxHeight(500d);
+			// tablePane.setMinHeight(220d);
+
+			getGrid().add(tablePane, 0, 2, 2, 1);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	abstract void populaCadastroForm();
 
@@ -120,7 +135,7 @@ public abstract class CadastroBase extends StageBase {
 		if (pane != null)
 			teste = pane.getContent();
 		TableView<ItemEstoqueModel> table = (TableView<ItemEstoqueModel>) ((Pane) teste).getChildren().get(0);
-		
+
 		ObservableList<ItemEstoqueModel> items = table.getItems();
 		items.removeAll(items);
 		carregaDadosTable(table);
@@ -130,7 +145,7 @@ public abstract class CadastroBase extends StageBase {
 		try {
 			controller.salva();
 			showMensagemSucesso("Dados salvos com sucesso.");
-			controller.novo();
+			controller.novoUsuario();
 			btnExcluir.setDisable(true);
 			controller.buscaTodos();
 			reloadForm();
@@ -150,7 +165,7 @@ public abstract class CadastroBase extends StageBase {
 
 				showMensagemSucesso("Dados excluídos com sucesso");
 				controller.setList(new ArrayList<>());
-				controller.novo();
+				controller.novoUsuario();
 
 			}
 			reloadForm();
@@ -196,8 +211,9 @@ public abstract class CadastroBase extends StageBase {
 
 	protected void handleTableClick(Event event) {
 		int id = Integer.parseInt(super.getTableViewSelectedValueId(event));
-
 		try {
+			controller = getUsuarioController();
+
 			controller.busca(id);
 			populaForm();
 			btnExcluir.setDisable(false);

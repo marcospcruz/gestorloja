@@ -132,7 +132,7 @@ public class FabricanteController extends ControllerBase {
 	}
 
 	@Override
-	public void novo() {
+	public void novoUsuario() {
 		fabricante = new Fabricante();
 	}
 

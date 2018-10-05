@@ -84,7 +84,7 @@ public abstract class ControllerBase {
 
 	public abstract void validaExistente(String text) throws Exception;
 
-	public abstract void novo();
+	public abstract void novoUsuario();
 
 	protected void logDebug(String message) {
 		final Logger logger = SingletonManager.getInstance().getLogger(this.getClass());

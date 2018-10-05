@@ -24,8 +24,7 @@ public class SingletonManager {
 	private Usuario usuarioLogado;
 	private Map<String, ControllerBase> controllersMap;
 	private LocalDate dataManutencao;
-	
-	
+
 	private SingletonManager() {
 
 	}
@@ -66,11 +65,10 @@ public class SingletonManager {
 	//
 	// }
 	private String getConfigurationPropertyValue(String propertyKey) throws IOException {
-		Properties properties=Util.getConfigFileProperties();
+		Properties properties = Util.getConfigFileProperties();
 		return properties.getProperty(propertyKey);
 	}
 
-	
 	public void setDataManutencaoSistema(LocalDate dataManutencao) {
 		this.dataManutencao = dataManutencao;
 
@@ -133,15 +131,20 @@ public class SingletonManager {
 		try {
 			return Boolean.parseBoolean(getConfigurationPropertyValue("permiteVendaSemControlarEstoque"));
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 		return false;
 	}
 
 	public Logger getLogger(Class clazz) {
-		
+
 		return Logger.getLogger(clazz);
+	}
+
+	public boolean isManutencao() {
+
+		return usuarioLogado.getIdUsuario() == 1;
 	}
 
 }

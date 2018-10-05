@@ -1,8 +1,11 @@
 package br.com.marcospcruz.gestorloja;
 
 import java.io.File;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.persistence.NoResultException;
 
@@ -15,6 +18,7 @@ import br.com.marcospcruz.gestorloja.model.PerfilUsuario;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.LogIn;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -37,7 +41,7 @@ public class AppFx extends Application {
 		System.exit(0);
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws NoSuchAlgorithmException {
 		if (args.length > 0)
 			switch (args[0]) {
 			case "1":
@@ -111,7 +115,7 @@ public class AppFx extends Application {
 		}
 	}
 
-	private static void criaUsuario() {
+	private static void criaUsuario() throws NoSuchAlgorithmException {
 		Crud<InterfaceGrafica> iDao = criaInterfaceGrafica();
 		Crud<PerfilUsuario> dao = criaPerfisUsuario(iDao);
 		criaUsuarios(dao);
@@ -123,22 +127,41 @@ public class AppFx extends Application {
 	 * @return
 	 */
 	private static Crud<InterfaceGrafica> criaInterfaceGrafica() {
-
-		List<InterfaceGrafica> interfaces = Arrays.asList(new InterfaceGrafica[] {
+		InterfaceGrafica[] guis = new InterfaceGrafica[] {
 				new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_ESTOQUE, InterfaceGrafica.ESTOQUE),
 				new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_CAIXA, InterfaceGrafica.CONTROLE_DE_CAIXA),
-				new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_PDV, InterfaceGrafica.PONTO_DE_VENDA)
+				new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_PDV, InterfaceGrafica.PONTO_DE_VENDA),
+				new InterfaceGrafica(InterfaceGrafica.CLASS_NAME_USUARIOS, InterfaceGrafica.USUARIOS)
 				// new InterfaceGrafica(pack + "VendaPrincipalGui","Venda")
-		});
+		};
+		PerfilUsuario[] perfis = { new PerfilUsuario("Manutencao", Arrays.asList(guis)),
+				new PerfilUsuario("Administrador", Arrays.asList(guis)),
+				new PerfilUsuario("Vendedor", Arrays.asList(guis[1], guis[2])),
+				new PerfilUsuario("Caixa", Arrays.asList(guis[1])),
+				new PerfilUsuario("Estoque", Arrays.asList(guis[0])) };
+		Crud<PerfilUsuario> pDao = new CrudDao<>();
+		// List<InterfaceGrafica> interfaces = Arrays.asList(guis);
 		Crud<InterfaceGrafica> iDao = new CrudDao<>();
-		interfaces.stream().forEach(i -> {
+		for (int x = 0; x < perfis.length; x++) {
+			PerfilUsuario i = perfis[x];
 			try {
-				iDao.busca("interface.findinterface", "className", i.getClassName());
+
+				if (x >= 1) {
+					ArrayList<InterfaceGrafica> newGuis = new ArrayList<>(i.getInterfaces());
+					i.setInterfaces(new ArrayList<>());
+					for (int y = 0; y < newGuis.size(); y++) {
+						InterfaceGrafica ii = newGuis.get(y);
+						ii = iDao.busca("interface.findinterface", "className", ii.getClassName());
+						ii.getPerfisUsuario().add(i);
+						i.getInterfaces().add(ii);
+					}
+				}
+				pDao.busca("perfilusuario.findperfil", "descricao", i.getDescricao());
 			} catch (NoResultException e) {
 				e.printStackTrace();
-				iDao.update(i);
+				pDao.update(i);
 			}
-		});
+		}
 		return iDao;
 	}
 
@@ -146,16 +169,17 @@ public class AppFx extends Application {
 	 * metodo provisorio
 	 * 
 	 * @param dao
+	 * @throws NoSuchAlgorithmException
 	 */
-	private static void criaUsuarios(Crud<PerfilUsuario> dao) {
+	private static void criaUsuarios(Crud<PerfilUsuario> dao) throws NoSuchAlgorithmException {
 		List perfilUsuario = Arrays
-				.asList(new PerfilUsuario[] { dao.busca("perfilusuario.findperfil", DESCRICAO, "Administrador") });
+				.asList(new PerfilUsuario[] { dao.busca("perfilusuario.findperfil", DESCRICAO, "Manutencao") });
 
-		List<Usuario> usuarios = Arrays
-				.asList(new Usuario[] { new Usuario("Marcos Pereira da Cruz", "marcos", "123456", perfilUsuario)
-//						new Usuario("Cibele Pereira Bellini", "cibele", "ci@2018", perfilUsuario),
-//						new Usuario("Nadia", "nadia", "123456", perfilUsuario) 
-						});
+		List<Usuario> usuarios = Arrays.asList(new Usuario[] {
+				new Usuario("Marcos Pereira da Cruz", "marcos", Util.encryptaPassword("123456"), perfilUsuario)
+				// new Usuario("Cibele Pereira Bellini", "cibele", "ci@2018", perfilUsuario),
+				// new Usuario("Nadia", "nadia", "123456", perfilUsuario)
+		});
 
 		usuarios.stream().forEach(usuario -> {
 			Crud<Usuario> userdao = new CrudDao<>();
@@ -179,8 +203,9 @@ public class AppFx extends Application {
 	 */
 	private static Crud<PerfilUsuario> criaPerfisUsuario(Crud<InterfaceGrafica> iDao) {
 		// @formatter:off
-		PerfilUsuario[] perfis = { new PerfilUsuario("Administrador", iDao.busca("interface.findall")),
-				new PerfilUsuario("Vendedor"), new PerfilUsuario("Caixa"), new PerfilUsuario("Estoque") };
+		 List<InterfaceGrafica> guis = iDao.busca("interface.findall");
+		PerfilUsuario[] perfis = { new PerfilUsuario("Manutencao",guis),
+				new PerfilUsuario("Administrador"),new PerfilUsuario("Vendedor"), new PerfilUsuario("Caixa"), new PerfilUsuario("Estoque") };
 
 		List<PerfilUsuario> perfisList = Arrays.asList(perfis);
 		Crud<PerfilUsuario> dao = new CrudDao<>();

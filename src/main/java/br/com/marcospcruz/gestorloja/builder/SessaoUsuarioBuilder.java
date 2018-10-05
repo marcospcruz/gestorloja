@@ -2,6 +2,8 @@ package br.com.marcospcruz.gestorloja.builder;
 
 import java.util.Date;
 
+import javax.persistence.NoResultException;
+
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
@@ -22,8 +24,12 @@ public class SessaoUsuarioBuilder {
 		Usuario usuario = SingletonManager.getInstance().getUsuarioLogado();
 		if (usuario != null) {
 			CrudDao<SessaoUsuario> sessaoUsuarioDao = new CrudDao<>();
-			sessaoUsuario = sessaoUsuarioDao.busca("sessaousuario.findSessaoAtiva", "idUsuario",
-					usuario.getIdUsuario());
+			try {
+				sessaoUsuario = sessaoUsuarioDao.busca("sessaousuario.findSessaoAtiva", "idUsuario",
+						usuario.getIdUsuario());
+			} catch (NoResultException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

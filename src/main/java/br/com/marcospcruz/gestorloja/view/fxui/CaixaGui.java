@@ -331,7 +331,7 @@ public class CaixaGui extends StageBase {
 	}
 
 	private void close(ActionEvent e) {
-		controller.novo();
+		controller.novoUsuario();
 		hide();
 	}
 

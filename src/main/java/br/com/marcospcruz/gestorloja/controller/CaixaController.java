@@ -296,7 +296,7 @@ public class CaixaController extends ControllerBase {
 	}
 
 	@Override
-	public void novo() {
+	public void novoUsuario() {
 		Caixa ultimoCaixa = buscaUltimoCaixa();
 		caixa = new Caixa();
 

@@ -146,7 +146,6 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 	protected void populaPesquisaPanel() {
 		TitledPane pesquisaPane = new TitledPane("Pesquisa", new Button());
 
-		pesquisaPane.setMaxWidth(getLayoutsMaxWidth());
 		pesquisaPane.setMinWidth(getLayoutsMaxWidth());
 		FlowPane pane = new FlowPane(Orientation.HORIZONTAL);
 		// BorderPane pane = new BorderPane();
