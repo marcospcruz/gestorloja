@@ -465,7 +465,7 @@ public class EstoquePrincipalGui extends StageBase {
 				try {
 					reloadTableView();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+
 					e.printStackTrace();
 				}
 			}

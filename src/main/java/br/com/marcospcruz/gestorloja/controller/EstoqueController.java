@@ -396,7 +396,7 @@ public class EstoqueController extends ControllerBase {
 					.filter(itemEstoque -> itemEstoque.getCodigoDeBarras().equals(produto))
 					.collect(Collectors.toList());
 			if (itensEstoque.isEmpty()) {
-				tmpItensEstoque = new ArrayList<>(itensEstoque);
+				tmpItensEstoque = new ArrayList<>(backup);
 				itensEstoque = tmpItensEstoque.stream()
 						.filter(itemEstoque -> itemEstoque.getProduto().getDescricaoProduto().contains(produto))
 						.collect(Collectors.toList());
