@@ -129,6 +129,7 @@ public class ControleCaixaGui extends StageBase {
 		controller.buscaTodos();
 		boolean ativaBotaoAbrir = false;
 		for (Object item : controller.getList()) {
+			controller.busca(((Caixa) item).getIdCaixa());
 			Caixa caixa = (Caixa) item;
 			ativaBotaoAbrir = caixa.getDataFechamento() == null;
 			try {
@@ -137,8 +138,8 @@ public class ControleCaixaGui extends StageBase {
 				String dataHoraFechamento = caixa != null && caixa.getDataFechamento() != null
 						? Util.formataDataHora(caixa.getDataFechamento())
 						: "";
-				String totalVendido = Util.formataMoeda(sumarizaVendasCaixa(caixa.getVendas()));
-				
+				String totalVendido = Util.formataMoeda(sumarizaVendasCaixa());
+
 				String trocoFinal = Util.formataMoeda(caixa != null ? caixa.getSaldoFinal() : 0f);
 				String status = caixa != null && caixa.getDataFechamento() == null ? "Aberto" : "Fechado";
 				String operadorFechamento = caixa != null && caixa.getUsuarioFechamento() != null
@@ -166,14 +167,18 @@ public class ControleCaixaGui extends StageBase {
 
 	/**
 	 * 
-	 * @param vendas
+	 * @param caixa
 	 * @return
 	 */
-	private Float sumarizaVendasCaixa(Set<Venda> vendas) {
+	private Float sumarizaVendasCaixa() {
 		float totalVendas = 0;
-		for (Venda venda : vendas) {
-			totalVendas += venda.getTotalVendido();
+		try {
+			totalVendas = getCaixaController().getTotalVendasCaixa();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
 
 		return totalVendas;
 	}

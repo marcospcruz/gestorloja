@@ -93,6 +93,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 	}
 
 	private ItemEstoque parseRow(String[] columns) throws Exception {
+		
 		ItemEstoqueBuilder builder = new ItemEstoqueBuilder();
 		if (columns[CATEGORIA_PRODUTO].contains("FORCE"))
 			System.out.println();

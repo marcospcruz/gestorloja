@@ -214,9 +214,10 @@ public class VendaController extends ControllerBase {
 			if (itemVendaBackup != null)
 				itensVenda.add(itemVendaBackup);
 			else {
-				if (itemVenda.getQuantidade() == 0)
+				if (itemVenda.getQuantidade() == 0 && !itemVenda.getVenda().isEstornado()) {
 					itemVendaMap.remove(codigoDeBarras);
-				venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
+					venda.setItensVenda(new ArrayList<>(itemVendaMap.values()));
+				}
 			}
 			calculaValorTotalVenda();
 
@@ -236,7 +237,7 @@ public class VendaController extends ControllerBase {
 			// System.out.println(valorItemVenda);
 			// valorTotal += valorItemVenda;
 
-			float desconto = Float.isNaN(venda.getPorcentagemDesconto()) ? 0 : (venda.getPorcentagemDesconto() / 100f);
+			Float desconto = Float.isNaN(venda.getPorcentagemDesconto()) ? 0 : (venda.getPorcentagemDesconto() / 100f);
 			float tmp = valorItemVenda * desconto;
 			valorItemVenda -= tmp;
 			item.setValorVendido(valorItemVenda);
@@ -652,6 +653,7 @@ public class VendaController extends ControllerBase {
 	}
 
 	public void estornaVenda() throws Exception {
+		venda.setEstornado(true);
 		Caixa caixa = venda.getCaixa();
 		Pagamento pagamento = venda.getPagamento();
 		for (MeioPagamento mp : pagamento.getMeiosPagamento()) {
@@ -670,7 +672,6 @@ public class VendaController extends ControllerBase {
 
 		}
 
-		venda.setEstornado(true);
 		salva();
 		resetVenda();
 	}

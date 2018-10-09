@@ -58,7 +58,7 @@ public class Venda implements Serializable {
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
 
-	private float porcentagemDesconto;
+	private int porcentagemDesconto;
 
 	private boolean estornado;
 
@@ -123,7 +123,7 @@ public class Venda implements Serializable {
 		this.dataVenda = dataVenda;
 	}
 
-	public void setPorcentagemDesconto(float porcentagemDesconto) {
+	public void setPorcentagemDesconto(int porcentagemDesconto) {
 		this.porcentagemDesconto = porcentagemDesconto;
 
 	}

@@ -625,9 +625,9 @@ public class PDV extends StageBase {
 				float valorVendido = controller.getVenda().getTotalVendido();
 
 				float descontoConcedido = controller.getValorBrutoVenda() - valorVendido;
-				float porcentagemDesconto = (descontoConcedido / controller.getValorBrutoVenda()) * 100;
+				Float porcentagemDesconto = (descontoConcedido / controller.getValorBrutoVenda()) * 100;
 				if (!naoAtualizaDesconto)
-					controller.getVenda().setPorcentagemDesconto(porcentagemDesconto);
+					controller.getVenda().setPorcentagemDesconto(porcentagemDesconto.intValue());
 				itensTable.stream().forEach(item -> {
 					Float valorTotal = Util.parseStringDecimalToFloat(item.getValorTotal().substring(3));
 					Float valorProduto = Util.parseStringDecimalToFloat(item.getValorProduto().substring(3));
@@ -665,9 +665,9 @@ public class PDV extends StageBase {
 			return;
 		VendaController controller;
 		try {
-			float desconto = Float.parseFloat(!valorDesconto.isEmpty() ? valorDesconto.replace(',', '.') : "0");
+			Float desconto = Float.parseFloat(!valorDesconto.isEmpty() ? valorDesconto.replace(',', '.') : "0");
 			controller = getVendaController();
-			controller.getVenda().setPorcentagemDesconto(desconto);
+			controller.getVenda().setPorcentagemDesconto(desconto.intValue());
 			controller.calculaValorTotalVenda();
 			if (!atualizaDesconto)
 				atualizaSubTotal(controller);

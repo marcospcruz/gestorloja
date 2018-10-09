@@ -105,6 +105,7 @@ public class VendasCaixaGui extends StageBase {
 		Stage pdv = new PDV(true);
 
 		abreJanelaModal(pdv);
+		reloadForm();
 	}
 
 	@Override
@@ -119,6 +120,7 @@ public class VendasCaixaGui extends StageBase {
 	@Override
 	protected void carregaDadosTable(@SuppressWarnings("rawtypes") TableView table) throws Exception {
 		List<VendaModel> dadoss = new ArrayList<>();
+		
 		Caixa caixa = (Caixa) controller.getItem();
 		VendaController controller = getVendaController();
 		try {

@@ -84,11 +84,10 @@ public class CaixaController extends ControllerBase {
 
 		try {
 			if (caixa == null) {
+				buscaCaixa(caixa);
 				// busca(BUSCA_CAIXA_ABERTO);
 				if (!caixaList.isEmpty())
 					caixa = caixaList.get(0);
-			} else {
-
 			}
 		} catch (Exception e) {
 
@@ -438,7 +437,7 @@ public class CaixaController extends ControllerBase {
 
 	public void atualizaSaldoCaixa() {
 		if (caixa.getIdCaixa() != 0)
-			caixa = dao.busca("caixa.findCaixa", "id", caixa.getIdCaixa());
+			buscaCaixa(caixa);
 		float saldoCaixa = caixa.getSaldoInicial();
 
 		for (TransacaoFinanceira transacaoFinanceira : caixa.getTransacoesCaixa()) {
@@ -452,8 +451,13 @@ public class CaixaController extends ControllerBase {
 		caixa.setSaldoFinal(saldoCaixa);
 	}
 
+	public void buscaCaixa(Caixa caixa) {
+		this.caixa = dao.busca("caixa.findCaixa", "id", caixa.getIdCaixa());
+
+	}
+
 	public Float getTotalTransacoesCaixa(int idOperacao) {
-		float totalReceitas = 0;
+		float total = 0;
 
 		//@formatter:off
 		
@@ -463,9 +467,9 @@ public class CaixaController extends ControllerBase {
 				.collect(Collectors.toSet());
 		//@formatter:on
 		for (TransacaoFinanceira tf : transacoes) {
-			totalReceitas += tf.getValorTransacaoFinanceira();
+			total += tf.getValorTransacaoFinanceira();
 		}
-		return totalReceitas;
+		return total;
 	}
 
 	public void adicionaTransacao(TransacaoFinanceira transacao) {
@@ -484,6 +488,16 @@ public class CaixaController extends ControllerBase {
 
 		return null;
 
+	}
+
+	public float getTotalVendasCaixa() {
+		float totalVendas = 0;
+		buscaCaixa(caixa);
+		for (Venda venda : caixa.getVendas()) {
+			totalVendas += venda.getTotalVendido();
+		}
+
+		return totalVendas;
 	}
 
 }

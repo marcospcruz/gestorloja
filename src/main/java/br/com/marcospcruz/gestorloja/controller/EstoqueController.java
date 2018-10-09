@@ -203,7 +203,7 @@ public class EstoqueController extends ControllerBase {
 			return;
 		if (quantidade < 1 && !SingletonManager.getInstance().isPermiteVendaSemControlarEstoque())
 			throw new Exception("Quantidade inválida!");
-		if (itemEstoque.isEstoqueDedutivel()
+		if (itemEstoque.isEstoqueDedutivel() && !SingletonManager.getInstance().isPermiteVendaSemControlarEstoque()
 		// && quantidade > 0
 		) {
 			itemEstoque.setQuantidade(itemEstoque.getQuantidade() + quantidade);
@@ -384,7 +384,6 @@ public class EstoqueController extends ControllerBase {
 					itensEstoque = tmpItensEstoque.stream().filter(
 							itemEstoque -> itemEstoque.getTipoProduto().getDescricaoTipo().contains(tipoProduto))
 							.collect(Collectors.toList());
-					
 
 				}
 			}

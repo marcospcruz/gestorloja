@@ -408,7 +408,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	}
 
 	private Alert showMessage(String message, AlertType alertType, String title, ButtonType... buttonType) {
-		SingletonManager.getInstance().getLogger(this.getClass()).info(message);
+		
 		Alert alert;
 		if (buttonType != null)
 			alert = new Alert(alertType, message, buttonType);
@@ -423,7 +423,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	public void showMensagemSucesso(String message) {
 		showMessage(message, AlertType.INFORMATION, "Operação realizada com sucesso!");
-
+		SingletonManager.getInstance().getLogger(this.getClass()).info(message);
 	}
 
 	public boolean showConfirmAtionMessage(String string) {
@@ -554,7 +554,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	private void showErrorMessage(String string, String message) {
 		showMessage(message, AlertType.ERROR, string);
-
+		SingletonManager.getInstance().getLogger(this.getClass()).error(message);
 	}
 
 	public void showErrorMessage(String string, Exception e) {
@@ -564,7 +564,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	public void showErrorMessage(Exception e) {
 		showErrorMessage(e.getMessage());
-		SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
+		e.printStackTrace();
 
 	}
 

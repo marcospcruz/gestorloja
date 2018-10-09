@@ -156,7 +156,8 @@ public class CaixaGui extends StageBase {
 		Crud<Caixa> dao = new CrudDao<>();
 		Caixa caixa = (Caixa) controller.getItem();
 		if (caixa.getIdCaixa() != 0)
-			caixa = dao.update(caixa);
+//			caixa = dao.busca(caixa.getClass(),caixa.getIdCaixa());
+			caixa=dao.busca("caixa.findCaixa", "id",caixa.getIdCaixa());
 		Button button = new Button("Visualizar Vendas");
 		boolean disableButton;
 		try {
@@ -373,7 +374,9 @@ public class CaixaGui extends StageBase {
 
 		int row = 0;
 
-		Caixa caixa = (Caixa) controller.getItem();
+		
+			Caixa caixa = (Caixa) controller.getItem();
+		
 		dadosGrid.add(criaLabelBold("Data Hora Abertura Caixa:"), 0, row);
 		horaAberturaLbl = criaLabelNormal("");
 		dadosGrid.add(horaAberturaLbl, 1, row++);
