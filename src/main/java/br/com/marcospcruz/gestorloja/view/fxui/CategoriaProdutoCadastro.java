@@ -6,7 +6,6 @@ import java.util.List;
 import org.hibernate.LazyInitializationException;
 
 import br.com.marcospcruz.gestorloja.controller.TipoProdutoController;
-import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
@@ -16,6 +15,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -48,6 +48,18 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 	public void handle(ActionEvent arg0) {
 
 	}
+
+	// public void handleTableClick(Event event) {
+	// int id = Integer.parseInt(super.getTableViewSelectedValueId(event));
+	// try {
+	// controller.busca(id);
+	//
+	// } catch (Exception e) {
+	//
+	// e.printStackTrace();
+	// }
+	//
+	// }
 
 	@Override
 	protected void populaForm() {
@@ -202,7 +214,7 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 		carregaTiposProduto(controller.getList(), items);
 		// items.addAll(controller.getList());
 		table.setItems(items);
-
+		controller.setItem(new SubTipoProduto());
 	}
 
 	protected void carregaTiposProduto(List<TipoProduto> list, ObservableList<TipoProdutoModel> items)

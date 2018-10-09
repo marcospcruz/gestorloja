@@ -37,7 +37,13 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 	@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c "
 			+ "LEFT JOIN FETCH c.vendas "
 			+ "LEFT JOIN FETCH c.transacoesCaixa "
-			+ "ORDER BY c.dataAbertura desc") })
+			+ "ORDER BY c.dataAbertura desc"),
+	@NamedQuery(name = "caixa.findCaixaDataAbertura", query = "select distinct c from Caixa c "
+			+ "LEFT JOIN FETCH c.vendas "
+			+ "LEFT JOIN FETCH c.transacoesCaixa "
+			+" WHERE c.dataAbertura=:data "
+			+ "ORDER BY c.dataAbertura desc")
+	})
 //@formatter:on
 public class Caixa extends AbstractModel {
 	/**

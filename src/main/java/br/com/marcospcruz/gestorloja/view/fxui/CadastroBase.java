@@ -212,7 +212,7 @@ public abstract class CadastroBase extends StageBase {
 	protected void handleTableClick(Event event) {
 		int id = Integer.parseInt(super.getTableViewSelectedValueId(event));
 		try {
-			controller = getUsuarioController();
+//			controller = getUsuarioController();
 
 			controller.busca(id);
 			populaForm();

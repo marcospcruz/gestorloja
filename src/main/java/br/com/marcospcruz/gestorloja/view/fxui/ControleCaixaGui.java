@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -211,7 +212,8 @@ public class ControleCaixaGui extends StageBase {
 		super.handleTableClick(event);
 		try {
 			CaixaController controller = getCaixaController();
-
+			
+			controller.buscaCaixaDia(Util.parseData(super.queryParam));
 			abreTelaCadastro();
 			reloadForm();
 		} catch (Exception e) {

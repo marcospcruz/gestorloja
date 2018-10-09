@@ -8,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
@@ -64,7 +65,7 @@ public class CrudDao<T> implements Crud<T> {
 			SingletonManager.getInstance().getLogger(this.getClass()).info("Carregando entidade " + entity);
 		} catch (Exception e) {
 
-			SingletonManager.getInstance().getLogger(this.getClass()).error(e.getMessage(),e);
+			SingletonManager.getInstance().getLogger(this.getClass()).error(e.getMessage(), e);
 
 			throw e;
 
@@ -138,8 +139,10 @@ public class CrudDao<T> implements Crud<T> {
 		inicializaEntityManager();
 
 		Query query = entityManager.createNamedQuery(namedQuery);
-
-		query.setParameter(parametro, value);
+		if (value instanceof java.util.Date)
+			query.setParameter(parametro, (java.util.Date) value, TemporalType.TIMESTAMP);
+		else
+			query.setParameter(parametro, value);
 
 		T entity = (T) query.getSingleResult();
 		closeEntityManager();

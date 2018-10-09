@@ -62,6 +62,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 	private double layoutsMaxWidth;
 	protected Button btnExcluir;
 	protected ControllerBase controller;
+	protected String queryParam;
 
 	public StageBase() {
 		SingletonManager singletonManager = SingletonManager.getInstance();
@@ -175,6 +176,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 		} catch (Exception e) {
 
 			e.printStackTrace();
+			this.queryParam=value;
 		}
 
 	}

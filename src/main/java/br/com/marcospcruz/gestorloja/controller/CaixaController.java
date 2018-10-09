@@ -1,5 +1,6 @@
 package br.com.marcospcruz.gestorloja.controller;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.persistence.NoResultException;
 
 import org.hibernate.LazyInitializationException;
 
@@ -498,6 +501,25 @@ public class CaixaController extends ControllerBase {
 		}
 
 		return totalVendas;
+	}
+
+	public void buscaCaixaDia(Date dataAbertura) {
+		// Timestamp timestamp = new Timestamp();
+		System.out.println(dataAbertura.getTime());
+		try {
+			caixa = dao.busca("caixa.findCaixaDataAbertura", "data", dataAbertura);
+		} catch (NoResultException e) {
+			buscaTodos();
+			for (Caixa caixa : caixaList) {
+				String parsedDate=Util.formataDataHora(caixa.getDataAbertura());
+				String dataAberturaString=Util.formataDataHora(dataAbertura);
+				if(parsedDate.equals(dataAberturaString)) {
+					this.caixa=caixa;
+					break;
+				}
+			}
+		}
+
 	}
 
 }
