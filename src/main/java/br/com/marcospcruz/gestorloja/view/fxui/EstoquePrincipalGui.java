@@ -147,7 +147,7 @@ public class EstoquePrincipalGui extends StageBase {
 					showMensagemSucesso(importador.getMensagemRetorno());
 					reloadForm();
 				} catch (Exception e) {
-					showErrorMessage(e.getMessage());
+					showErrorMessage(e);
 					SingletonManager.getInstance().getLogger(getClass()).error(e);
 				}
 
