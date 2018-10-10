@@ -78,6 +78,7 @@ public class CaixaController extends ControllerBase {
 	@Override
 	public void busca(String query) throws Exception {
 		// Crud<Caixa> dao = getDao();
+		caixaList = null;
 		caixaList = dao.busca(query);
 
 	}
@@ -86,12 +87,12 @@ public class CaixaController extends ControllerBase {
 	public Object getItem() {
 
 		try {
-			if (caixa == null) {
-				buscaCaixa(caixa);
-				// busca(BUSCA_CAIXA_ABERTO);
-				if (!caixaList.isEmpty())
-					caixa = caixaList.get(0);
-			}
+			// if (caixa == null) {
+//			buscaCaixa(caixa);
+			// busca(BUSCA_CAIXA_ABERTO);
+			// if (!caixaList.isEmpty())
+			// caixa = caixaList.get(0);
+			// }
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -439,8 +440,8 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public void atualizaSaldoCaixa() {
-		if (caixa.getIdCaixa() != 0)
-			buscaCaixa(caixa);
+//		if (caixa.getIdCaixa() != 0)
+//			buscaCaixa(caixa);
 		float saldoCaixa = caixa.getSaldoInicial();
 
 		for (TransacaoFinanceira transacaoFinanceira : caixa.getTransacoesCaixa()) {
@@ -511,10 +512,10 @@ public class CaixaController extends ControllerBase {
 		} catch (NoResultException e) {
 			buscaTodos();
 			for (Caixa caixa : caixaList) {
-				String parsedDate=Util.formataDataHora(caixa.getDataAbertura());
-				String dataAberturaString=Util.formataDataHora(dataAbertura);
-				if(parsedDate.equals(dataAberturaString)) {
-					this.caixa=caixa;
+				String parsedDate = Util.formataDataHora(caixa.getDataAbertura());
+				String dataAberturaString = Util.formataDataHora(dataAbertura);
+				if (parsedDate.equals(dataAberturaString)) {
+					this.caixa = caixa;
 					break;
 				}
 			}

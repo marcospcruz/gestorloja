@@ -318,8 +318,7 @@ public class PDV extends StageBase {
 			VendaController controller = getVendaController();
 
 			Pagamento pagamento = controller.getPagamentoVenda();
-			if (pagamento == null)
-				pagamento = new Pagamento();
+			
 			String descricaoTipoMeioPagamento = checkBox.getText();
 			List<MeioPagamento> meiosPagamento = pagamento.getMeiosPagamento();
 			// selecionando meio pagamento existente
@@ -757,7 +756,7 @@ public class PDV extends StageBase {
 		} else {
 			Button button = new Button("Estornar Venda");
 			button.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
-
+			
 			button.setOnAction(evt -> {
 				try {
 					if (showConfirmAtionMessage("Deseja estornar esta Venda?")) {
@@ -773,6 +772,7 @@ public class PDV extends StageBase {
 					e.printStackTrace();
 				}
 			});
+			
 			VendaController vendaController = getVendaController();
 			if (vendaController.getVenda().getCaixa().getUsuarioFechamento() == null)
 				children.add(button);
@@ -1025,7 +1025,7 @@ public class PDV extends StageBase {
 			// itemVenda.setItemEstoque(itemEstoque);
 			// controller.setItemVenda(itemVenda);
 			// itemEstoque.setQuantidade(quantidade);
-			controller.populaItemEstoque(itemEstoque, quantidade);
+			controller.adicionaItemEstoque(itemEstoque, quantidade);
 			// TODO: APAGAR ESTE MÉTODO
 			// controller.adicionaProdutoLista();
 

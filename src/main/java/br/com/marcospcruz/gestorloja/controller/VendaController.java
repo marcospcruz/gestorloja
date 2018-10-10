@@ -272,7 +272,7 @@ public class VendaController extends ControllerBase {
 
 	}
 
-	public void populaItemEstoque(ItemEstoque itemEstoque, int quantidade) throws Exception {
+	public void adicionaItemEstoque(ItemEstoque itemEstoque, int quantidade) throws Exception {
 		String key = itemEstoque.getCodigoDeBarras();
 		estoqueController.setItem(itemEstoque);
 		if (itemVendaMap == null)
@@ -432,7 +432,7 @@ public class VendaController extends ControllerBase {
 			}
 		}
 		venda.setPagamento(pagamento);
-
+		venda.setCaixa((Caixa) caixaController.getItem());
 	}
 
 	private void salvaItemVenda(ItemVenda itemVenda) {
@@ -682,4 +682,19 @@ public class VendaController extends ControllerBase {
 			pagamento = new CrudDao<Pagamento>().update(pagamento);
 		return pagamento;
 	}
+
+	public void recebePagamento(MeioPagamento mp) {
+		Pagamento pagamento = venda.getPagamento();
+
+		float valorPagamento = 0;
+		if (!pagamento.getMeiosPagamento().contains(mp)) {
+			pagamento.getMeiosPagamento().add(mp);
+			for (MeioPagamento meioPagamento : pagamento.getMeiosPagamento()) {
+				valorPagamento = meioPagamento.getValorPago() + pagamento.getValorPagamento();
+
+			}
+			pagamento.setValorPagamento(valorPagamento);
+		}
+	}
+
 }

@@ -211,6 +211,7 @@
 
 
 		<dependency>
+			<!-- groupId>br.com.marcospcruz</groupId -->
 			<groupId>my-fonts</groupId>
 			<artifactId>my-fonts</artifactId>
 			<version>1.0.1</version>

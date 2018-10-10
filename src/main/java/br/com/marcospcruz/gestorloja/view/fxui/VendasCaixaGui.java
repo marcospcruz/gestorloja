@@ -122,6 +122,7 @@ public class VendasCaixaGui extends StageBase {
 		List<VendaModel> dadoss = new ArrayList<>();
 		
 		Caixa caixa = (Caixa) controller.getItem();
+		
 		VendaController controller = getVendaController();
 		try {
 			for (Venda venda : caixa.getVendas()) {

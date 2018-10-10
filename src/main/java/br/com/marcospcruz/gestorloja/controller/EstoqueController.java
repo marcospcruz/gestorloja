@@ -48,7 +48,7 @@ public class EstoqueController extends ControllerBase {
 
 	public ItemEstoque getItemEstoque() {
 		if (itemEstoque != null && itemEstoque.getIdItemEstoque() != null)
-			itemEstoque = itemEstoqueDao.update(itemEstoque);
+			itemEstoque = itemEstoqueDao.busca(ItemEstoque.class, itemEstoque.getIdItemEstoque());
 		return itemEstoque;
 	}
 

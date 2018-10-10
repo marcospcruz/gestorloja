@@ -24,8 +24,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @Table(name = "Venda")
-@NamedQuery(name="venda.findVenda",query="select v from Venda v "
-		+ "join fetch v.itensVenda "
+@NamedQuery(name = "venda.findVenda", query = "select v from Venda v " + "join fetch v.itensVenda "
 		+ "where v.idVenda=:id")
 public class Venda implements Serializable {
 	/**
@@ -49,8 +48,7 @@ public class Venda implements Serializable {
 	// (cascade = { CascadeType.ALL})
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
-	@ManyToOne
-	// (cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	// (cascade = CascadeType.ALL)
 	@JoinColumn(name = "idCaixa")
 	private Caixa caixa;
@@ -100,6 +98,8 @@ public class Venda implements Serializable {
 	}
 
 	public Pagamento getPagamento() {
+		if (pagamento == null)
+			pagamento = new Pagamento();
 		return pagamento;
 	}
 
