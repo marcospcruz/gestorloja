@@ -3,9 +3,6 @@ package br.com.marcospcruz.gestorloja.dao;
 import java.util.List;
 import java.util.Map;
 
-import br.com.marcospcruz.gestorloja.model.ItemEstoque;
-import br.com.marcospcruz.gestorloja.model.Usuario;
-
 public interface Crud<T> {
 	/**
 	 * M�todo respons�vel em procurar entidade no banco de dados.

@@ -1,9 +1,6 @@
 package br.com.marcospcruz.gestorloja.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -87,7 +84,7 @@ public abstract class ControllerBase {
 	public abstract void novoUsuario();
 
 	protected void logDebug(String message) {
-		final Logger logger = SingletonManager.getInstance().getLogger(this.getClass());
+		Logger logger = SingletonManager.getInstance().getLogger(this.getClass());
 		if (logger.isDebugEnabled()) {
 			logger.debug(message);
 		}

@@ -391,7 +391,13 @@ public class VendaController extends ControllerBase {
 
 	public void salva() {
 
-		venda = vendaDao.update(venda);
+//		venda = vendaDao.update(venda);
+		try {
+			caixaController.salva();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// venda.getPagamento().setVenda(venda);
 		// caixaController.atualizaPagamento(venda.getPagamento());
 	}
@@ -432,7 +438,9 @@ public class VendaController extends ControllerBase {
 			}
 		}
 		venda.setPagamento(pagamento);
-		venda.setCaixa((Caixa) caixaController.getItem());
+		Caixa caixa = (Caixa) caixaController.getItem();
+		venda.setCaixa(caixa);
+		caixa.getVendas().add(venda);
 	}
 
 	private void salvaItemVenda(ItemVenda itemVenda) {
@@ -625,7 +633,7 @@ public class VendaController extends ControllerBase {
 			for (MeioPagamento meio : pagamento.getMeiosPagamento())
 				valorPagamentoVenda += meio.getValorPago();
 		} catch (Exception e) {
-			SingletonManager.getInstance().getLogger(getClass()).warn(e);
+			SingletonManager.getInstance().getLogger(getClass()).warn(e.getMessage());
 		}
 
 		return valorPagamentoVenda;

@@ -243,7 +243,7 @@ public class CaixaController extends ControllerBase {
 				subTotalVendas += venda.getTotalVendido();
 			}
 		} catch (Exception e) {
-			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e.getMessage());
 		}
 		return subTotalVendas;
 	}
@@ -334,7 +334,7 @@ public class CaixaController extends ControllerBase {
 				}
 
 		} catch (Exception e) {
-			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e.getMessage());
 		}
 		return totalRecebido;
 	}
@@ -366,7 +366,7 @@ public class CaixaController extends ControllerBase {
 				}
 
 			} catch (Exception e) {
-				SingletonManager.getInstance().getLogger(getClass()).warn(e);
+				SingletonManager.getInstance().getLogger(getClass()).warn(e.getMessage());
 			}
 		}
 		return subTotais;
@@ -388,7 +388,7 @@ public class CaixaController extends ControllerBase {
 
 			qtVendas = vendas.stream().filter(venda -> venda.isEstornado()).collect(Collectors.toList()).size();
 		} catch (Exception e) {
-			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e.getMessage());
 		}
 
 		return qtVendas;
@@ -404,7 +404,7 @@ public class CaixaController extends ControllerBase {
 		try {
 			qtVendas = caixa.getVendas().size() - getQuantidadeVendasEstornadas();
 		} catch (LazyInitializationException e) {
-			SingletonManager.getInstance().getLogger(this.getClass()).warn(e);
+			SingletonManager.getInstance().getLogger(this.getClass()).warn(e.getMessage());
 		}
 		return qtVendas;
 	}

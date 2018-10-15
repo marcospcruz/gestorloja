@@ -24,9 +24,10 @@ public class SingletonManager {
 	private Usuario usuarioLogado;
 	private Map<String, ControllerBase> controllersMap;
 	private LocalDate dataManutencao;
+	
 
 	private SingletonManager() {
-
+		
 	}
 
 	public static SingletonManager getInstance() {
