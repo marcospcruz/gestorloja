@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -44,7 +46,8 @@ public class CaixaGui extends StageBase {
 	private Label trocoInicial;
 	private Label saldoFechamento;
 	private Label horaFechamentoLbl;
-
+	private Logger logger = SingletonManager.getInstance().getLogger(getClass());
+	
 	public CaixaGui() throws Exception {
 		super();
 		controller = getCaixaController();
@@ -100,6 +103,8 @@ public class CaixaGui extends StageBase {
 	}
 
 	private Node criaSubTotaisPagamentos() throws Exception {
+		
+		logger.info("Pagamentos Recebidos");
 		TitledPane titledPane = new TitledPane("Pagamentos Recebidos", new Button());
 		titledPane.setCollapsible(false);
 		GridPane grid = new GridPane();
@@ -112,8 +117,10 @@ public class CaixaGui extends StageBase {
 		for (String key : subTotaisMap.keySet()) {
 			Label descricao = criaLabelBold(key);
 			grid.add(descricao, 0, rowIndex);
-			Label valor = criaLabelNormal(Util.formataMoeda(subTotaisMap.get(key)));
+			String valorValue = Util.formataMoeda(subTotaisMap.get(key));
+			Label valor = criaLabelNormal(valorValue);
 			grid.add(valor, 1, rowIndex++);
+			logger.info(key + ": " + valorValue);
 		}
 		titledPane.setContent(grid);
 		titledPane.setMaxHeight(Double.MAX_VALUE);
@@ -148,6 +155,7 @@ public class CaixaGui extends StageBase {
 		String totalRecebido = Util.formataMoeda(controller.getTotalPagamentosVendasRecebidoCaixa());
 		// String totalRecebido=
 		subTotalGrid.add(criaLabelBold("Total Pagamentos:"), column++, row);
+		logger.info("Total Pagamentos:"+controller.getTotalPagamentosVendasRecebidoCaixa());
 		subTotalGrid.add(criaLabelNormal(totalRecebido), column--, row++);
 		//
 		subTotalGrid.add(criaLabelBold("Diferença (Venda - Pagamentos):"), column++, row);
@@ -156,8 +164,8 @@ public class CaixaGui extends StageBase {
 		Crud<Caixa> dao = new CrudDao<>();
 		Caixa caixa = (Caixa) controller.getItem();
 		if (caixa.getIdCaixa() != 0)
-//			caixa = dao.busca(caixa.getClass(),caixa.getIdCaixa());
-			caixa=dao.busca("caixa.findCaixa", "id",caixa.getIdCaixa());
+			// caixa = dao.busca(caixa.getClass(),caixa.getIdCaixa());
+			caixa = dao.busca("caixa.findCaixa", "id", caixa.getIdCaixa());
 		Button button = new Button("Visualizar Vendas");
 		boolean disableButton;
 		try {
@@ -374,9 +382,8 @@ public class CaixaGui extends StageBase {
 
 		int row = 0;
 
-		
-			Caixa caixa = (Caixa) controller.getItem();
-		
+		Caixa caixa = (Caixa) controller.getItem();
+
 		dadosGrid.add(criaLabelBold("Data Hora Abertura Caixa:"), 0, row);
 		horaAberturaLbl = criaLabelNormal("");
 		dadosGrid.add(horaAberturaLbl, 1, row++);
