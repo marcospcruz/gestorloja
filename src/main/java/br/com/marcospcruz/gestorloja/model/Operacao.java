@@ -16,7 +16,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "operacao.findOperacao", query = "select o from Operacao o  where descricao=:descricao") })
+		@NamedQuery(name = "operacao.findOperacao", query = "select o from Operacao o where o.descricao=:descricao") })
 public class Operacao implements Serializable {
 	/**
 	 * 

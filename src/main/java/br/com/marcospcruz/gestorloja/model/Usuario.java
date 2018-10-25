@@ -45,7 +45,7 @@ import javax.persistence.TemporalType;
 				+ "where u.idUsuario=:id"),
 		@NamedQuery (name="usuario.findAll", query="select distinct u from Usuario u "
 				+ "JOIN FETCH u.perfisUsuario "
-				+ "where u.idUsuario !=1"
+				+ "where u.idUsuario <> 1"
 //				+ "JOIN FETCH pu.interfaces "
 				)})
 //@formatter:on

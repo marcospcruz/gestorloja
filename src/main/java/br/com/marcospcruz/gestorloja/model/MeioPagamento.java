@@ -16,10 +16,12 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
-
+//@formatter:off
 @NamedQueries({
 		@NamedQuery(name = "meioPagamento.buscaPagamentosOutrosDistinct", query = "select distinct m from MeioPagamento m "
-				+ "where m.descricao != null " + "group by m.descricao") })
+				+ "where m.descricao is not null " 
+				+ "group by m.descricao") })
+//@formatter:on
 @Entity
 public class MeioPagamento implements Serializable {
 	/**

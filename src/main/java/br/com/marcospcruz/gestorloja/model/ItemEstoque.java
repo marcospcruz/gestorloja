@@ -22,7 +22,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 @Table(name = "Estoque")
 @NamedQueries({
 		@NamedQuery(name = "itemestoque.readCodigo", query = "select distinct ie from ItemEstoque ie "
-			+ "JOIN ie.fabricante "
+			+ "JOIN ie.fabricante f "
 			+ "JOIN ie.produto p "
 			+"JOIN ie.tipoProduto t "
 			+ "where upper(ie.codigoDeBarras) = :codigo"),
@@ -55,10 +55,10 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 				+ "order by f.nome,t.descricaoTipo"
 				),
 		@NamedQuery(name = "itemEstoque.readAll", query = "select distinct ie from ItemEstoque ie " 
-				+ "JOIN fetch ie.fabricante f "
-				+ "JOIN fetch ie.produto p "
-				+ "JOIN fetch ie.tipoProduto t "
-				+ "LEFT JOIN fetch t.superTipoProduto t "
+				+ "JOIN ie.fabricante f "
+				+ "JOIN fetch ie.produto "
+				+ "JOIN ie.tipoProduto t "
+				+ "LEFT JOIN t.superTipoProduto tp "
 				+ "order by f.nome, t.descricaoTipo"),
 		@NamedQuery(name="itemEstoque.readProduto",query="select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p "

@@ -19,13 +19,17 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
 @Entity
+//@formatter:off
 @NamedQueries({
 		@NamedQuery(name = "perfilusuario.findperfil", query = "select p from PerfilUsuario p "
-				+ "JOIN FETCH p.interfaces " + "where p.descricao=:descricao "),
-		@NamedQuery(name = "perfilusuario.findperfilUsuario", query = "select p " + "from PerfilUsuario p "
-				+ "join p.usuarios u " + "where u.idUsuario=:idUsuario"),
+				+ "JOIN FETCH p.interfaces " 
+				+ "where p.descricao=:descricao "),
+		@NamedQuery(name = "perfilusuario.findperfilUsuario", query = "select p from PerfilUsuario p "
+				+ "join p.usuarios u " 
+				+ "where u.idUsuario=:idUsuario"),
 		@NamedQuery(name = "perfilusuario.findperfisUsuario", query = "select p from PerfilUsuario p "
-				+ "where p.idPerfilUsuario!=1") })
+				+ "where p.idPerfilUsuario <> 1") })
+//@formatter:on
 public class PerfilUsuario implements Serializable {
 	/**
 	 * 

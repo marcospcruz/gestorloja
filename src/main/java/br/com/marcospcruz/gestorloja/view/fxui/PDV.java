@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
@@ -87,7 +88,6 @@ public class PDV extends StageBase {
 	private NumberTextField subTotalTxt;
 	private Label trocoLabel;
 
-	private NumberTextField valorDinheiroTxt;
 	private Map<CheckBox, List<Node>> formaPagamentoMap;
 
 	private ItemEstoque itemEstoque;
@@ -318,7 +318,7 @@ public class PDV extends StageBase {
 			VendaController controller = getVendaController();
 
 			Pagamento pagamento = controller.getPagamentoVenda();
-			
+
 			String descricaoTipoMeioPagamento = checkBox.getText();
 			List<MeioPagamento> meiosPagamento = pagamento.getMeiosPagamento();
 			// selecionando meio pagamento existente
@@ -462,21 +462,21 @@ public class PDV extends StageBase {
 
 	private void updatePagamento(CheckBox x, List<Node> nodes, String newValue) throws Exception {
 
-		if (lastSelected == x && x.isSelected()) {
+		// if (lastSelected == x && x.isSelected()) {
 
-			VendaController controller = getVendaController();
-			Pagamento pagamento = controller.getVenda().getPagamento();
-			MeioPagamento mp = pagamento.getMeiosPagamento().stream()
-					.filter(meio -> meio.getTipoMeioPagamento().getDescricaoTipoMeioPagamento().equals(x.getText()))
-					.findFirst().get();
+		VendaController controller = getVendaController();
+		Pagamento pagamento = controller.getVenda().getPagamento();
+		MeioPagamento mp = pagamento.getMeiosPagamento().stream()
+				.filter(meio -> meio.getTipoMeioPagamento().getDescricaoTipoMeioPagamento().equals(x.getText()))
+				.findFirst().get();
 
-			// if (mp != null) {
-			mp.setValorPago(Util.parseStringDecimalToFloat(newValue));
-			//// pagamento.setValorPagamento(controller.getValorTotalPagamentoVenda());
-			calculaTroco();
+		// if (mp != null) {
+		mp.setValorPago(Util.parseStringDecimalToFloat(newValue));
+		//// pagamento.setValorPagamento(controller.getValorTotalPagamentoVenda());
+		calculaTroco();
 
-			// }
-		}
+		// }
+		// }
 	}
 
 	private NumberTextField criaCampoValor() {
@@ -484,24 +484,40 @@ public class PDV extends StageBase {
 		field.textProperty().addListener((observableList, oldValue, newValue) -> {
 
 			try {
-
+				System.out.println(field);
 				Platform.runLater(() -> {
-					try {
-						//@formatter:off
-						formaPagamentoMap
-								.forEach((t, u) -> {
-									try {
-										updatePagamento(t, u, newValue);
-									} catch (Exception e) {
-										
-										e.printStackTrace();
-									}
-								});
-						//@formatter:on
-					} catch (Exception e) {
-						e.printStackTrace();
+					for (Entry<CheckBox, List<Node>> entry : formaPagamentoMap.entrySet()) {
+						for (Node node : entry.getValue()) {
+							if (field.equals(node)) {
+								CheckBox key = entry.getKey();
+								try {
+									updatePagamento(key, entry.getValue(), newValue);
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								break;
+							}
+						}
 					}
-				});
+
+				}); // Platform.runLater(() -> {
+					// try {
+//						//@formatter:off
+//						formaPagamentoMap
+//								.forEach((t, u) -> {
+//									try {
+//										updatePagamento(t, u, newValue);
+//									} catch (Exception e) {
+//										
+//										e.printStackTrace();
+//									}
+//								});
+//						//@formatter:on
+				// } catch (Exception e) {
+				// e.printStackTrace();
+				// }
+				// });
 			} catch (Exception e) {
 
 				e.printStackTrace();
@@ -756,7 +772,7 @@ public class PDV extends StageBase {
 		} else {
 			Button button = new Button("Estornar Venda");
 			button.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
-			
+
 			button.setOnAction(evt -> {
 				try {
 					if (showConfirmAtionMessage("Deseja estornar esta Venda?")) {
@@ -772,7 +788,7 @@ public class PDV extends StageBase {
 					e.printStackTrace();
 				}
 			});
-			
+
 			VendaController vendaController = getVendaController();
 			if (vendaController.getVenda().getCaixa().getUsuarioFechamento() == null)
 				children.add(button);
