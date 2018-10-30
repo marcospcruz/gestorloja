@@ -9,6 +9,8 @@ import java.util.stream.Stream;
 
 import javax.persistence.NoResultException;
 
+import org.apache.log4j.Logger;
+
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
 import br.com.marcospcruz.gestorloja.facade.LoginFacade;
@@ -35,10 +37,20 @@ public class AppFx extends Application {
 	}
 
 	@Override
-	public void stop() throws Exception {
-		super.stop();
-		SingletonManager.getInstance().getLogger(this.getClass()).info("application stopped");
-		System.exit(0);
+	public void stop() {
+		Logger logger = SingletonManager.getInstance().getLogger(this.getClass());
+		try {
+			super.stop();
+			logger.info("Aplicação fechada com sucesso.");
+
+			
+		} catch (Exception e) {
+			logger.error("Falha ao finalizar aplicação!");
+			logger.error(e);
+		} finally {
+			System.exit(0);
+		}
+
 	}
 
 	public static void main(String args[]) throws NoSuchAlgorithmException {

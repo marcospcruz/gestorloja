@@ -87,8 +87,10 @@ public class ItemEstoqueCadastro extends StageBase {
 		flow.getChildren().add(grid);
 		titledPane.setContent(flow);
 		titledPane.setPrefHeight(height);
+		titledPane.setPrefWidth(width);
 		root.getChildren().add(titledPane);
 		// getvBox().setPadding(new Insets(10, 0, 0, 100));
+		
 		setScene(scene);
 
 	}
