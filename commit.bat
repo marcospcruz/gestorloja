@@ -19,4 +19,4 @@ git commit -m %mensagemCommit%
 git push origin fx_release
 rem * * * git push https://github.com/marcospcruz/gestorloja.git
 
-rem * * * call mvn eclipse:eclipse
+call mvn eclipse:eclipse
