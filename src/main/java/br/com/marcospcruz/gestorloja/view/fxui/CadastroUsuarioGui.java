@@ -30,6 +30,7 @@ public class CadastroUsuarioGui extends StageBase {
 	private TextField nomeCompletoField;
 	private TitledPane perfisUsuarioPane;
 	private boolean desabilitaFields;
+	private CheckBox ativaUsuario;
 
 	public CadastroUsuarioGui() {
 		this(false);
@@ -39,7 +40,7 @@ public class CadastroUsuarioGui extends StageBase {
 		super();
 		grid = new GridPane();
 		setTitle("Cadastro de Usuário");
-		super.setDimension(415, 250);
+		super.setDimension(412, 270);
 		// double thisWidth = (double) super.getWidth() - ((double) super.getWidth() *
 		// 10 / 100);
 		setLayoutsMaxWidth(scene.widthProperty().get());
@@ -92,13 +93,12 @@ public class CadastroUsuarioGui extends StageBase {
 		nomeUsuarioField.setDisable(desabilitaFields);
 		// nomeUsuarioField.setMaxWidth(width * 0.25);
 		dadosUsuarioGrid.add(nomeUsuarioField, 1, rowIndex++);
-
+		dadosUsuarioGrid.add(criaLabelNormal("Ativar Usuário: "), 0, rowIndex);
+		ativaUsuario = new CheckBox("");
+		dadosUsuarioGrid.add(ativaUsuario, 1, rowIndex++);
 		// TextField nomeUsuarioField = new TextField();
 		// nomeUsuarioField.setMinWidth(width * 0.25);
 		// grid.add(nomeUsuarioField, 1, rowIndex++);
-
-		// pane.setRowValignment(VPos.BASELINE);
-		Usuario usuario = null;
 
 		perfisUsuarioPane = criaPerfisPane();
 		Button button = new Button("Salvar");
@@ -165,7 +165,7 @@ public class CadastroUsuarioGui extends StageBase {
 				Usuario user = (Usuario) controller.getItem();
 				user.setNomeUsuario(nomeUsuario);
 				user.setNomeCompleto(nomeCompleto);
-
+				user.setAtivo(ativaUsuario.isSelected());
 				controller.salva();
 				showMensagemSucesso("Usuário " + nomeUsuario + " salvo com sucesso.");
 				close();
@@ -199,7 +199,8 @@ public class CadastroUsuarioGui extends StageBase {
 				return;
 			nomeUsuarioField.setText(usuario.getNomeUsuario());
 			nomeCompletoField.setText(usuario.getNomeCompleto());
-			if(desabilitaFields) {
+			ativaUsuario.setSelected(usuario.isAtivo());
+			if (desabilitaFields) {
 				nomeCompletoField.setStyle(CSS_COLOR_BLACK);
 				nomeUsuarioField.setStyle(CSS_COLOR_BLACK);
 			}

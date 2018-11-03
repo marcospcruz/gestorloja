@@ -8,6 +8,7 @@ public class UsuarioModel {
 	private SimpleIntegerProperty codigo;
 	private SimpleStringProperty nomeCompleto;
 	private SimpleStringProperty nomeUsuario;
+	private SimpleStringProperty status;
 
 	public int getCodigo() {
 		return codigo.get();
@@ -32,6 +33,19 @@ public class UsuarioModel {
 
 	public String getNomeUsuario() {
 		return nomeUsuario.get();
+	}
+
+	public void setStatus(String status) {
+		this.status=new SimpleStringProperty(status);
+		
+	}
+
+	public String getStatus() {
+		return status.get();
+	}
+
+	public void setStatus(SimpleStringProperty status) {
+		this.status = status;
 	}
 
 }

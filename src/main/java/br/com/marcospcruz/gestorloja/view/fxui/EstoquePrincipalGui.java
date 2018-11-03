@@ -1,13 +1,12 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
-import java.awt.Desktop.Action;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.controller.FabricanteController;
-import br.com.marcospcruz.gestorloja.controller.ProdutoController;
+import br.com.marcospcruz.gestorloja.controller.relatorio.RelatorioEstoqueGeral;
 import br.com.marcospcruz.gestorloja.facade.ImportadorArquivo;
 import br.com.marcospcruz.gestorloja.facade.ImportadorArquivoCsv;
 import br.com.marcospcruz.gestorloja.model.Fabricante;
@@ -122,11 +121,28 @@ public class EstoquePrincipalGui extends StageBase {
 		TitledPane pane = new TitledPane("Operação", new Button());
 		pane.setCollapsible(false);
 		FlowPane content = new FlowPane(Orientation.HORIZONTAL);
-		Button btn = new Button("Importar Dados de Estoque");
-		btn.setOnAction(this::importaDadosEstoque);
-		content.getChildren().add(btn);
+		Button[] btns = { criaBotao("Importar Dados de Estoque", this::importaDadosEstoque),
+				criaBotao("Imprime Relatório Geral", this::imprimeRelatorio) };
+		for (Button btn : btns)
+			content.getChildren().add(btn);
 		pane.setContent(content);
 		return pane;
+	}
+
+	private void imprimeRelatorio(ActionEvent event) {
+		RelatorioEstoqueGeral relatorio = new RelatorioEstoqueGeral();
+		try {
+			relatorio.gerarRelatorio();
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+	}
+
+	protected Button criaBotao(String label, EventHandler<ActionEvent> xxx) {
+		Button btn = new Button(label);
+		btn.setOnAction(xxx);
+		return btn;
 	}
 
 	private void importaDadosEstoque(ActionEvent event) {

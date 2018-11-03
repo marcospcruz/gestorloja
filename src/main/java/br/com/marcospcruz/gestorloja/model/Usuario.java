@@ -1,7 +1,6 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +19,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 //@formatter:off
@@ -75,18 +76,21 @@ public class Usuario implements Serializable {
 	@Column
 	@Temporal(value = TemporalType.TIMESTAMP)
 	private Date dataCriacao;
+	private boolean ativo;
 
 	public Usuario() {
 
 	}
 
-	public Usuario(String string, String string2, String string3, List<PerfilUsuario> perfisUsuario) {
+	public Usuario(String string, String string2, String string3, List<PerfilUsuario> perfisUsuario, boolean ativo) {
 		this();
 		setNomeCompleto(string);
 		setNomeUsuario(string2);
 		setPassword(string3);
 		setPerfisUsuario(perfisUsuario);
+		setAtivo(ativo);
 		setPrimeiroAcesso(primeiroAcesso);
+		setOperador(SingletonManager.getInstance().getUsuarioLogado());
 	}
 
 	public Usuario(int idUsuario) {
@@ -160,6 +164,14 @@ public class Usuario implements Serializable {
 
 	public void setPrimeiroAcesso(boolean primeiroAcesso) {
 		this.primeiroAcesso = primeiroAcesso;
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 	@Override

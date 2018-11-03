@@ -41,7 +41,6 @@ public class AppFx extends Application {
 			super.stop();
 			logger.info("Aplicação fechada com sucesso.");
 
-			
 		} catch (Exception e) {
 			logger.error("Falha ao finalizar aplicação!");
 			logger.error(e);
@@ -185,8 +184,8 @@ public class AppFx extends Application {
 		List perfilUsuario = Arrays
 				.asList(new PerfilUsuario[] { dao.busca("perfilusuario.findperfil", DESCRICAO, "Manutencao") });
 
-		List<Usuario> usuarios = Arrays.asList(new Usuario[] {
-				new Usuario("Marcos Pereira da Cruz", "marcos", Util.encryptaPassword("123456"), perfilUsuario)
+		List<Usuario> usuarios = Arrays.asList(new Usuario[] { new Usuario("Marcos Pereira da Cruz", "marcos",
+				Util.encryptaPassword("123456"), perfilUsuario, Boolean.TRUE)
 				// new Usuario("Cibele Pereira Bellini", "cibele", "ci@2018", perfilUsuario),
 				// new Usuario("Nadia", "nadia", "123456", perfilUsuario)
 		});

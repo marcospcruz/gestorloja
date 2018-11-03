@@ -5,6 +5,7 @@ import java.util.List;
 import br.com.marcospcruz.gestorloja.controller.UsuarioController;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+import br.com.marcospcruz.gestorloja.view.fxui.model.ItemEstoqueModel;
 import br.com.marcospcruz.gestorloja.view.fxui.model.UsuarioModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,11 +16,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class ControleUsuarioGui extends CadastroBase {
 
-	private static final String[] COLUNAS = { "codigo", "nomeCompleto", "nomeUsuario" };
+	private static final String[] COLUNAS = { "codigo", "nomeCompleto", "nomeUsuario", "status" };
 
 	public ControleUsuarioGui() throws Exception {
 		super(COLUNAS, getUsuarioController());
@@ -76,7 +78,9 @@ public class ControleUsuarioGui extends CadastroBase {
 
 	@Override
 	void reloadForm() throws Exception {
-
+//		TableView<ItemEstoqueModel> table = (TableView<ItemEstoqueModel>) ((Pane) teste).getChildren().get(0);
+//		carregaDadosTable(table);
+		reloadTableView("Usuários");
 	}
 
 	@Override
@@ -89,6 +93,7 @@ public class ControleUsuarioGui extends CadastroBase {
 			model.setCodigo(usuario.getIdUsuario());
 			model.setNomeCompleto(usuario.getNomeCompleto());
 			model.setNomeUsuario(usuario.getNomeUsuario());
+			model.setStatus(usuario.isAtivo() ? "Ativo" : "Desativado");
 			usuarios.add(model);
 		}
 		table.setItems(usuarios);
@@ -96,7 +101,7 @@ public class ControleUsuarioGui extends CadastroBase {
 
 	@Override
 	protected void pesquisaItem(ActionEvent event) {
-		// TODO Auto-generated method stub
+	
 
 	}
 
@@ -110,9 +115,11 @@ public class ControleUsuarioGui extends CadastroBase {
 			else
 				cadastro = new CadastroUsuarioGui(true);
 			abreJanelaModal(cadastro);
+			reloadForm();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+
 		}
 		// abreTelaCadastro(new CadastroUsuarioGui())
 	}
