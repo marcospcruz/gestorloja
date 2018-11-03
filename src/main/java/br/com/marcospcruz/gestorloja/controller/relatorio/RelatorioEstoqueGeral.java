@@ -22,8 +22,10 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 
@@ -32,6 +34,7 @@ public class RelatorioEstoqueGeral {
 	private static final String PASTA_PROJETO = AppFx.CONTROLE_ESTOQUE_HOME + "/";
 
 	private static final String ARQUIVO_JASPER = "META-INF/relatorios_jaspers/relatorio_estoque_geral.jasper";
+	private static final String ARQUIVO_JRXML = "META-INF/relatorios_jaspers/relatorio_estoque_geral.jrxml";
 
 	private static final String RELATORIO_GERADO = "relatorio_estoque.pdf";
 
@@ -58,12 +61,12 @@ public class RelatorioEstoqueGeral {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void gerarRelatorio(JRDataSource jrDataSource, Map parametros) throws Exception {
 
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(ARQUIVO_JASPER);
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(ARQUIVO_JRXML);
+
+		JasperReport jasperReport = JasperCompileManager.compileReport(inputStream);
 
 		if (inputStream == null)
 			throw new Exception("Necessário compilar o Relatório.");
-
-		FileOutputStream outPut = null;
 
 		File arquivoRelatorio = new File(PASTA_PROJETO + RELATORIO_GERADO);
 
@@ -75,16 +78,16 @@ public class RelatorioEstoqueGeral {
 
 			}
 
-			JasperPrint print = JasperFillManager.fillReport(inputStream, parametros, jrDataSource);
+			JasperPrint print = JasperFillManager.fillReport(jasperReport, parametros, jrDataSource);
 
 			JRExporter exporter = new JRPdfExporter();
-			
+
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT, print);
 
 			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, new FileOutputStream(arquivoRelatorio));
-			
+
 			exporter.exportReport();
-			
+
 			// outPut = new FileOutputStream(arquivoRelatorio);
 
 			// JasperExportManager.exportReportToPdfStream(print, outPut);

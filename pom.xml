@@ -202,22 +202,16 @@
 
 
 
-		<!-- dependency>
-			<groupId>br.com.marcospcruz</groupId>
-
-			<artifactId>my-fonts</artifactId>
-			<version>1.0.1</version>
-		</dependency-->
-
-
 		<dependency>
-			<!-- groupId>br.com.marcospcruz</groupId -->
-			<groupId>my-fonts</groupId>
+			<groupId>br.com.marcospcruz</groupId>
 			<artifactId>my-fonts</artifactId>
 			<version>1.0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/META-INF/relatorios_jaspers/my-fonts-1.0.1.jar</systemPath>
 		</dependency>
+
+
+		<!-- dependency> <groupId>my-fonts</groupId> <artifactId>my-fonts</artifactId> 
+			<version>1.0.1</version> <scope>system</scope> <systemPath>${project.basedir}/src/main/resources/META-INF/relatorios_jaspers/my-fonts-1.0.1.jar</systemPath> 
+			</dependency -->
 	</dependencies>
 	<build>
 		<plugins>
