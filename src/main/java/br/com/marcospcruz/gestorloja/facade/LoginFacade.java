@@ -16,7 +16,6 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.LogIn;
 import br.com.marcospcruz.gestorloja.view.fxui.StageFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class LoginFacade {
@@ -36,6 +35,8 @@ public class LoginFacade {
 	public void processaLogin(String nomeUsuario, String senha) throws Exception {
 		validaDadosInputados(nomeUsuario, senha);
 		Usuario usuario = buscaUsuario(nomeUsuario);
+		if (!usuario.isAtivo())
+			throw new Exception("Usuário " + nomeUsuario + " desativado!");
 		SingletonManager.getInstance().setUsuarioLogado(usuario);
 		if (usuario.isPrimeiroAcesso()) {
 			Stage stage = StageFactory.createStage(InterfaceGrafica.CLASS_NAME_PASSWORD);
@@ -141,7 +142,7 @@ public class LoginFacade {
 				sessaoUsuarioBuilder = new SessaoUsuarioBuilder();
 			}
 			sessaoUsuarioBuilder.createSessaoUsuario().setDataFim(SingletonManager.getInstance().getData());
-			
+
 			SessaoUsuario sessao = sessaoUsuarioBuilder.getSessaoUsuario();
 			// temp
 			sessaoUsuarioDao.update(sessao);
