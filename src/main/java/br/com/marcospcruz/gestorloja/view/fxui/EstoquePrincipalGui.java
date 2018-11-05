@@ -137,9 +137,9 @@ public class EstoquePrincipalGui extends StageBase {
 		try {
 			relatorio.gerarRelatorio();
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			showErrorMessage(e);
 		}
+
 	}
 
 	protected Button criaBotao(String label, EventHandler<ActionEvent> xxx) {

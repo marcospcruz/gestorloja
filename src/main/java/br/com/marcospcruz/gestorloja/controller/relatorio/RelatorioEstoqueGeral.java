@@ -33,7 +33,6 @@ public class RelatorioEstoqueGeral {
 
 	private static final String PASTA_PROJETO = AppFx.CONTROLE_ESTOQUE_HOME + "/";
 
-	private static final String ARQUIVO_JASPER = "META-INF/relatorios_jaspers/relatorio_estoque_geral.jasper";
 	private static final String ARQUIVO_JRXML = "META-INF/relatorios_jaspers/relatorio_estoque_geral.jrxml";
 
 	private static final String RELATORIO_GERADO = "relatorio_estoque.pdf";
