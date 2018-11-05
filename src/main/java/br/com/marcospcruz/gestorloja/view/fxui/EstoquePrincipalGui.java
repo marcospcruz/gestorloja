@@ -78,8 +78,8 @@ public class EstoquePrincipalGui extends StageBase {
 		TitledPane operacoes = criaOperacoesPanel();
 		TitledPane tablePane = super.criaTablePane("Estoque de Produtos");
 		getvBox().getChildren().addAll(cadastroPane, pesquisaPane, tablePane);
-		if (SingletonManager.getInstance().isManutencao())
-			getvBox().getChildren().add(operacoes);
+
+		getvBox().getChildren().add(operacoes);
 
 	}
 
@@ -121,10 +121,13 @@ public class EstoquePrincipalGui extends StageBase {
 		TitledPane pane = new TitledPane("Operação", new Button());
 		pane.setCollapsible(false);
 		FlowPane content = new FlowPane(Orientation.HORIZONTAL);
-		Button[] btns = { criaBotao("Importar Dados de Estoque", this::importaDadosEstoque),
-				criaBotao("Imprime Relatório Geral", this::imprimeRelatorio) };
+		Button[] btns = new Button[2];
+		if (SingletonManager.getInstance().isManutencao())
+			btns[0] = criaBotao("Importar Dados de Estoque", this::importaDadosEstoque);
+		btns[1] = criaBotao("Imprime Relatório Geral", this::imprimeRelatorio);
 		for (Button btn : btns)
-			content.getChildren().add(btn);
+			if (btn != null)
+				content.getChildren().add(btn);
 		pane.setContent(content);
 		return pane;
 	}

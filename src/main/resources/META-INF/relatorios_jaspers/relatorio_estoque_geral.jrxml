@@ -31,8 +31,11 @@
 	<variable name="quantitade_total" class="java.lang.Integer" calculation="Count">
 		<variableExpression><![CDATA[$F{quantidade}]]></variableExpression>
 	</variable>
-	<variable name="saldo_total_estoque" class="java.lang.Float" calculation="Sum">
+	<variable name="saldo_total_estoque" class="java.lang.Integer" calculation="Sum">
 		<variableExpression><![CDATA[$F{quantidade}]]></variableExpression>
+	</variable>
+	<variable name="valor_total_estoque" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$V{valor_total}]]></variableExpression>
 	</variable>
 	<background>
 		<band splitType="Stretch"/>
@@ -68,7 +71,7 @@
 	<columnHeader>
 		<band height="38" splitType="Stretch">
 			<staticText>
-				<reportElement x="20" y="5" width="60" height="32" uuid="d358f082-6250-4692-9301-8d67fab64635"/>
+				<reportElement x="7" y="5" width="60" height="32" uuid="d358f082-6250-4692-9301-8d67fab64635"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
@@ -109,7 +112,7 @@
 				<reportElement x="0" y="37" width="555" height="1" uuid="5038f32f-a222-4d4f-a3dd-fc44c9be2279"/>
 			</line>
 			<staticText>
-				<reportElement x="95" y="5" width="70" height="32" uuid="119cc6a2-1a8f-4299-8dcc-6574d8deadb5"/>
+				<reportElement x="86" y="5" width="70" height="32" uuid="119cc6a2-1a8f-4299-8dcc-6574d8deadb5"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
@@ -120,31 +123,45 @@
 	<detail>
 		<band height="21" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="90" height="18" uuid="f5ae5712-719e-4faa-992e-482b93012b72"/>
-				<textElement textAlignment="Right"/>
+				<reportElement x="0" y="0" width="70" height="18" uuid="f5ae5712-719e-4faa-992e-482b93012b72"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{tipoProduto}.getDescricaoTipo()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="180" y="0" width="170" height="18" uuid="b8bd4c4c-1a64-457e-9b7c-da794e99f38e"/>
+				<reportElement x="167" y="0" width="183" height="18" uuid="b8bd4c4c-1a64-457e-9b7c-da794e99f38e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{produto}.getDescricaoProduto()]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="350" y="1" width="40" height="18" uuid="df1db46d-3bd1-4f44-b0ee-078d84c128cd"/>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{quantidade}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement stretchType="RelativeToTallestObject" x="412" y="0" width="58" height="18" uuid="e096b30d-0c99-40c3-ba7d-93685eb03aa8"/>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{valorUnitario}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement x="485" y="0" width="63" height="18" uuid="feff6fe9-afdd-41b6-83c3-8501d2f47581"/>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$V{valor_total}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="95" y="0" width="74" height="18" uuid="8d26b862-fab4-4006-b340-9bdb32bd54b1"/>
+				<reportElement x="84" y="0" width="74" height="18" uuid="8d26b862-fab4-4006-b340-9bdb32bd54b1"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{fabricante}.getNome()]]></textFieldExpression>
 			</textField>
 		</band>
@@ -179,7 +196,7 @@
 	<summary>
 		<band height="37" splitType="Stretch">
 			<textField>
-				<reportElement x="80" y="8" width="100" height="18" uuid="2ca1268c-4856-433a-86ca-9661d5721fc2"/>
+				<reportElement x="126" y="8" width="35" height="17" uuid="2ca1268c-4856-433a-86ca-9661d5721fc2"/>
 				<textElement>
 					<font fontName="Arial"/>
 				</textElement>
@@ -192,24 +209,36 @@
 				<reportElement x="0" y="23" width="555" height="1" uuid="997cf532-4d73-4404-aae4-61722f7f87e7"/>
 			</line>
 			<staticText>
-				<reportElement x="1" y="4" width="68" height="18" uuid="d48e9733-c4b2-47e1-953a-ba55d5b0a806"/>
+				<reportElement x="1" y="4" width="120" height="18" uuid="d48e9733-c4b2-47e1-953a-ba55d5b0a806"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Total Itens:]]></text>
+				<text><![CDATA[Total Cadastrado:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="340" y="4" width="114" height="18" uuid="744897e4-bbad-4330-b3a9-5abb6480e32b"/>
+				<reportElement x="174" y="4" width="114" height="18" uuid="744897e4-bbad-4330-b3a9-5abb6480e32b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Estoque Total:]]></text>
+				<text><![CDATA[Quantidade Total:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="460" y="6" width="86" height="20" uuid="81e76f41-dc3c-43e6-ac98-8ba63bb3600f"/>
+				<reportElement x="288" y="7" width="31" height="20" uuid="81e76f41-dc3c-43e6-ac98-8ba63bb3600f"/>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$V{saldo_total_estoque}]]></textFieldExpression>
 			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="446" y="8" width="108" height="20" uuid="5137a672-5ff7-4968-a592-12b4d6288ad4"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$V{valor_total_estoque}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="330" y="5" width="114" height="18" uuid="93b8dda8-7a6e-4f76-9979-db2d68b25975"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total (R$):]]></text>
+			</staticText>
 		</band>
 	</summary>
 </jasperReport>
