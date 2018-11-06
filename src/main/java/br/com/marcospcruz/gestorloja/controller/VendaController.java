@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.persistence.NoResultException;
 
+import org.apache.log4j.Logger;
+
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
@@ -32,9 +34,9 @@ public class VendaController extends ControllerBase {
 	private Crud<ItemVenda> itemVendaDao;
 	private Venda venda;
 	private ItemVenda itemVendaBackup;
-	private boolean fazBackup;
 	private CaixaController caixaController;
 	// private Map<String,ItemVenda> itensVendaMap;
+	private Logger logger = SingletonManager.getInstance().getLogger(getClass());
 
 	public VendaController() throws Exception {
 		super();
@@ -84,10 +86,8 @@ public class VendaController extends ControllerBase {
 	@Override
 	public void busca(Object id) throws Exception {
 		try {
-			fazBackup = true;
 			buscaProduto(id.toString());
 		} finally {
-			fazBackup = false;
 		}
 	}
 
@@ -104,9 +104,33 @@ public class VendaController extends ControllerBase {
 			venda = vendaDao.busca("venda.findVenda", "id", venda.getIdVenda());
 			return venda.getItensVenda();
 		} catch (NoResultException e) {
+			atualizaItensVenda();
 			return venda.getItensVenda();
 		}
 
+	}
+
+	/**
+	 * 
+	 */
+	private void atualizaItensVenda() {
+		List<ItemVenda> itensVenda = new ArrayList<>();
+		for (ItemVenda itemVenda : venda.getItensVenda()) {
+			try {
+				logger.info(
+						"Consultando item codigo " + itemVenda.getItemEstoque().getCodigoDeBarras() + " no estoque ");
+				estoqueController.busca(itemVenda.getItemEstoque());
+				ItemEstoque itemEstoque = (ItemEstoque) estoqueController.getItem();
+				itemVenda.setItemEstoque(itemEstoque);
+				itensVenda.add(itemVenda);
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+		}
+		venda.setItensVenda(itensVenda);
+		calculaValorTotalVenda();
 	}
 
 	@Override
@@ -299,7 +323,8 @@ public class VendaController extends ControllerBase {
 			itemVenda = new ItemVenda();
 		itemVenda.setItemEstoque(itemEstoque);
 
-		itemVenda.setQuantidade(quantidade + itemVenda.getQuantidade());
+		// itemVenda.setQuantidade(quantidade + itemVenda.getQuantidade());
+		itemVenda.setQuantidade(quantidade);
 		itemVenda.setVenda(venda);
 		subtraiEstoque(quantidade);
 
@@ -391,7 +416,7 @@ public class VendaController extends ControllerBase {
 
 	public void salva() {
 
-//		venda = vendaDao.update(venda);
+		// venda = vendaDao.update(venda);
 		try {
 			caixaController.salva();
 		} catch (Exception e) {
@@ -633,7 +658,8 @@ public class VendaController extends ControllerBase {
 			for (MeioPagamento meio : pagamento.getMeiosPagamento())
 				valorPagamentoVenda += meio.getValorPago();
 		} catch (Exception e) {
-			SingletonManager.getInstance().getLogger(getClass()).warn(e.getMessage());
+
+			logger.warn(e.getMessage());
 		}
 
 		return valorPagamentoVenda;

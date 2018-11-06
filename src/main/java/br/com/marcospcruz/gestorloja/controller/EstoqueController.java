@@ -229,7 +229,8 @@ public class EstoqueController extends ControllerBase {
 		itemEstoque = (ItemEstoque) object;
 
 		itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
-				itemEstoque.getProduto().getIdProduto(), "idFabricante", itemEstoque.getFabricante().getIdFabricante());
+				itemEstoque.getProduto().getIdProduto(), "idFabricante", itemEstoque.getFabricante().getIdFabricante(),
+				"idTipoProduto", itemEstoque.getTipoProduto().getIdTipoItem());
 
 	}
 

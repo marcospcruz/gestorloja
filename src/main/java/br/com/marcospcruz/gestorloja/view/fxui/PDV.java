@@ -19,6 +19,7 @@ import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
+import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
@@ -67,8 +68,8 @@ public class PDV extends StageBase {
 	private static final String VALOR_VENDA = "Valor Venda:";
 	//@formatter:on
 	private AutoCompleteTextField<ItemEstoque> estoqueDropDown;
-	private RadioButton radioCodigoBarra;
-	private RadioButton radioDescricaoProduto;
+	// private RadioButton radioCodigoBarra;
+	// private RadioButton radioDescricaoProduto;
 	private Button adicionarBtn;
 	private Button removerBtn;
 	private Label fabricanteLabel;
@@ -100,6 +101,7 @@ public class PDV extends StageBase {
 	private boolean novaVenda;
 	private Label subTotalRecebido;
 	private boolean editaVenda;
+	private boolean produtoEncontradoNoEstoque;
 
 	public PDV() throws Exception {
 		this(false);
@@ -127,7 +129,7 @@ public class PDV extends StageBase {
 			try {
 				CaixaController caixaController = getCaixaController();
 				caixaController.validateCaixaFechado();
-				getVendaController().resetVenda();
+				// getVendaController().resetVenda();
 			} catch (Exception e) {
 				// showErrorMessage(e.getMessage() + "Abrir caixa para realização de vendas.");
 				showErrorMessage("Abrir caixa para realização de vendas.");
@@ -179,8 +181,8 @@ public class PDV extends StageBase {
 		Scene scene=getScene();
 		try {
 			scene.setCursor(Cursor.WAIT);
-			if (!editaVenda)
-				limpaFormularioPdv();
+//			if (!editaVenda)
+//				limpaFormularioPdv();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
@@ -195,10 +197,11 @@ public class PDV extends StageBase {
 		// gridPane.setPadding(new Insets(0, 15, 5, 0));
 		gridPane.setHgap(7);
 		gridPane.setVgap(7);
+		TitledPane trocoPanel = criaTrocoPanel();
 		gridPane.add(criaTablePane(), 0, 0, 1, 3);
 		gridPane.add(criaSubTotalPane(), 1, 0);
 		gridPane.add(criaFormasPagtoPanel(), 1, 1);
-		gridPane.add(criaTrocoPanel(), 1, 2);
+		gridPane.add(trocoPanel, 1, 2);
 		return gridPane;
 	}
 
@@ -672,6 +675,12 @@ public class PDV extends StageBase {
 
 		flow.getChildren().add(grid);
 		titledPane.setContent(flow);
+		try {
+			atualizaSubTotal(getVendaController());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return titledPane;
 	}
 
@@ -735,7 +744,7 @@ public class PDV extends StageBase {
 		children.add(table);
 		if (novaVenda) {
 
-			Button buttonLimpar = new Button("Cancelar");
+			Button buttonLimpar = new Button("Cancelar Venda");
 			buttonLimpar.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
 			buttonLimpar.setOnAction(evt -> {
 				try {
@@ -986,15 +995,16 @@ public class PDV extends StageBase {
 					e.printStackTrace();
 				}
 			});
-			radioCodigoBarra = new RadioButton("Código de Barras");
-			radioCodigoBarra.setSelected(true);
-			ToggleGroup group = new ToggleGroup();
-			radioCodigoBarra.setToggleGroup(group);
-			radioDescricaoProduto = new RadioButton("Descrição de Produto");
-			radioDescricaoProduto.setToggleGroup(group);
+			// radioCodigoBarra = new RadioButton("Código de Barras");
+			// radioCodigoBarra.setSelected(true);
+			// ToggleGroup group = new ToggleGroup();
+			// radioCodigoBarra.setToggleGroup(group);
+			// radioDescricaoProduto = new RadioButton("Descrição de Produto");
+			// radioDescricaoProduto.setToggleGroup(group);
+			flowPane.getChildren().add(criaLabelBold("Descrição / Código do Produto: "));
 			flowPane.getChildren().add(estoqueDropDown);
-			flowPane.getChildren().add(radioCodigoBarra);
-			flowPane.getChildren().add(radioDescricaoProduto);
+			// flowPane.getChildren().add(radioCodigoBarra);
+			// flowPane.getChildren().add(radioDescricaoProduto);
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -1053,7 +1063,7 @@ public class PDV extends StageBase {
 			e.printStackTrace();
 		} finally {
 			carregaDadosTable(table);
-
+			produtoEncontradoNoEstoque = false;
 		}
 
 	}
@@ -1099,8 +1109,13 @@ public class PDV extends StageBase {
 		// removerBtn.setDisable(true);
 		Object estoqueValue = estoqueDropDown.getValue();
 		boolean ehItemEstoque = estoqueValue != null && estoqueValue instanceof ItemEstoque;
-
-		if (ehItemEstoque && radioDescricaoProduto.isSelected()) {
+		if (produtoEncontradoNoEstoque) {
+			// produtoEncontradoNoEstoque = false;
+			return;
+		}
+		if (ehItemEstoque
+		// && radioDescricaoProduto.isSelected()
+		) {
 			VendaController vendaController = getVendaController();
 			itemEstoque = (ItemEstoque) estoqueValue;
 
@@ -1113,7 +1128,9 @@ public class PDV extends StageBase {
 
 			boolean desatibilitaRemover = vendaController.getItemVenda(itemEstoque.getCodigoDeBarras()) == null;
 			removerBtn.setDisable(desatibilitaRemover);
-		} else if (estoqueValue != null && estoqueValue instanceof String && radioCodigoBarra.isSelected()) {
+		} else if (estoqueValue != null && estoqueValue instanceof String
+		// && radioCodigoBarra.isSelected()
+		) {
 			populaDadosProduto((String) estoqueValue);
 			adicionarBtn.setDisable(false);
 		}
@@ -1146,6 +1163,7 @@ public class PDV extends StageBase {
 		produtoLabel.setText(produto.getDescricaoProduto());
 		exibeEscondeProdutosNodes(true);
 		selectedCodigoBarra = itemEstoque.getCodigoDeBarras();
+		produtoEncontradoNoEstoque = true;
 	}
 
 	private void exibeEscondeProdutosNodes(boolean showNode) {

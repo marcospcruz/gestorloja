@@ -5,7 +5,6 @@ import java.util.List;
 import br.com.marcospcruz.gestorloja.controller.UsuarioController;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
-import br.com.marcospcruz.gestorloja.view.fxui.model.ItemEstoqueModel;
 import br.com.marcospcruz.gestorloja.view.fxui.model.UsuarioModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,7 +15,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class ControleUsuarioGui extends CadastroBase {

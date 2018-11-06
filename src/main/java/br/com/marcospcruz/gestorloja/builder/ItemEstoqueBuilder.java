@@ -53,7 +53,7 @@ public class ItemEstoqueBuilder {
 			itemEstoque.setProduto(produto);
 
 		} catch (NullPointerException e) {
-			SingletonManager.getInstance().getLogger(getClass()).error(e.getMessage(), e);
+			SingletonManager.getInstance().getLogger(getClass()).error(e);
 		}
 		return this;
 	}

@@ -61,9 +61,11 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 						columns[x++] = token.nextToken();
 					}
 					SingletonManager.getInstance().getLogger(getClass()).info("Lendo linha " + rowIndex);
-					ItemEstoque item = parseRow(columns);
-					if (!dadosEstoqueMap.containsKey(item.getCodigoDeBarras())) {
-						dadosEstoqueMap.put(item.getCodigoDeBarras(), item);
+					if(columns.length>0) {
+						ItemEstoque item = parseRow(columns);
+						if (!dadosEstoqueMap.containsKey(item.getCodigoDeBarras())) {
+							dadosEstoqueMap.put(item.getCodigoDeBarras(), item);
+						}
 					}
 
 					// QT CADASTRADO;Codigo de barras;CATEGORIA;SUB-CATEGORIA;Marca /
@@ -73,7 +75,11 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 
 				}
 				rowIndex++;
-				// if(rowIndex==131)
+				System.out.println(rowIndex);
+				
+				 if(rowIndex==326) {
+					 System.out.println();
+				 }
 
 			}
 			setMensagemRetorno(rowIndex + " linhas lidas.");
@@ -95,8 +101,7 @@ public class ImportadorArquivoCsv extends ImportadorArquivo {
 	private ItemEstoque parseRow(String[] columns) throws Exception {
 		
 		ItemEstoqueBuilder builder = new ItemEstoqueBuilder();
-		if (columns[CATEGORIA_PRODUTO].contains("FORCE"))
-			System.out.println();
+		
 		//@formatter:off
 		ItemEstoque item=null; 
 		try{
