@@ -65,10 +65,10 @@ public class Caixa extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "idUsuarioFechamento")
 	private Usuario usuarioFechamento;
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa", orphanRemoval = true, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa", orphanRemoval = true, cascade = {CascadeType.MERGE,CascadeType.REMOVE,CascadeType.PERSIST})
 	@OrderBy(value = "idVenda")
 	private Set<Venda> vendas;
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa", orphanRemoval = true, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa", orphanRemoval = true, cascade = {CascadeType.MERGE,CascadeType.REMOVE,CascadeType.PERSIST})
 	@OrderBy(value = "idTransacaoFinanceira")
 	private Set<TransacaoFinanceira> transacoesCaixa;
 

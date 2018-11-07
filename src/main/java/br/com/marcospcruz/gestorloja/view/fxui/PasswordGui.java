@@ -13,7 +13,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 
 public class PasswordGui extends StageBase {
 	public PasswordGui() {
@@ -45,7 +44,7 @@ public class PasswordGui extends StageBase {
 			try {
 				UsuarioController controller = StageBase.getUsuarioController();
 				if (!senha.equals(confirmacao)) {
-					throw new Exception("Nova Senha e Confrima nova Senha não conferem");
+					throw new Exception("Nova Senha e Confirma nova Senha não conferem");
 				}
 				SingletonManager.getInstance().getUsuarioLogado().setPassword(Util.encryptaPassword(senha));
 				controller.setItem(SingletonManager.getInstance().getUsuarioLogado());

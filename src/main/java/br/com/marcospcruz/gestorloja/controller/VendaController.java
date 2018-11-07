@@ -22,6 +22,7 @@ import br.com.marcospcruz.gestorloja.model.MeioPagamento;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
+import br.com.marcospcruz.gestorloja.model.TransacaoFinanceira;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
@@ -420,7 +421,7 @@ public class VendaController extends ControllerBase {
 		try {
 			caixaController.salva();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 		// venda.getPagamento().setVenda(venda);
@@ -688,13 +689,20 @@ public class VendaController extends ControllerBase {
 
 	public void estornaVenda() throws Exception {
 		venda.setEstornado(true);
-		Caixa caixa = venda.getCaixa();
+		caixaController.busca(venda.getCaixa().getIdCaixa());
+		Caixa caixa = (Caixa) caixaController.getItem();
 		Pagamento pagamento = venda.getPagamento();
+		caixaController.atualizaVenda(venda);
 		for (MeioPagamento mp : pagamento.getMeiosPagamento()) {
 			TipoMeioPagamento tp = mp.getTipoMeioPagamento();
 			if (tp.getIdTipoMeioPagamento() == 1) {
-				float saldoCaixa = caixa.getSaldoFinal() - mp.getValorPago();
-				caixa.setSaldoFinal(saldoCaixa);
+
+				TransacaoFinanceira tf = caixa.getTransacoesCaixa().stream()
+						.filter(t -> t.getMeioPagamento() != null
+								&& t.getMeioPagamento().getIdMeioPagamento() == mp.getIdMeioPagamento())
+						.findFirst().orElse(null);
+				caixa.getTransacoesCaixa().remove(tf);
+				logger.info("transacoes financeiras caixa: {}".replace("{}", Integer.toString(caixa.getTransacoesCaixa().size())));
 			}
 			mp.setEstornado(true);
 		}
@@ -705,7 +713,7 @@ public class VendaController extends ControllerBase {
 			devolveProduto(itemVenda.getItemEstoque().getCodigoDeBarras(), itemVenda.getQuantidade());
 
 		}
-
+		caixaController.atualizaSaldoCaixa();
 		salva();
 		resetVenda();
 	}

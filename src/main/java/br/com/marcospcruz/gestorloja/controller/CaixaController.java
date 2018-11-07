@@ -46,7 +46,7 @@ public class CaixaController extends ControllerBase {
 	@Override
 	public void busca(Object id) {
 
-		caixa = dao.busca(Caixa.class, Integer.parseInt(id.toString()));
+		caixa = dao.busca("caixa.findCaixa", "id", Integer.parseInt(id.toString()));
 
 	}
 
@@ -86,7 +86,7 @@ public class CaixaController extends ControllerBase {
 
 		try {
 			// if (caixa == null) {
-//			buscaCaixa(caixa);
+			// buscaCaixa(caixa);
 			// busca(BUSCA_CAIXA_ABERTO);
 			// if (!caixaList.isEmpty())
 			// caixa = caixaList.get(0);
@@ -438,8 +438,8 @@ public class CaixaController extends ControllerBase {
 	}
 
 	public void atualizaSaldoCaixa() {
-//		if (caixa.getIdCaixa() != 0)
-//			buscaCaixa(caixa);
+		// if (caixa.getIdCaixa() != 0)
+		// buscaCaixa(caixa);
 		float saldoCaixa = caixa.getSaldoInicial();
 
 		for (TransacaoFinanceira transacaoFinanceira : caixa.getTransacoesCaixa()) {
@@ -519,6 +519,16 @@ public class CaixaController extends ControllerBase {
 			}
 		}
 
+	}
+
+	public void atualizaVenda(Venda venda) {
+		for(Venda v:caixa.getVendas()) {
+			if(v.getIdVenda()==venda.getIdVenda()) {
+				caixa.getVendas().remove(v);
+				caixa.getVendas().add(venda);
+			}
+		}
+		
 	}
 
 }

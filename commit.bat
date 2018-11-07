@@ -20,4 +20,4 @@ git push origin fx_release
 rem * * * git push https://github.com/marcospcruz/gestorloja.git
 
 call mvn eclipse:eclipse
-call mvn clean package
+rem * * * call mvn clean package

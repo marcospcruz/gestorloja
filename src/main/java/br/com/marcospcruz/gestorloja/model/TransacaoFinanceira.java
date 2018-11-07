@@ -28,7 +28,7 @@ public class TransacaoFinanceira implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idCaixa")
 	private Caixa caixa;
-	@OneToOne(cascade=CascadeType.ALL)
+	@OneToOne(cascade= {CascadeType.MERGE,CascadeType.PERSIST})
 	@JoinColumn(name = "idMeioPagamento")
 	private MeioPagamento meioPagamento;
 	@ManyToOne

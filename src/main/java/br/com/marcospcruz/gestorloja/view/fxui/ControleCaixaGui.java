@@ -1,14 +1,11 @@
 package br.com.marcospcruz.gestorloja.view.fxui;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import br.com.marcospcruz.gestorloja.controller.CaixaController;
 import br.com.marcospcruz.gestorloja.model.Caixa;
 import br.com.marcospcruz.gestorloja.model.CaixaModel;
-import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import javafx.collections.FXCollections;
