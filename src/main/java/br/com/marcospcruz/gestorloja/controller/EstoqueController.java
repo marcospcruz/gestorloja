@@ -227,7 +227,7 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void busca(Object object) throws Exception {
 		itemEstoque = (ItemEstoque) object;
-
+		System.out.println(itemEstoque.getIdItemEstoque());
 		itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
 				itemEstoque.getProduto().getIdProduto(), "idFabricante", itemEstoque.getFabricante().getIdFabricante(),
 				"idTipoProduto", itemEstoque.getTipoProduto().getIdTipoItem());

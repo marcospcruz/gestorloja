@@ -60,6 +60,8 @@ public class Venda implements Serializable {
 
 	private boolean estornado;
 
+	private String motivoEstorno;
+
 	public Venda() {
 		setDataVenda(SingletonManager.getInstance().getData());
 		itensVenda = new ArrayList<>();
@@ -197,6 +199,15 @@ public class Venda implements Serializable {
 
 	public boolean isEstornado() {
 		return estornado;
+	}
+
+	public void setMotivoEstorno(String motivoEstorno) {
+		this.motivoEstorno = motivoEstorno;
+
+	}
+
+	public String getMotivoEstorno() {
+		return motivoEstorno;
 	}
 
 }

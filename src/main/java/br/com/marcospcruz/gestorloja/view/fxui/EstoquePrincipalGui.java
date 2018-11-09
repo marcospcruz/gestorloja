@@ -51,7 +51,8 @@ public class EstoquePrincipalGui extends StageBase {
 			"produto", // ConstantesEnum.VALOR_UNITARIO_LABEL.getValue().toString(),
 			"qt", // ConstantesEnum.VALOR_TOTAL_LABEL.getValue().toString()
 			"vlUnitario", 
-			"vlTotal" };//@formatter:on
+			"vlTotal" };
+	//@formatter:on
 
 	// private ObservableList<ItemEstoqueModel> dadosEstoque;
 
@@ -61,7 +62,7 @@ public class EstoquePrincipalGui extends StageBase {
 
 	private AutoCompleteTextField<SubTipoProduto> subCategoriaProduto;
 
-	private AutoCompleteTextField<Produto> infoProduto;
+	private AutoCompleteTextField<Produto> comboInfoProduto;
 
 	public EstoquePrincipalGui() throws Exception {
 		super();
@@ -239,9 +240,10 @@ public class EstoquePrincipalGui extends StageBase {
 		comboFabricantes.getEditor().setText("");
 		categoriaProduto.getEditor().setText("");
 		subCategoriaProduto.getEditor().setText("");
+		comboInfoProduto.getEditor().setText("");
 		reloadComboFabricantes();
 		reloadComboCategoria();
-
+		
 		controller.buscaTodos();
 		reloadTableView();
 		controller.setItem(null);
@@ -291,15 +293,15 @@ public class EstoquePrincipalGui extends StageBase {
 				//
 				// }
 				this::pesquisaItem);
-		infoProduto = super.criaProdutoAutoComboBox();
-		infoProduto.setOnAction(this::pesquisaItem);
+		comboInfoProduto = super.criaProdutoAutoComboBox();
+		comboInfoProduto.setOnAction(this::pesquisaItem);
 		//@formatter:off
 		flowPane.getChildren().addAll(
 				new Label("Fabricante:"), comboFabricantes, 
 				new Label("Categoria:"), categoriaProduto, 
 				new Label("Sub-Categoria:"), subCategoriaProduto
 				);
-		produtoPane.getChildren().addAll(new Label("Descricao / Codigo Produto:"),infoProduto);
+		produtoPane.getChildren().addAll(new Label("Descricao / Codigo Produto:"),comboInfoProduto);
 		contentPane.getChildren().addAll(flowPane,produtoPane
 //		
 //		new Label("Descricao / Codigo Produto:"), infoProduto
@@ -420,7 +422,7 @@ public class EstoquePrincipalGui extends StageBase {
 				// ProdutoController produtoController = getProdutoController();
 				EstoqueController estoqueController = getEstoqueController();
 				Object fabricanteValue = comboFabricantes.getValue();
-				Object produtoValue = infoProduto.getValue();
+				Object produtoValue = comboInfoProduto.getValue();
 				Object categoriaValue = subCategoriaProduto.getValue() == null ? categoriaProduto.getValue()
 						: subCategoriaProduto.getValue();
 
@@ -465,14 +467,13 @@ public class EstoquePrincipalGui extends StageBase {
 			} catch (Exception e) {
 
 				comboFabricantes.getEditor().setText("");
-				infoProduto.getEditor().setText("");
+				comboInfoProduto.getEditor().setText("");
 				categoriaProduto.getEditor().setText("");
 				subCategoriaProduto.getEditor().setText("");
 				subCategoriaProduto.getItems().removeAll(subCategoriaProduto.getItems());
 				comboFabricantes.setValue(null);
-				infoProduto.setValue(null);
+				comboInfoProduto.setValue(null);
 				categoriaProduto.setValue(null);
-				subCategoriaProduto.setValue(null);
 				subCategoriaProduto.setValue(null);
 
 				//

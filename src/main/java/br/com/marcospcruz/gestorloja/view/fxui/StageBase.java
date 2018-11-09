@@ -430,7 +430,7 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 
 	public boolean showConfirmAtionMessage(String string) {
 		Alert alert = showMessage(string, AlertType.CONFIRMATION, "Confirma Operação.", ButtonType.YES, ButtonType.NO);
-		SingletonManager.getInstance().getLogger(getClass()).warn(string);
+		SingletonManager.getInstance().getLogger(this.getClass()).warn(string);
 		return alert.getResult() == ButtonType.YES;
 	}
 

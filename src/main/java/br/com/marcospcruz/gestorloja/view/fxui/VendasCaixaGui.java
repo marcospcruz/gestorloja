@@ -164,6 +164,7 @@ public class VendasCaixaGui extends StageBase {
 		}
 		ObservableList<VendaModel> dados = FXCollections.observableArrayList(dadoss);
 		table.setItems(dados);
+		controller.resetVenda();
 	}
 
 	@Override

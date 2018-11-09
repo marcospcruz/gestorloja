@@ -46,7 +46,7 @@ public class CaixaController extends ControllerBase {
 	@Override
 	public void busca(Object id) {
 
-		caixa = dao.busca("caixa.findCaixa", "id", Integer.parseInt(id.toString()));
+		caixa = dao.busca(Caixa.class, Integer.parseInt(id.toString()));
 
 	}
 
@@ -238,6 +238,8 @@ public class CaixaController extends ControllerBase {
 		float subTotalVendas = 0;
 		try {
 			for (Venda venda : caixa.getVendas()) {
+				if (venda.isEstornado())
+					continue;
 				subTotalVendas += venda.getTotalVendido();
 			}
 		} catch (Exception e) {
@@ -469,6 +471,9 @@ public class CaixaController extends ControllerBase {
 				.collect(Collectors.toSet());
 		//@formatter:on
 		for (TransacaoFinanceira tf : transacoes) {
+			MeioPagamento mp = tf.getMeioPagamento();
+			if (mp != null && mp.isEstornado())
+				continue;
 			total += tf.getValorTransacaoFinanceira();
 		}
 		return total;
@@ -496,6 +501,8 @@ public class CaixaController extends ControllerBase {
 		float totalVendas = 0;
 		buscaCaixa(caixa);
 		for (Venda venda : caixa.getVendas()) {
+			if (venda.isEstornado())
+				continue;
 			totalVendas += venda.getTotalVendido();
 		}
 
@@ -519,16 +526,6 @@ public class CaixaController extends ControllerBase {
 			}
 		}
 
-	}
-
-	public void atualizaVenda(Venda venda) {
-		for(Venda v:caixa.getVendas()) {
-			if(v.getIdVenda()==venda.getIdVenda()) {
-				caixa.getVendas().remove(v);
-				caixa.getVendas().add(venda);
-			}
-		}
-		
 	}
 
 }

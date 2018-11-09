@@ -19,13 +19,12 @@ import br.com.marcospcruz.gestorloja.model.Pagamento;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
 import br.com.marcospcruz.gestorloja.model.TipoMeioPagamento;
+import br.com.marcospcruz.gestorloja.model.Venda;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.AutoCompleteTextField;
 import br.com.marcospcruz.gestorloja.view.fxui.custom.NumberTextField;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -38,9 +37,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
@@ -182,6 +184,7 @@ public class PDV extends StageBase {
 			scene.setCursor(Cursor.WAIT);
 //			if (!editaVenda)
 //				limpaFormularioPdv();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
@@ -778,14 +781,23 @@ public class PDV extends StageBase {
 			});
 			children.addAll(button, buttonLimpar);
 		} else {
-			Button button = new Button("Estornar Venda");
-			button.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
+			Button estornaButton = new Button("Estornar Venda");
+			estornaButton.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 12));
+			VendaController controller = getVendaController();
 
-			button.setOnAction(evt -> {
+			estornaButton.setOnAction(evt -> {
 				try {
-					if (showConfirmAtionMessage("Deseja estornar esta Venda?")) {
-						VendaController controller = getVendaController();
-						controller.estornaVenda();
+					TextInputDialog motivoEstornoDialog = new TextInputDialog();
+					motivoEstornoDialog.setContentText("Motivo do Estorno" );
+					motivoEstornoDialog.setHeaderText("Informe o Motivo do Estorno");
+					// motivoEstornoDialog.initOwner(this);
+					motivoEstornoDialog.showAndWait();
+					motivoEstornoDialog.setWidth(800);
+					String motivoEstorno = motivoEstornoDialog.getEditor().getText();
+//					if (showConfirmAtionMessage("Deseja estornar esta Venda?")) {
+					if(!motivoEstorno.isEmpty()) {
+
+						controller.estornaVenda(motivoEstorno);
 						// limpaFormularioPdv();
 						showMensagemSucesso("Venda estornada com sucesso.");
 						close();
@@ -798,14 +810,14 @@ public class PDV extends StageBase {
 			});
 
 			VendaController vendaController = getVendaController();
-			button.setDisable(vendaController.getVenda().isEstornado());
-			if (vendaController.getVenda().getCaixa().getUsuarioFechamento() == null)
-				children.add(button);
-			
+			if (vendaController.getVenda().getCaixa().getUsuarioFechamento() == null) {
 
-		}
-		titledPane.setContent(pane);
-		return titledPane;
+				estornaButton.setDisable(vendaController.getVenda().isEstornado());
+				children.add(estornaButton);
+			}
+
+		}titledPane.setContent(pane);return titledPane;
+
 	}
 
 	protected void finalizarVenda() throws Exception {
@@ -988,15 +1000,6 @@ public class PDV extends StageBase {
 
 		try {
 			estoqueDropDown = criaEstoqueProdutoDropDown();
-			estoqueDropDown.getEditor().textProperty().addListener(new ChangeListener<String>() {
-
-				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				
-					produtoEncontradoNoEstoque = false;
-
-				}
-			});
 			estoqueDropDown.setOnAction(arg0 -> {
 				try {
 					populaProduto(arg0);
