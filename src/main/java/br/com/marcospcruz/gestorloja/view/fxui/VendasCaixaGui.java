@@ -43,7 +43,8 @@ public class VendasCaixaGui extends StageBase {
 			"descontoConcedido",
 			"totalRecebido",
 			"meiosPagamento",
-			"status"
+			"status",
+			"motivoEstorno"
 	};
 	private TitledPane tablePane;
 	//@formatter:on
@@ -154,6 +155,7 @@ public class VendasCaixaGui extends StageBase {
 					.setPorcentagemDescontoConcedido(descontoConcedido)
 					.setMeiosPagamentos(tiposMeioPagamentoString.toString())
 					.setStatus(venda.isEstornado())
+					.setMotivoEstorno(venda.getMotivoEstorno())
 					.getVendaModel();
 			//@formatter:on
 				dadoss.add(vendaModel);
@@ -161,6 +163,7 @@ public class VendasCaixaGui extends StageBase {
 
 		} catch (Exception e) {
 			SingletonManager.getInstance().getLogger(getClass()).warn(e);
+			e.printStackTrace();
 		}
 		ObservableList<VendaModel> dados = FXCollections.observableArrayList(dadoss);
 		table.setItems(dados);

@@ -62,7 +62,12 @@ public class VendaModelBuilder {
 	}
 
 	public VendaModelBuilder setStatus(boolean estornado) {
-		vendaModel.setStatus(estornado?"Estornada":"OK");
+		vendaModel.setStatus(estornado ? "Estornada" : "OK");
+		return this;
+	}
+
+	public VendaModelBuilder setMotivoEstorno(String motivoEstorno) {
+		vendaModel.setMotivoEstorno(motivoEstorno == null ? "" : motivoEstorno);
 		return this;
 	}
 

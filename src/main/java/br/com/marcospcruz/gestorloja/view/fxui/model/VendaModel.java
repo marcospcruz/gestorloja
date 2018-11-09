@@ -13,6 +13,7 @@ public class VendaModel {
 	private SimpleStringProperty valorVenda;
 	private SimpleStringProperty id;
 	private SimpleStringProperty status;
+	private SimpleStringProperty motivoEstorno;
 
 	public void setStatus(String status) {
 		this.status = new SimpleStringProperty(status);
@@ -93,5 +94,17 @@ public class VendaModel {
 
 	public String getId() {
 		return id.get();
+	}
+
+	public void setMotivoEstorno(String motivoEstorno) {
+		this.motivoEstorno = new SimpleStringProperty(motivoEstorno);
+
+	}
+
+	public String getMotivoEstorno() {
+
+		String retorno = motivoEstorno != null && motivoEstorno.get() == null ? "" : motivoEstorno.get();
+
+		return retorno;
 	}
 }
