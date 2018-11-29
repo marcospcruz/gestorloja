@@ -16,14 +16,14 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "operacao.findOperacao", query = "select o from Operacao o  where descricao=:descricao") })
+		@NamedQuery(name = "operacao.findOperacao", query = "select o from Operacao o where o.descricao=:descricao") })
 public class Operacao implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2885276051452312103L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idOperacao;
 	private String descricao;
 	private Date dataCriacao;

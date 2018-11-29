@@ -1,8 +1,10 @@
 package br.com.marcospcruz.gestorloja.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
@@ -89,7 +91,7 @@ public class TipoProdutoController extends ControllerBase {
 		tipoProduto.setDataInsercao(SingletonManager.getInstance().getData());
 
 		tipoProduto = tipoProdutoDao.update(tipoProduto);
-		getCacheMap().put(tipoProduto.getIdTipoItem(), tipoProduto);
+
 	}
 
 	private void validaCriaTipoProduto(boolean subTipo, Object superTipoProduto, String descricao) throws Exception {
@@ -138,7 +140,7 @@ public class TipoProdutoController extends ControllerBase {
 
 				tipoProduto = null;
 
-				throw new Exception("Tipo de Produto " + descricao + " já cadastrado!");
+				throw new Exception("Tipo de Produto " + descricao + " jÃ¡ cadastrado!");
 
 			}
 
@@ -162,6 +164,10 @@ public class TipoProdutoController extends ControllerBase {
 
 	public List<TipoProduto> getList() {
 
+		// if (tiposProdutos == null || tiposProdutos.size() < 1)
+		//
+		// carregaTiposProdutos();
+
 		return tiposProdutos;
 
 	}
@@ -171,22 +177,19 @@ public class TipoProdutoController extends ControllerBase {
 	}
 
 	public void setItem(Object tipoProduto) {
-		if (tipoProduto != null && !(tipoProduto instanceof TipoProduto)) {
-			tipoProduto = new SubTipoProduto(tipoProduto.toString(), getUsuarioLogado());
-		}
+		// if (tipoProduto != null && !(tipoProduto instanceof TipoProduto)) {
+		// tipoProduto = new SubTipoProduto(tipoProduto.toString(), getUsuarioLogado());
+		// }
+		// this.tipoProduto = (SubTipoProduto) tipoProduto;
+		// // implementação para AutocompleteComboBox
+		// if (tipoProduto != null)
+		// setList((List) ((SubTipoProduto) tipoProduto).getSubTiposProduto());
 		this.tipoProduto = (SubTipoProduto) tipoProduto;
-		// implementação para AutocompleteComboBox
-		if (tipoProduto != null)
-			setList((List) ((SubTipoProduto) tipoProduto).getSubTiposProduto());
 	}
 
 	public void carregaTiposProdutos() {
-		if (getCacheMap() == null || getCacheMap().isEmpty()) {
-			setList(tipoProdutoDao.busca("tipoProduto.readtiposabstratos"));
-			setCacheMap(getList().stream().collect(Collectors.toMap(i -> ((TipoProduto) i).getIdTipoItem(), i -> i)));
-		} else {
-			setList(new ArrayList(getCacheMap().values()));
-		}
+
+		setList(tipoProdutoDao.busca("tipoProduto.readtiposabstratos"));
 
 	}
 
@@ -218,59 +221,31 @@ public class TipoProdutoController extends ControllerBase {
 	 * @throws Exception
 	 */
 	public void busca(String parametro) throws Exception {
+
+		zeraAtributos();
+
 		if (parametro.length() == 0) {
 
 			throw new Exception(BUSCA_INVALIDA);
 
 		}
-		Map<Object, Object> cache = getCacheMap();
 
-		if (cache == null || cache.isEmpty()) {
-			buscaTodos();
-		}
-		if (cache != null) {
-			List todosTiposProdutos = new ArrayList();
-			cache.values().stream().forEach(tp -> {
-				todosTiposProdutos.add(tp);
-				((SubTipoProduto) tp).getSubTiposProduto().stream().forEach(t -> {
-					todosTiposProdutos.add(t);
-				});
-			});
+		if (contemAcentuacao(parametro)) {
 
-			setList(todosTiposProdutos);
+			buscaInWorkAround(parametro);
+
 		}
 
-		setList((ArrayList) tiposProdutos.stream()
-				.filter(tp -> ((SubTipoProduto) tp).getDescricaoTipo().toUpperCase().contains(parametro.toUpperCase().trim())
-						|| ((SubTipoProduto) tp).getSuperTipoProduto() != null && ((SubTipoProduto) tp)
-								.getSuperTipoProduto().getDescricaoTipo().toUpperCase().contains(parametro.toUpperCase().trim()))
-				.collect(Collectors.toList()));
-		// zeraAtributos();
-		if (tiposProdutos == null || tiposProdutos.isEmpty())
-			if (contemAcentuacao(parametro)) {
+		String valor = "%" + parametro.toUpperCase() + "%";
 
-				buscaInWorkAround(parametro);
+		tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike", "descricao", valor);
+		// setCacheMap((Map<Object, Object>) tiposProdutos.stream()
+		// .collect(Collectors.toMap(tipo -> ((SubTipoProduto) tipo).getIdTipoItem(),
+		// tipo -> tipo)));
 
-			} else {
+		if (!tiposProdutos.isEmpty())
 
-				String valor = "%" + parametro.toUpperCase() + "%";
-
-				// tiposProdutos = tipoProdutoDao.buscaList("tipoProduto.readParametroLike",
-				// "descricao", valor);
-
-			}
-
-		if (!tiposProdutos.isEmpty() && tiposProdutos.size() == 1) {
 			tipoProduto = (SubTipoProduto) tiposProdutos.get(0);
-			// if (!tipoProduto.getSubTiposProduto().isEmpty()) {
-			//
-			// List<SubTipoProduto> subTipos = new ArrayList<>();
-			// // subTipos.add(tipoProduto);
-			// // subTipos.addAll(tipoProduto.getSubTiposProduto());
-			// // setList(subTipos);
-			// tipoProduto = null;
-			// }
-		}
 
 		else if (tiposProdutos.isEmpty())
 
@@ -290,9 +265,9 @@ public class TipoProdutoController extends ControllerBase {
 
 		for (SubTipoProduto peca : tmp) {
 
-			String descricao = peca.getDescricaoTipo().toLowerCase();
+			String descricao = peca.getDescricaoTipo();
 
-			if (descricao.contains(parametro.toLowerCase())) {
+			if (descricao.contains(parametro)) {
 
 				tiposProdutos.add(peca);
 
@@ -314,7 +289,7 @@ public class TipoProdutoController extends ControllerBase {
 	 * 
 	 */
 	public void excluir() throws Exception {
-
+		tipoProduto = tipoProdutoDao.update(tipoProduto);
 		if (tipoProduto == null || tipoProduto.getIdTipoItem() == null) {
 
 			throw new Exception(REMOCAO_INVALIDA_EXCEPTION);
@@ -328,10 +303,22 @@ public class TipoProdutoController extends ControllerBase {
 
 		if (tipoProduto.getSubTiposProduto().size() > 0)
 			throw new Exception(REMOCAO_SUPERTIPO_POPULADO);
-		getCacheMap().remove(tipoProduto.getIdTipoItem());
-		tipoProduto = tipoProdutoDao.busca(SubTipoProduto.class, tipoProduto.getIdTipoItem());
 
+		tipoProduto = tipoProdutoDao.busca(tipoProduto.getClass(), tipoProduto.getIdTipoItem());
+
+		// SubTipoProduto superTipoProduto =
+		// tipoProdutoDao.update(tipoProduto.getSuperTipoProduto());
+		//
+		// superTipoProduto.getSubTiposProduto().remove(tipoProduto);
+
+		if (tipoProduto.getSuperTipoProduto() != null && tipoProduto.getItensEstoque() != null
+				&& !tipoProduto.getItensEstoque().isEmpty()) {
+			int qtEstoque = tipoProduto.getItensEstoque().size();
+			throw new Exception("Não é possível excluir esta categoria! Há " + qtEstoque
+					+ (qtEstoque > 1 ? " itens cadastrados" : " ítem cadastrado") + " no estoque.");
+		}
 		tipoProdutoDao.delete(tipoProduto);
+		// tipoProdutoDao.update(superTipoProduto);
 
 		setItem(null);
 
@@ -344,23 +331,21 @@ public class TipoProdutoController extends ControllerBase {
 	 * @param idSubProduto
 	 */
 	public void busca(Object id) {
-		if (id != null) {
-			Integer idSubProduto = Integer.valueOf(id.toString());
+		Integer idSubProduto = Integer.valueOf(id.toString());
+		try {
 			tipoProduto = tipoProdutoDao.busca(SubTipoProduto.class, idSubProduto);
-		} else
-			throw new NullPointerException();
+			tipoProduto = tipoProdutoDao.update(tipoProduto);
+		} catch (Exception e) {
+			SingletonManager.getInstance().getLogger(getClass()).warn(e.getMessage());
+		}
+
 	}
 
 	public List buscaTodos() {
 		// implementação para AutocompleteJComboBox
-		Map<Object, Object> cache = getCacheMap();
-		if (cache == null || cache.isEmpty()) {
-			setList(tipoProdutoDao.busca("tipoProduto.readtiposabstratos"));
-			setCacheMap((Map<Object, Object>) tiposProdutos.stream()
-					.collect(Collectors.toMap(tp -> ((SubTipoProduto) tp).getIdTipoItem(), tp -> tp)));
-		} else {
-			setList(new ArrayList(cache.values()));
-		}
+		// if (getList() == null || getList().isEmpty())
+
+		setList(tipoProdutoDao.busca("tipoProduto.readtiposabstratos"));
 		return getList();
 
 	}
@@ -402,8 +387,7 @@ public class TipoProdutoController extends ControllerBase {
 
 	@Override
 	public void salva() throws Exception {
-		// TODO Auto-generated method stub
-
+		tipoProduto = tipoProdutoDao.update(tipoProduto);
 	}
 
 	@Override
@@ -414,44 +398,32 @@ public class TipoProdutoController extends ControllerBase {
 
 	@Override
 	public void validaExistente(String text) throws Exception {
-
-		// if (tipoProduto == null || tipoProduto.getIdTipoItem() != null &&
-		// tipoProduto.getIdTipoItem() != 0)
-		// return;
-		buscaTodos();
-		List<SubTipoProduto> todosTipos = new ArrayList<>();
-		tiposProdutos.stream().forEach(tipo -> {
-			todosTipos.add((SubTipoProduto) tipo);
-			((SubTipoProduto) tipo).getSubTiposProduto().stream().forEach(sub -> {
-				todosTipos.add(sub);
-			});
-		});
-
-		SubTipoProduto teste = todosTipos.stream()
-				.filter(x -> ((SubTipoProduto) x).getDescricaoTipo().equalsIgnoreCase(text)).findAny().orElse(null);
-
-		if (tipoProduto == null || tipoProduto.getIdTipoItem() == null && teste != null) {
-			throw new Exception("Descrição de Categoria já existente.");
-		}
-
-	}
-
-	@Override
-	public void carregaCache() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public String validaExclusaoItem() {
-		String string1 = "Categoria de Produtos contém ";
-		String string2 = " A exclusão pode causar perda de dados. Deseja continuar?";
-		if (!tipoProduto.getSubTiposProduto().isEmpty())
-			return string1 + tipoProduto.getSubTiposProduto().size() + " sub-categorias cadastradas. " + string2;
-		if (!((SubTipoProduto) tipoProduto).getItensEstoque().isEmpty())
-			return string1 + ((SubTipoProduto) tipoProduto).getItensEstoque().size() + " ítens no estoque." + string2;
-		;
-		return null;
+	public void novoUsuario() {
+		tipoProduto = new SubTipoProduto();
+
+	}
+
+	public TipoProduto buscaSuperCategoria(String string) {
+		buscaTodos();
+		return (TipoProduto) tiposProdutos.stream().filter(t -> ((TipoProduto) t).getDescricaoTipo().equals(string))
+				.findFirst().orElse(null);
+
+	}
+
+	public void buscaTipoProduto(String string) {
+		tipoProduto = tipoProdutoDao.busca("tipoProduto.readParametro", "descricao", string.toLowerCase());
+	}
+
+	public void attachEntidade(SubTipoProduto tipoProduto) throws Exception {
+		setItem(tipoProduto);
+		if (tipoProduto.getIdTipoItem() != null)
+			salva();
+
 	}
 
 	// public void iniciaTipoPecaRoupa() {

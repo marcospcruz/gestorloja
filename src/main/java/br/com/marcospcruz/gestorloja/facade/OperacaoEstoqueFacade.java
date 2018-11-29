@@ -1,7 +1,5 @@
 package br.com.marcospcruz.gestorloja.facade;
 
-import org.apache.xmlbeans.impl.schema.BuiltinSchemaTypeSystem;
-
 import br.com.marcospcruz.gestorloja.controller.ControllerBase;
 import br.com.marcospcruz.gestorloja.controller.EstoqueController;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
@@ -18,13 +16,12 @@ public class OperacaoEstoqueFacade {
 		this.controller = controller;
 	}
 
-	public void adicionaItemEstoque(ItemEstoque itemEstoque) throws Exception {
+	public void salvaDadosItem(ItemEstoque itemEstoque) throws Exception {
 		controller.setItem(itemEstoque);
 //		((EstoqueController)controller).validaProdutoExistente();
 		controller.salva();
 
 		controller.registraHistoricoOperacao(ENTRADA_ESTOQUE);
-	
 //		((EstoqueController)controller).anulaAtributos();
 //		SingletonManager.getInstance().reloadControllers();
 	}

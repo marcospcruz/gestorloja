@@ -1,8 +1,10 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -22,16 +24,26 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 @Entity
 //@formatter:off
 @NamedQueries({
-		@NamedQuery(name = "caixa.findCaixaAberto", query = "select distinct c from Caixa c " 
-				+ "LEFT JOIN c.vendas "
-				+ "LEFT JOIN fetch c.usuarioAbertura u "
-				+ "LEFT JOIN fetch c.usuarioFechamento u "
-				+ "where c.dataFechamento=null"),
-		@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c "
-				+ "LEFT JOIN fetch c.vendas v "
-				+ "LEFT JOIN fetch c.usuarioAbertura u "
-				+ "LEFT JOIN fetch c.usuarioFechamento u "
-				+ "LEFT JOIN fetch v.pagamento p") })
+	@NamedQuery(name = "caixa.findCaixa", query = "select distinct c from Caixa c " 
+			+ "LEFT JOIN c.vendas v "
+			+ "LEFT JOIN v.pagamento p "
+			+ "LEFT JOIN p.meiosPagamento mp "
+			+ "LEFT JOIN fetch c.transacoesCaixa "
+			+ "where c.idCaixa=:id"),
+	@NamedQuery(name = "caixa.findCaixaAberto", query = "select distinct c from Caixa c " 
+			+ "LEFT JOIN fetch c.vendas "
+			+ "LEFT JOIN fetch c.transacoesCaixa "
+			+ "where c.dataFechamento=null"),
+	@NamedQuery(name = "caixa.findAll", query = "select distinct c from Caixa c "
+			+ "LEFT JOIN FETCH c.vendas "
+			+ "LEFT JOIN FETCH c.transacoesCaixa "
+			+ "ORDER BY c.dataAbertura desc"),
+	@NamedQuery(name = "caixa.findCaixaDataAbertura", query = "select distinct c from Caixa c "
+			+ "LEFT JOIN FETCH c.vendas "
+			+ "LEFT JOIN FETCH c.transacoesCaixa "
+			+" WHERE c.dataAbertura=:data "
+			+ "ORDER BY c.dataAbertura desc")
+	})
 //@formatter:on
 public class Caixa extends AbstractModel {
 	/**
@@ -53,9 +65,12 @@ public class Caixa extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "idUsuarioFechamento")
 	private Usuario usuarioFechamento;
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa", orphanRemoval = true, cascade = CascadeType.ALL)
 	@OrderBy(value = "idVenda")
 	private Set<Venda> vendas;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "caixa", orphanRemoval = true, cascade = CascadeType.ALL)
+	@OrderBy(value = "idTransacaoFinanceira")
+	private Set<TransacaoFinanceira> transacoesCaixa;
 
 	public Caixa() {
 		setDataAbertura(SingletonManager.getInstance().getData());
@@ -123,6 +138,16 @@ public class Caixa extends AbstractModel {
 
 	public void setVendas(Set<Venda> vendas) {
 		this.vendas = vendas;
+	}
+
+	public Set<TransacaoFinanceira> getTransacoesCaixa() {
+		if (transacoesCaixa == null)
+			transacoesCaixa = new HashSet<>();
+		return transacoesCaixa;
+	}
+
+	public void setTransacoesCaixa(Set<TransacaoFinanceira> transacoesCaixa) {
+		this.transacoesCaixa = transacoesCaixa;
 	}
 
 	@Override

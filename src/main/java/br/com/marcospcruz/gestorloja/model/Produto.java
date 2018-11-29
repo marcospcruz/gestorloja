@@ -15,18 +15,23 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 //@formatter:off
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "produto.readall", query = "select distinct p from Produto p " 
+		@NamedQuery(name = "produto.readall", query = "select distinct p from Produto p "
+				+ "LEFT JOIN FETCH p.estoqueProduto " 
 ),
 		@NamedQuery(name = "produto.readparametrolike", query = "select distinct p from Produto p "
 //				+ "JOIN fetch p.tiposProduto t "
+				+ "LEFT JOIN FETCH p.estoqueProduto "
 				+ "where upper(p.descricaoProduto) like :descricao"),
 		@NamedQuery(name = "produto.readparametro", query = "select distinct p from Produto p "
-				
+				+ "LEFT JOIN FETCH p.estoqueProduto "
 				+"where upper(p.descricaoProduto) = :descricao")
 		})
 		
@@ -39,7 +44,7 @@ public class Produto implements Serializable {
 	private static final long serialVersionUID = 1325592421055276202L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idProduto;
 	@Column(unique = true)
 	private String descricaoProduto;
@@ -58,22 +63,26 @@ public class Produto implements Serializable {
 	private Date dataInsercao;
 
 	@OneToMany(mappedBy = "produto")
-	// @Fetch(FetchMode.JOIN)
+	@Fetch(FetchMode.JOIN)
 	private Collection<ItemEstoque> estoqueProduto;
 
 	public Produto(TipoProduto tipoProduto, SubTipoProduto subTipoProduto, String descricao, String unidadeMedida) {
 		// setTipoProduto(subTipoProduto);
 		// getTipoProduto().setSuperTipoProduto((SubTipoProduto) tipoProduto);
+		this();
 		setDescricaoProduto(descricao);
 		setUnidadeMedida(unidadeMedida);
 
 	}
 
 	public Produto() {
-		setDataInsercao(SingletonManager.getInstance().getData());
+		SingletonManager instance = SingletonManager.getInstance();
+		setDataInsercao(instance.getData());
+		setOperador(instance.getUsuarioLogado());
 	}
 
 	public Produto(String string) {
+		this();
 		this.descricaoProduto = string;
 	}
 

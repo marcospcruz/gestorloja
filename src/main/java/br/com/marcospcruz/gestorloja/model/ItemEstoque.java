@@ -2,7 +2,6 @@ package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,11 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
@@ -27,7 +22,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 @Table(name = "Estoque")
 @NamedQueries({
 		@NamedQuery(name = "itemestoque.readCodigo", query = "select distinct ie from ItemEstoque ie "
-			+ "JOIN ie.fabricante "
+			+ "JOIN ie.fabricante f "
 			+ "JOIN ie.produto p "
 			+"JOIN ie.tipoProduto t "
 			+ "where upper(ie.codigoDeBarras) = :codigo"),
@@ -55,22 +50,23 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 				+ "JOIN ie.tipoProduto t "
 				+ "JOIN t.superTipoProduto st "
 				+ "where "
-				+ "upper(t.descricaoTipo) =:descricaoTipo "
-				+ "OR UPPER(st.descricaoTipo) =:descricaoTipo "
+				+ "upper(t.descricaoTipo) like :descricaoTipo "
+				+ "OR UPPER(st.descricaoTipo) like :descricaoTipo "
 				+ "order by f.nome,t.descricaoTipo"
 				),
 		@NamedQuery(name = "itemEstoque.readAll", query = "select distinct ie from ItemEstoque ie " 
-				+ "JOIN fetch ie.fabricante f "
-				+ "JOIN fetch ie.produto p "
-				+ "JOIN fetch ie.tipoProduto t "
-				+ "LEFT JOIN fetch t.superTipoProduto t "
+				+ "JOIN ie.fabricante f "
+				+ "JOIN fetch ie.produto "
+				+ "JOIN ie.tipoProduto t "
+				+ "LEFT JOIN t.superTipoProduto tp "
 				+ "order by f.nome, t.descricaoTipo"),
 		@NamedQuery(name="itemEstoque.readProduto",query="select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p "
 				+"JOIN ie.tipoProduto t "
 				+ "JOIN ie.fabricante f "
 				+ "WHERE p.idProduto=:idProduto "
-				+ "AND f.idFabricante=:idFabricante"),
+				+ "AND f.idFabricante=:idFabricante "
+				+ "AND t.idTipoItem=:idTipoProduto"),
 		
 		@NamedQuery(name = "itemestoque.readTipoFabricante", query = "select distinct ie from ItemEstoque ie "
 				+ "JOIN ie.produto p " 
@@ -92,7 +88,7 @@ public class ItemEstoque implements Serializable {
 	private static final long serialVersionUID = 8193836692123395239L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idItemEstoque;
 
 	@ManyToOne(cascade = CascadeType.MERGE)
@@ -109,6 +105,7 @@ public class ItemEstoque implements Serializable {
 	// @JoinColumn(name = "idItemEstoque") }, inverseJoinColumns = {
 	// @JoinColumn(name = "idFabricante") })
 	private Fabricante fabricante;
+	
 	private Integer quantidade;
 	@Column(unique = true)
 	private String codigoDeBarras;
@@ -119,22 +116,12 @@ public class ItemEstoque implements Serializable {
 	private boolean estoqueDedutivel;
 	private float valorUnitario;
 	private float valorCusto;
-	@OneToMany
-	@Fetch(FetchMode.JOIN)
-	@JoinColumn(name = "idItemEstoque")
-	private List<HistoricoOperacao> historicoOperacao;
 
 	public ItemEstoque() {
 		setDataContagem(SingletonManager.getInstance().getData());
-		setOperador(SingletonManager.getInstance().getUsuarioLogado());
-	}
-
-	public List<HistoricoOperacao> getHistoricoOperacao() {
-		return historicoOperacao;
-	}
-
-	public void setHistoricoOperacao(List<HistoricoOperacao> historicoOperacao) {
-		this.historicoOperacao = historicoOperacao;
+		setEstoqueDedutivel(Boolean.TRUE);
+		setQuantidade(0);
+		// setOperador(SingletonManager.getInstance().getUsuarioLogado());
 	}
 
 	public Integer getIdItemEstoque() {
@@ -279,8 +266,9 @@ public class ItemEstoque implements Serializable {
 		if (operador == null) {
 			if (other.operador != null)
 				return false;
-		} else if (!operador.equals(other.operador))
-			return false;
+		} 
+//		else if (!operador.equals(other.operador))
+//			return false;
 		if (produto == null) {
 			if (other.produto != null)
 				return false;

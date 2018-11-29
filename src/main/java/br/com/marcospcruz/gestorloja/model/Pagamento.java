@@ -7,12 +7,17 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 public class Pagamento implements Serializable {
@@ -21,20 +26,27 @@ public class Pagamento implements Serializable {
 	 */
 	private static final long serialVersionUID = -2356444305643322916L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idPagamento;
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "pagamento", orphanRemoval = true)
+	@OneToMany(cascade = { CascadeType.ALL }, mappedBy = "pagamento", fetch = FetchType.EAGER)
 	private List<MeioPagamento> meiosPagamento;
 	private float valorPagamento;
 	private float trocoPagamento;
-	@ManyToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "idVenda")
+
 	private Venda venda;
 
 	private Date dataVenda;
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario usuarioLogado;
+	private boolean estornado;
+
+	public Pagamento() {
+		setUsuarioLogado(SingletonManager.getInstance().getUsuarioLogado());
+
+	}
 
 	public int getIdPagamento() {
 		return idPagamento;
@@ -76,13 +88,6 @@ public class Pagamento implements Serializable {
 
 	public void setVenda(Venda venda) {
 		this.venda = venda;
-	}
-
-	@Override
-	public String toString() {
-		return "Pagamento [idPagamento=" + idPagamento + ", meiosPagamento=" + meiosPagamento + ", valorPagamento="
-				+ valorPagamento + ", trocoPagamento=" + trocoPagamento + ", venda=" + venda + ", dataVenda="
-				+ dataVenda + ", usuarioLogado=" + usuarioLogado + "]";
 	}
 
 	@Override
@@ -137,11 +142,6 @@ public class Pagamento implements Serializable {
 		return true;
 	}
 
-	public void setdataVenda(Date dataVenda) {
-		this.dataVenda = dataVenda;
-
-	}
-
 	public void setUsuarioLogado(Usuario usuarioLogado) {
 		this.usuarioLogado = usuarioLogado;
 	}
@@ -156,6 +156,15 @@ public class Pagamento implements Serializable {
 
 	public Usuario getUsuarioLogado() {
 		return usuarioLogado;
+	}
+
+	public void setEstornado(boolean estornado) {
+		this.estornado = estornado;
+
+	}
+
+	public boolean isEstornado() {
+		return estornado;
 	}
 
 }

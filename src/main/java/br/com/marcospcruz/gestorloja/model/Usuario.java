@@ -4,33 +4,51 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 //@formatter:off
 @NamedQueries({
+	@NamedQuery(name = "usuario.findUserName", query = "select u from Usuario u "
+//			+ "JOIN FETCH u.perfisUsuario "
+//			+ "LEFT JOIN u.operador o "						
+			+ "where u.nomeUsuario=:nomeUsuario "
+			),
 		@NamedQuery(name = "usuario.findLogin", query = "select u from Usuario u "
-				+ "JOIN FETCH u.perfisUsuario "
+//				+ "JOIN FETCH u.perfisUsuario "
 //				+ "LEFT JOIN u.operador o "						
 				+ "where u.nomeUsuario=:nomeUsuario "
 				+ "and u.password=:password"),
 		@NamedQuery(name = "usuario.findNomeUsuario", query = "select u from Usuario u "
-				+ "LEFT JOIN u.operador o "
-//				+ "JOIN FETCH u.perfisUsuario p "
-//				+ "LEFT JOIN FETCH u.interfaces i "				
-				+ "where u.nomeUsuario=:nomeUsuario") })
+//				+ "LEFT JOIN u.operador o "
+				+ "JOIN FETCH u.perfisUsuario "
+//				+ "LEFT JOIN FETCH p.interfaces i "				
+				+ "where u.nomeUsuario=:nomeUsuario"),@NamedQuery(name = "usuario.findUsuario", query = "select u from Usuario u "
+//				+ "LEFT JOIN u.operador o "
+				+ "JOIN FETCH u.perfisUsuario "
+//				+ "LEFT JOIN FETCH p.interfaces i "				
+				+ "where u.idUsuario=:id"),
+		@NamedQuery (name="usuario.findAll", query="select distinct u from Usuario u "
+				+ "JOIN FETCH u.perfisUsuario "
+				+ "where u.idUsuario <> 1"
+//				+ "JOIN FETCH pu.interfaces "
+				)})
 //@formatter:on
 public class Usuario implements Serializable {
 
@@ -48,25 +66,31 @@ public class Usuario implements Serializable {
 	private Date ultimoAcesso;
 	private String nomeCompleto;
 	private boolean primeiroAcesso;
-	@OneToMany
-	@JoinTable(name = "Perfil_usuario", joinColumns = { @JoinColumn(name = "idUsuario") }, inverseJoinColumns = {
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE })
+	@JoinTable(name = "PerfilUsuario_usuario", joinColumns = { @JoinColumn(name = "idUsuario") }, inverseJoinColumns = {
 			@JoinColumn(name = "idPerfilUsuario") })
 	private List<PerfilUsuario> perfisUsuario;
 	@ManyToOne
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
+	@Column
+	@Temporal(value = TemporalType.TIMESTAMP)
+	private Date dataCriacao;
+	private boolean ativo;
 
 	public Usuario() {
 
 	}
 
-	public Usuario(String string, String string2, String string3, List<PerfilUsuario> perfisUsuario) {
+	public Usuario(String string, String string2, String string3, List<PerfilUsuario> perfisUsuario, boolean ativo) {
 		this();
 		setNomeCompleto(string);
 		setNomeUsuario(string2);
 		setPassword(string3);
 		setPerfisUsuario(perfisUsuario);
+		setAtivo(ativo);
 		setPrimeiroAcesso(primeiroAcesso);
+		setOperador(SingletonManager.getInstance().getUsuarioLogado());
 	}
 
 	public Usuario(int idUsuario) {
@@ -81,12 +105,12 @@ public class Usuario implements Serializable {
 		this.operador = operador;
 	}
 
-	private void setNomeCompleto(String nomeCompleto) {
+	public void setNomeCompleto(String nomeCompleto) {
 		this.nomeCompleto = nomeCompleto;
 
 	}
 
-	private void setPerfisUsuario(List<PerfilUsuario> perfisUsuario) {
+	public void setPerfisUsuario(List<PerfilUsuario> perfisUsuario) {
 		this.perfisUsuario = perfisUsuario;
 
 	}
@@ -96,6 +120,7 @@ public class Usuario implements Serializable {
 	}
 
 	public List<PerfilUsuario> getPerfisUsuario() {
+
 		return perfisUsuario;
 	}
 
@@ -139,6 +164,14 @@ public class Usuario implements Serializable {
 
 	public void setPrimeiroAcesso(boolean primeiroAcesso) {
 		this.primeiroAcesso = primeiroAcesso;
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 	@Override
@@ -204,6 +237,15 @@ public class Usuario implements Serializable {
 		return "Usuario [idUsuario=" + idUsuario + ", nomeUsuario=" + nomeUsuario + ", password=" + password
 				+ ", ultimoAcesso=" + ultimoAcesso + ", nomeCompleto=" + nomeCompleto + ", primeiroAcesso="
 				+ primeiroAcesso + ", perfisUsuario=" + perfisUsuario + "]";
+	}
+
+	public void setDataCriacao(Date now) {
+		this.dataCriacao = now;
+
+	}
+
+	public Date getDataCriacao() {
+		return dataCriacao;
 	}
 
 }

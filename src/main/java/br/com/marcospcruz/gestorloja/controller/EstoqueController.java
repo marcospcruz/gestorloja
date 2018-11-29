@@ -7,29 +7,28 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.itextpdf.text.pdf.AcroFields.Item;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
 
 import br.com.marcospcruz.gestorloja.abstractfactory.ControllerAbstractFactory;
 import br.com.marcospcruz.gestorloja.dao.Crud;
 import br.com.marcospcruz.gestorloja.dao.CrudDao;
-import br.com.marcospcruz.gestorloja.model.Fabricante;
 import br.com.marcospcruz.gestorloja.model.HistoricoOperacao;
 import br.com.marcospcruz.gestorloja.model.ItemEstoque;
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Produto;
 import br.com.marcospcruz.gestorloja.model.SubTipoProduto;
-import br.com.marcospcruz.gestorloja.model.TipoProduto;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.ConstantesEnum;
 import br.com.marcospcruz.gestorloja.util.Util;
 
 public class EstoqueController extends ControllerBase {
 
-	private static final String MESSAGE_QT_INVALIDA_EXCEPTION = "Quantidade informada Invï¿½lida!";
+	private static final String MESSAGE_QT_INVALIDA_EXCEPTION = "Quantidade informada Inválida!";
 
 	private ItemEstoque itemEstoque;
 
-	// private Crud<ItemEstoque> itemEstoqueDao;
+	private Crud<ItemEstoque> itemEstoqueDao;
 
 	private List<ItemEstoque> itensEstoque;
 
@@ -37,15 +36,19 @@ public class EstoqueController extends ControllerBase {
 
 	private List<ItemEstoque> consultaEstoque;
 
+	// private CrudDao<ItemEstoque> itemEstoqueDao;
+
 	public EstoqueController() throws Exception {
 
-		// itemEstoqueDao = new CrudDao<>();
+		itemEstoqueDao = new CrudDao<>();
 		carregaItensEstoque();
 		produtoController = (ProdutoController) getController(ControllerAbstractFactory.PRODUTO);
 
 	}
 
 	public ItemEstoque getItemEstoque() {
+		if (itemEstoque != null && itemEstoque.getIdItemEstoque() != null)
+			itemEstoque = itemEstoqueDao.busca(ItemEstoque.class, itemEstoque.getIdItemEstoque());
 		return itemEstoque;
 	}
 
@@ -66,23 +69,8 @@ public class EstoqueController extends ControllerBase {
 	private void carregaItensEstoque() {
 		// if (itensEstoque == null || itensEstoque.isEmpty())
 
-		itensEstoque = null;
-		Map<Object, Object> cacheMap = super.getCacheMap();
-		if (cacheMap == null || cacheMap.isEmpty()) {
-			CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
-			itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
-			Map results = itensEstoque.stream().collect(
-					Collectors.toMap(itemEstoque -> itemEstoque.getIdItemEstoque(), itemEstoque -> itemEstoque));
-			setCacheMap(results);
-		} else if (itensEstoque == null)
-			itensEstoque = new ArrayList(getCacheMap().values());
-		// setList(itensEstoque);
+		itensEstoque = itemEstoqueDao.busca("itemEstoque.readAll");
 
-	}
-
-	private Crud<ItemEstoque> getDao() {
-
-		return new CrudDao<>();
 	}
 
 	public void setItensEstoque(List<ItemEstoque> itensEstoque) {
@@ -146,40 +134,25 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public void buscaItemPorCodigoDeBarras(String codigoProduto) {
-		try {
-			Map<Object, Object> cache = getCacheMap();
-
-			if (cache != null || !cache.isEmpty()) {
-				itemEstoque = (ItemEstoque) cache.values().stream()
-						.filter(item -> codigoProduto.equals(((ItemEstoque) item).getCodigoDeBarras())).findAny()
-						.orElse(null);
-			} else {
-				Crud<ItemEstoque> itemEstoqueDao = getDao();
-				itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigoEstoque", "codigo", codigoProduto);
-			}
-		} catch (Exception e) {
-			itemEstoque = null;
-		}
+		itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigo", "codigo", codigoProduto);
 
 	}
 
 	public void buscaItemEstoque(String descricao, String descricaoTipo) throws Exception {
+		if (Util.isPalavraAcentuada(descricao)) {
+			buscaComAcentuacao(descricaoTipo, descricao);
 
-		// if (Util.isPalavraAcentuada(descricao)) {
-		buscaComAcentuacao(descricaoTipo, descricao);
-		if (!itensEstoque.isEmpty())
-			return;
-		// } else {
-		Map<String, String> paramsMap = new HashMap<>();
-		paramsMap.put("descricaoProduto", "%" + descricao.toUpperCase() + "%");
-		String namedQuery = "itemestoque.readDescricaoProduto";
-		if (descricaoTipo != null) {
-			paramsMap.put("descricaoTipo", "%" + descricaoTipo.toUpperCase() + "%");
-			namedQuery = "itemestoque.readDescricaoPeca";
+		} else {
+			Map<String, String> paramsMap = new HashMap<>();
+			paramsMap.put("descricaoProduto", "%" + descricao.toUpperCase() + "%");
+			String namedQuery = "itemestoque.readDescricaoProduto";
+			if (descricaoTipo != null) {
+				paramsMap.put("descricaoTipo", "%" + descricaoTipo.toUpperCase() + "%");
+				namedQuery = "itemestoque.readDescricaoPeca";
+			}
+
+			setList(itemEstoqueDao.buscaList(namedQuery, paramsMap));
 		}
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
-		setList(itemEstoqueDao.buscaList(namedQuery, paramsMap));
-		// }
 		if (itensEstoque.size() == 1)
 
 			itemEstoque = itensEstoque.get(0);
@@ -187,7 +160,7 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public void busca(int idItemEstoque) {
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
+
 		itemEstoque = itemEstoqueDao.busca(ItemEstoque.class, idItemEstoque);
 
 	}
@@ -196,12 +169,23 @@ public class EstoqueController extends ControllerBase {
 
 		if (itemEstoque == null) {
 
-			throw new Exception("Exclusï¿½o invï¿½lida!");
+			throw new Exception("Exclusão inválida!");
 
 		}
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
-		itemEstoqueDao.delete(itemEstoque);
 
+		try {
+			// itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
+			// itemEstoque.getProduto().getIdProduto(), "idFabricante",
+			// itemEstoque.getFabricante().getIdFabricante(), "idTipoProduto",
+			// itemEstoque.getTipoProduto().getIdTipoItem());
+
+			itemEstoqueDao.delete(itemEstoque);
+
+		} catch (NoResultException e) {
+			e.printStackTrace();
+		} finally {
+
+		}
 		anulaAtributos();
 
 	}
@@ -212,15 +196,16 @@ public class EstoqueController extends ControllerBase {
 
 		itensEstoque = null;
 
-		SingletonManager.getInstance().resetControllers();
-
 	}
 
 	public void incrementaItem(int quantidade) throws Exception {
-
-		if (quantidade < 1)
+		if (!itemEstoque.isEstoqueDedutivel())
+			return;
+		if (quantidade < 1 && !SingletonManager.getInstance().isPermiteVendaSemControlarEstoque())
 			throw new Exception("Quantidade inválida!");
-		if (itemEstoque.isEstoqueDedutivel()) {
+		if (itemEstoque.isEstoqueDedutivel() && !SingletonManager.getInstance().isPermiteVendaSemControlarEstoque()
+		// && quantidade > 0
+		) {
 			itemEstoque.setQuantidade(itemEstoque.getQuantidade() + quantidade);
 
 			salva();
@@ -242,15 +227,15 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public void busca(Object object) throws Exception {
 		itemEstoque = (ItemEstoque) object;
-		Crud<ItemEstoque> itemEstoqueDao = getDao();
+		System.out.println(itemEstoque.getIdItemEstoque());
 		itemEstoque = itemEstoqueDao.busca("itemEstoque.readProduto", "idProduto",
-				itemEstoque.getProduto().getIdProduto(), "idFabricante", itemEstoque.getFabricante().getIdFabricante());
+				itemEstoque.getProduto().getIdProduto(), "idFabricante", itemEstoque.getFabricante().getIdFabricante(),
+				"idTipoProduto", itemEstoque.getTipoProduto().getIdTipoItem());
 
 	}
 
 	@Override
 	public List buscaTodos() {
-
 		carregaItensEstoque();
 		return itensEstoque;
 	}
@@ -258,14 +243,6 @@ public class EstoqueController extends ControllerBase {
 	@Override
 	public List getList() {
 		// buscaTodos();
-		// if (itensEstoque == null && !getCacheMap().isEmpty())
-
-		Map<Object, Object> cacheMap = getCacheMap();
-		if (cacheMap == null || cacheMap.isEmpty()) {
-			carregaItensEstoque();
-		}
-		if (itensEstoque == null)
-			itensEstoque = new ArrayList(cacheMap.values());
 		return itensEstoque;
 	}
 
@@ -273,16 +250,11 @@ public class EstoqueController extends ControllerBase {
 	public void busca(String text) throws Exception {
 		// busca(text, null, null);
 
-		Map<Object, Object> cache = getCacheMap();
-		if (cache != null || !cache.isEmpty()) {
-			itemEstoque = (ItemEstoque) cache.values().stream()
-					.filter(item -> text.equals(((ItemEstoque) item).getCodigoDeBarras())).findAny().orElse(null);
-			if (itemEstoque != null) {
-				return;
-			}
+		try {
+			itemEstoque = itemEstoqueDao.busca("itemestoque.readCodigo", "codigo", text);
+		} catch (NoResultException e) {
+			throw new Exception("Ítem código " + text + " não encontrado no estoque.");
 		}
-		Crud<ItemEstoque> dao = getDao();
-		itemEstoque = dao.busca("itemestoque.readCodigo", "codigo", text);
 	}
 
 	@Override
@@ -312,14 +284,7 @@ public class EstoqueController extends ControllerBase {
 
 	@Override
 	public void excluir() throws Exception {
-		Crud<ItemEstoque> dao = new CrudDao<>();
-
-		Map<Object, Object> cacheMap = getCacheMap();
-
-		cacheMap.remove(itemEstoque.getIdItemEstoque());
-		itemEstoque = dao.busca(ItemEstoque.class, itemEstoque.getIdItemEstoque());
-		dao.delete(itemEstoque);
-		setList(null);
+		// TODO Auto-generated method stub
 
 	}
 
@@ -336,126 +301,144 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	public void decrementaItem(int quantidade) throws Exception {
-		itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidade);
+		// itemEstoque.setQuantidade(itemEstoque.getQuantidade() - quantidade);
 
-		salva();
-
+		// salva();
+		incrementaItem(quantidade * -1);
 		anulaAtributos();
 
 	}
 
+	// public void busca(String tipoProduto, String produto, String fabricante) {
+	// buscaTodos();
+	// if (tipoProduto != null) {
+	// List<ItemEstoque> itens = itensEstoque.stream()
+	// .filter(item -> ((ItemEstoque)
+	// item).getTipoProduto().getSuperTipoProduto().getDescricaoTipo()
+	// .equalsIgnoreCase(tipoProduto)
+	// || ((ItemEstoque)
+	// item).getTipoProduto().getDescricaoTipo().equalsIgnoreCase(tipoProduto))
+	// .collect(Collectors.toList());
+	// if (!itens.isEmpty() && itens != itensEstoque) {
+	// itensEstoque = itens;
+	// return;
+	// }
+	//
+	// } else if (fabricante != null) {
+	// List<ItemEstoque> itens = itensEstoque.stream()
+	// .filter(item -> ((ItemEstoque)
+	// item).getFabricante().getNome().equals(fabricante))
+	// .collect(Collectors.toList());
+	// if (!itens.isEmpty() && itens != itensEstoque) {
+	// itensEstoque = itens;
+	// return;
+	// }
+	// }
+	//
+	// if (tipoProduto != null && Util.isPalavraAcentuada(tipoProduto)) {
+	// buscaComAcentuacao(tipoProduto);
+	//
+	// return;
+	// }
+	// String namedQuery = "itemestoque.readDescricaoTipo";
+	// Map<String, String> paramsMap = new HashMap<>();
+	// if (tipoProduto != null) {
+	// // paramsMap.put("descricaoTipo", "%" + tipoProduto.trim().toUpperCase() +
+	// "%");
+	// }
+	// if (produto != null) {
+	// paramsMap.put("descricaoProduto", "%" + produto.trim().toUpperCase() + "%");
+	// namedQuery = "itemestoque.readDescricaoPeca";
+	// }
+	//
+	// if (fabricante != null) {
+	// paramsMap.put("nomeFabricante", "%" + fabricante.trim().toUpperCase() + "%");
+	// namedQuery = "itemestoque.readTipoFabricante";
+	// }
+	//
+	// itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
+	// consultaEstoque = itensEstoque;
+	// }
 	public void busca(String tipoProduto, String produto, String fabricante) throws Exception {
-		// if (Util.isPalavraAcentuada(tipoProduto)) {
-		buscaComAcentuacao(tipoProduto, produto);
-		if (!itensEstoque.isEmpty())
-			return;
-		// }
-		String namedQuery = "itemestoque.readDescricaoTipo";
-		Map<String, String> paramsMap = new HashMap<>();
-		if (tipoProduto != null && !tipoProduto.isEmpty()) {
-			paramsMap.put("descricaoTipo", "%" + tipoProduto.trim().toUpperCase() + "%");
-		}
-		if (produto != null && !produto.isEmpty()) {
-			paramsMap.put("descricaoProduto", "%" + produto.trim().toUpperCase() + "%");
-			namedQuery = "itemestoque.readDescricaoPeca";
+		buscaTodos();
+		List<ItemEstoque> tmpItensEstoque = new ArrayList<>(itensEstoque);
+		List<ItemEstoque> backup = new ArrayList<>(itensEstoque);
+		;
+		if (fabricante != null) {
+			itensEstoque = tmpItensEstoque.stream()
+					.filter(itemEstoque -> fabricante.equals(itemEstoque.getFabricante().getNome()))
+					.collect(Collectors.toList());
 		}
 
-		if (fabricante != null && !fabricante.isEmpty()) {
-			paramsMap.put("nomeFabricante", "%" + fabricante.trim().toUpperCase() + "%");
-			namedQuery = "itemestoque.readTipoFabricante";
+		if (tipoProduto != null) {
+			tmpItensEstoque = new ArrayList<>(itensEstoque);
+			backup = new ArrayList<>(itensEstoque);
+			if (tipoProduto != null) {
+				itensEstoque = tmpItensEstoque.stream()
+						.filter(itemEstoque -> itemEstoque.getTipoProduto().getSuperTipoProduto() != null && itemEstoque
+								.getTipoProduto().getSuperTipoProduto().getDescricaoTipo().equals(tipoProduto))
+						.collect(Collectors.toList());
+				if (itensEstoque.isEmpty()) {
+					tmpItensEstoque = new ArrayList<>(itensEstoque);
+					if (tmpItensEstoque.isEmpty())
+						tmpItensEstoque = new ArrayList<>(backup);
+					itensEstoque = tmpItensEstoque.stream().filter(
+							itemEstoque -> itemEstoque.getTipoProduto().getDescricaoTipo().contains(tipoProduto))
+							.collect(Collectors.toList());
+
+				}
+			}
 		}
-		// if (!getCacheMap().isEmpty()) {
-		// Map<Object, Object> cache = getCacheMap();
-		// if (tipoProduto != null) {
-		// loadEstoqueSuperTipoCache(tipoProduto, cache);
-		// if (itensEstoque == null || itensEstoque.isEmpty()) {
-		// itensEstoque = new ArrayList(
-		// cache.values().stream().filter(item -> ((ItemEstoque) item).getTipoProduto()
-		// != null)
-		// .filter(item -> tipoProduto
-		// .equals(((ItemEstoque) item).getTipoProduto().getDescricaoTipo()))
-		// .collect(Collectors.toList()));
-		// }
-		// if (itensEstoque != null || !itensEstoque.isEmpty())
-		// return;
+		if (produto != null) {
+			tmpItensEstoque = new ArrayList<>(itensEstoque);
 
-		// }
+			itensEstoque = tmpItensEstoque.stream()
+					.filter(itemEstoque -> itemEstoque.getCodigoDeBarras().equals(produto))
+					.collect(Collectors.toList());
+			if (itensEstoque.isEmpty()) {
+				tmpItensEstoque = new ArrayList<>(backup);
+				itensEstoque = tmpItensEstoque.stream()
+						.filter(itemEstoque -> itemEstoque.getProduto().getDescricaoProduto().contains(produto))
+						.collect(Collectors.toList());
+			}
+		}
 
-		// }
-		CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
-		itensEstoque = itemEstoqueDao.buscaList(namedQuery, paramsMap);
 		if (itensEstoque.isEmpty())
-			throw new Exception("Ítem não encontrado no estoque.");
-	}
-
-	private void loadEstoqueSuperTipoCache(String tipoProduto, Map<Object, Object> cache) {
-		System.out.println(tipoProduto);
-		itensEstoque = new ArrayList(cache.values().stream()
-				.filter(item -> ((ItemEstoque) item).getTipoProduto().getSuperTipoProduto() != null)
-				.filter(item -> tipoProduto
-						.equals(((ItemEstoque) item).getTipoProduto().getSuperTipoProduto().getDescricaoTipo()))
-				.collect(Collectors.toList()));
+			throw new Exception("Dados não encontrados");
 	}
 
 	private void buscaComAcentuacao(String... params) {
-
 		buscaTodos();
 
-		int cont = 0;
 		for (String param : params) {
+			if (param == null)
+				continue;
+			List<ItemEstoque> objetos = new ArrayList<>();
+			for (Object o : itensEstoque) {
+				ItemEstoque itemEstoque = (ItemEstoque) o;
+				Produto produto = itemEstoque.getProduto();
 
-			try {
-				Predicate<ItemEstoque> predicate = null;
-				if (cont == 0)
-					predicate = filtroPorCategoria(param);
-				else if (cont == 1)
-					predicate = filtroPorProduto(param);
-				itensEstoque = itensEstoque.stream().filter(predicate).collect(Collectors.toList());
+				SubTipoProduto tipoProduto = itemEstoque.getTipoProduto();
+				boolean tipoProdutoMatches = false;
+				try {
+					tipoProdutoMatches = tipoProduto.getDescricaoTipo().toUpperCase().contains(param.toUpperCase())
+							? true
+							: tipoProduto.getSuperTipoProduto().getDescricaoTipo().toUpperCase()
+									.contains(param.toUpperCase()) ? true : false;
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
 
-			} catch (NullPointerException e) {
-				e.printStackTrace();
+				boolean produtoMatches = !tipoProdutoMatches
+						&& produto.getDescricaoProduto().toUpperCase().contains(param.toUpperCase());
+
+				if (tipoProdutoMatches || produtoMatches) {
+					objetos.add(itemEstoque);
+				}
 			}
-			cont++; // if (param == null)
-			// continue;
-			// List<ItemEstoque> objetos = new ArrayList<>();
-			// for (Object o : itensEstoque) {
-			// ItemEstoque itemEstoque = (ItemEstoque) o;
-			// Produto produto = itemEstoque.getProduto();
-			//
-			// SubTipoProduto tipoProduto = itemEstoque.getTipoProduto();
-			// boolean tipoProdutoMatches = false;
-			// try {
-			// tipoProdutoMatches =
-			// tipoProduto.getDescricaoTipo().toUpperCase().contains(param.toUpperCase())
-			// ? true
-			// : tipoProduto.getSuperTipoProduto().getDescricaoTipo().toUpperCase()
-			// .contains(param.toUpperCase()) ? true : false;
-			// } catch (NullPointerException e) {
-			// e.printStackTrace();
-			// }
-			//
-			// boolean produtoMatches = !tipoProdutoMatches
-			// && produto.getDescricaoProduto().toUpperCase().contains(param.toUpperCase());
-			//
-			// if (tipoProdutoMatches || produtoMatches) {
-			// objetos.add(itemEstoque);
-			// }
-			// }
-			// setList(objetos);
+			if (!objetos.isEmpty())
+				setList(objetos);
 		}
-	}
-
-	private Predicate<ItemEstoque> filtroPorProduto(String descricaoProduto) {
-		// TODO Auto-generated method stub
-		return item -> item.getProduto().getDescricaoProduto().toUpperCase()
-				.contains(descricaoProduto.trim().toUpperCase());
-	}
-
-	private Predicate<ItemEstoque> filtroPorCategoria(String descricaoTipo) {
-		// TODO Auto-generated method stub
-		return item -> item.getTipoProduto().getSuperTipoProduto().getDescricaoTipo()
-				.equalsIgnoreCase(descricaoTipo.trim())
-				|| item.getTipoProduto().getDescricaoTipo().equalsIgnoreCase(descricaoTipo.trim());
 	}
 
 	/**
@@ -467,40 +450,25 @@ public class EstoqueController extends ControllerBase {
 		itemEstoque.setOperador(getUsuarioLogado());
 		itemEstoque.setDataContagem(SingletonManager.getInstance().getData());
 
-		CrudDao<ItemEstoque> itemEstoqueDao = new CrudDao<>();
-		itemEstoque = itemEstoqueDao.update(itemEstoque);
-		// responsável em fazer o fetch de listas dos objetos
-		itemEstoque = itemEstoqueDao.busca(ItemEstoque.class, itemEstoque.getIdItemEstoque());
-		Produto produto = itemEstoque.getProduto();
-		Fabricante fabricante = itemEstoque.getFabricante();
-		TipoProduto superTipoProduto = itemEstoque.getTipoProduto().getSuperTipoProduto();
-		// superTipoProduto.getSubTiposProduto().add(itemEstoque.getTipoProduto());
-		getCacheMap().put(itemEstoque.getIdItemEstoque(), itemEstoque);
+		try {
+			itemEstoque = itemEstoqueDao.update(itemEstoque);
 
-		FabricanteController fabricanteController = (FabricanteController) SingletonManager.getInstance()
-				.getController(ControllerAbstractFactory.FABRICANTE);
-
-		TipoProdutoController tipoProdutoController = (TipoProdutoController) SingletonManager.getInstance()
-				.getController(ControllerAbstractFactory.TIPO_PRODUTO_CONTROLLER);
-
-		fabricanteController.getCacheMap().put(fabricante.getIdFabricante(), fabricante);
-
-		produtoController.getCacheMap().put(produto.getIdProduto(), produto);
-
-		tipoProdutoController.getCacheMap().put(superTipoProduto.getIdTipoItem(), superTipoProduto);
-
-		setList(null);
+		} catch (PersistenceException e) {
+			// e.printStackTrace();
+			throw e;
+		}
 
 	}
 
 	@Override
 	public void registraHistoricoOperacao(Operacao operacao) {
-		Crud<HistoricoOperacao> historicoDao = new CrudDao<>();
+
 		HistoricoOperacao historicoOperacao = new HistoricoOperacao();
 		historicoOperacao.setDataOperacao(SingletonManager.getInstance().getData());
 		historicoOperacao.setItemEstoque(itemEstoque);
 		historicoOperacao.setOperador(getUsuarioLogado());
 		historicoOperacao.setOperacao(operacao);
+		Crud<HistoricoOperacao> historicoDao = new CrudDao<>();
 		historicoDao.update(historicoOperacao);
 	}
 
@@ -511,15 +479,21 @@ public class EstoqueController extends ControllerBase {
 	}
 
 	@Override
-	public void carregaCache() {
-		// TODO Auto-generated method stub
+	public void novoUsuario() {
+		itemEstoque = new ItemEstoque();
 
 	}
 
-	@Override
-	public String validaExclusaoItem() {
-		// TODO Auto-generated method stub
-		return null;
+	public ItemEstoque validaCodigoDeBarras(String codigoBarras) {
+		buscaTodos();
+		//@formatter:off
+		return itensEstoque
+				.stream()
+				.filter(item->codigoBarras.equals(item.getCodigoDeBarras()))
+				.findFirst()
+				.orElse(null);
+		//@formatter:on
+
 	}
 
 }

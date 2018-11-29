@@ -3,6 +3,7 @@ package br.com.marcospcruz.gestorloja.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,21 +11,28 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+//@formatter:off
+@NamedQueries({
+		@NamedQuery(name = "meioPagamento.buscaPagamentosOutrosDistinct", query = "select distinct m from MeioPagamento m "
+				+ "where m.descricao is not null " 
+				+ "group by m.descricao") })
+//@formatter:on
 @Entity
-@NamedQuery(name = "meioPagamento.readMeioPagamentosDiversos", query = "select distinct m from MeioPagamento m "
-		+ "WHERE m.descricao is not null ")
 public class MeioPagamento implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 119407608316667340L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idMeioPagamento;
 
-	@ManyToOne
+	@ManyToOne(cascade= {CascadeType.MERGE})
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
 
@@ -39,8 +47,23 @@ public class MeioPagamento implements Serializable {
 
 	private int parcelas;
 	private String descricao;
+	private boolean estornado;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "idTransacaoFinanceira")
+	private TransacaoFinanceira transacaoFinanceira;
+
+	public MeioPagamento(String descricaoMeioPagamento) {
+		this();
+		setDescricao(descricaoMeioPagamento);
+	}
+
+	public MeioPagamento() {
+		setUsuarioLogado(SingletonManager.getInstance().getUsuarioLogado());
+	}
 
 	public TipoMeioPagamento getTipoMeioPagamento() {
+		if (tipoMeioPagamento == null)
+			tipoMeioPagamento = new TipoMeioPagamento();
 		return tipoMeioPagamento;
 	}
 
@@ -82,7 +105,10 @@ public class MeioPagamento implements Serializable {
 
 	@Override
 	public String toString() {
-		return descricao;
+		return "MeioPagamento [idMeioPagamento=" + idMeioPagamento + ", pagamento=" + pagamento + ", valorPago="
+				+ valorPago + ", tipoMeioPagamento=" + tipoMeioPagamento + ", dataPagamento=" + dataPagamento
+				+ ", usuarioLogado=" + usuarioLogado + ", parcelas=" + parcelas + ", descricao=" + descricao
+				+ ", estornado=" + estornado + ", transacaoFinanceira=" + transacaoFinanceira + "]";
 	}
 
 	@Override
@@ -91,10 +117,13 @@ public class MeioPagamento implements Serializable {
 		int result = 1;
 		result = prime * result + ((dataPagamento == null) ? 0 : dataPagamento.hashCode());
 		result = prime * result + ((descricao == null) ? 0 : descricao.hashCode());
+		result = prime * result + (estornado ? 1231 : 1237);
 		result = prime * result + idMeioPagamento;
-		result = prime * result + ((pagamento == null) ? 0 : pagamento.hashCode());
+		// result = prime * result + ((pagamento == null) ? 0 : pagamento.hashCode());
 		result = prime * result + parcelas;
 		result = prime * result + ((tipoMeioPagamento == null) ? 0 : tipoMeioPagamento.hashCode());
+		// result = prime * result + ((transacaoFinanceira == null) ? 0 :
+		// transacaoFinanceira.hashCode());
 		result = prime * result + ((usuarioLogado == null) ? 0 : usuarioLogado.hashCode());
 		result = prime * result + Float.floatToIntBits(valorPago);
 		return result;
@@ -139,36 +168,59 @@ public class MeioPagamento implements Serializable {
 		if (dataPagamento == null) {
 			if (other.dataPagamento != null)
 				return false;
-		}
-		// else if (!dataPagamento.equals(other.dataPagamento))
-		// return false;
+		} else if (!dataPagamento.equals(other.dataPagamento))
+			return false;
 		if (descricao == null) {
 			if (other.descricao != null)
 				return false;
 		} else if (!descricao.equals(other.descricao))
-			// return false;
-			// if (idMeioPagamento != other.idMeioPagamento)
-			// return false;
-			// if (pagamento == null) {
-			// if (other.pagamento != null)
-			// return false;
-			// } else if (!pagamento.equals(other.pagamento))
-			// return false;
-			if (parcelas != other.parcelas)
+			return false;
+		if (estornado != other.estornado)
+			return false;
+		if (idMeioPagamento != other.idMeioPagamento)
+			return false;
+		if (pagamento == null) {
+			if (other.pagamento != null)
 				return false;
+		} else if (!pagamento.equals(other.pagamento))
+			return false;
+		if (parcelas != other.parcelas)
+			return false;
 		if (tipoMeioPagamento == null) {
 			if (other.tipoMeioPagamento != null)
 				return false;
 		} else if (!tipoMeioPagamento.equals(other.tipoMeioPagamento))
 			return false;
-		// if (usuarioLogado == null) {
-		// if (other.usuarioLogado != null)
-		// return false;
-		// } else if (!usuarioLogado.equals(other.usuarioLogado))
-		// return false;
+		if (transacaoFinanceira == null) {
+			if (other.transacaoFinanceira != null)
+				return false;
+		} else if (!transacaoFinanceira.equals(other.transacaoFinanceira))
+			return false;
+		if (usuarioLogado == null) {
+			if (other.usuarioLogado != null)
+				return false;
+		} else if (!usuarioLogado.equals(other.usuarioLogado))
+			return false;
 		if (Float.floatToIntBits(valorPago) != Float.floatToIntBits(other.valorPago))
 			return false;
 		return true;
+	}
+
+	public TransacaoFinanceira getTransacaoFinanceira() {
+		return transacaoFinanceira;
+	}
+
+	public void setTransacaoFinanceira(TransacaoFinanceira transacaoFinanceira) {
+		this.transacaoFinanceira = transacaoFinanceira;
+	}
+
+	public void setEstornado(boolean estornado) {
+		this.estornado = estornado;
+
+	}
+
+	public boolean isEstornado() {
+		return estornado;
 	}
 
 }

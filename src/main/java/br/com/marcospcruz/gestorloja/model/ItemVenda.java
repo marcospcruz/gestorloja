@@ -9,19 +9,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
+
 @Entity
-@Table(name = "itemVenda")
+// @Table(name = "ItemVenda")
 public class ItemVenda implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7647914068901369106L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idItemVenda;
 	@ManyToOne
 	@JoinColumn(name = "idItemEstoque")
@@ -36,6 +37,14 @@ public class ItemVenda implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idVenda")
 	private Venda venda;
+	private boolean devolvidoAoEstoque;
+
+	public ItemVenda() {
+		dataVenda = SingletonManager.getInstance().getData();
+		operador = SingletonManager.getInstance().getUsuarioLogado();
+		setOperador(operador);
+		quantidade = 0;
+	}
 
 	public void setItemEstoque(ItemEstoque itemEstoque) {
 		this.itemEstoque = itemEstoque;
@@ -155,7 +164,20 @@ public class ItemVenda implements Serializable {
 	@Override
 	public String toString() {
 		return "ItemVenda [idItemVenda=" + idItemVenda + ", itemEstoque=" + itemEstoque + ", quantidade=" + quantidade
-				+ ", operador=" + operador + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda;
+				+ quantidade + ", valorVendido=" + valorVendido + ", dataVenda=" + dataVenda;
+	}
+
+	public void setDevolvido(boolean devolido) {
+		this.devolvidoAoEstoque = devolido;
+
+	}
+
+	public boolean isDevolvidoAoEstoque() {
+		return devolvidoAoEstoque;
+	}
+
+	public void setDevolvidoAoEstoque(boolean devolvidoAoEstoque) {
+		this.devolvidoAoEstoque = devolvidoAoEstoque;
 	}
 
 }

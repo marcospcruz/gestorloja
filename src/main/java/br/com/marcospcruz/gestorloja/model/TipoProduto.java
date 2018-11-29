@@ -1,13 +1,13 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,7 +26,7 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 @MappedSuperclass
 // @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "idSuperTipoProduto")
+@DiscriminatorColumn(name = "idSuperTipo")
 public abstract class TipoProduto implements Serializable {
 
 	/**
@@ -35,13 +35,14 @@ public abstract class TipoProduto implements Serializable {
 	private static final long serialVersionUID = -798434974846591857L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idTipoItem;
 
 	@Column(unique = true)
 	private String descricaoTipo;
 
-	@OneToMany(mappedBy = "superTipoProduto", cascade = CascadeType.MERGE)
+	@OneToMany(orphanRemoval = true, mappedBy = "superTipoProduto", cascade = {
+			CascadeType.MERGE }, fetch = FetchType.LAZY)
 	@OrderBy("descricaoTipo")
 	private Collection<SubTipoProduto> subTiposProduto;
 
@@ -77,8 +78,6 @@ public abstract class TipoProduto implements Serializable {
 	}
 
 	public String getDescricaoTipo() {
-		if (descricaoTipo.equals("Glutamina"))
-			System.out.println();
 		return descricaoTipo;
 	}
 
@@ -87,8 +86,6 @@ public abstract class TipoProduto implements Serializable {
 	}
 
 	public Collection<SubTipoProduto> getSubTiposProduto() {
-		if (subTiposProduto == null)
-			subTiposProduto = new ArrayList<>();
 		return subTiposProduto;
 	}
 

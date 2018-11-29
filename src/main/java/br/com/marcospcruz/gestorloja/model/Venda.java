@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,7 +13,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -23,6 +24,8 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @Table(name = "Venda")
+@NamedQuery(name = "venda.findVenda", query = "select v from Venda v " + "join fetch v.itensVenda "
+		+ "where v.idVenda=:id")
 public class Venda implements Serializable {
 	/**
 	 * 
@@ -30,29 +33,34 @@ public class Venda implements Serializable {
 	private static final long serialVersionUID = -90043730582596068L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idVenda;
 
 	private float totalVendido;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,mappedBy="venda")
-	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "venda")
 	// @MapKeyJoinColumn(name = "codigoDeBarras", table = "estoque")
 	// private Map<String, ItemVenda> itensVenda;
 	private List<ItemVenda> itensVenda;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataVenda;
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@OneToOne(cascade = CascadeType.MERGE)
+	// (cascade = { CascadeType.ALL})
 	@JoinColumn(name = "idPagamento")
 	private Pagamento pagamento;
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+	// (cascade = CascadeType.ALL)
 	@JoinColumn(name = "idCaixa")
 	private Caixa caixa;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "idOperador")
 	private Usuario operador;
 
-	private float porcentagemDesconto;
+	private int porcentagemDesconto;
+
+	private boolean estornado;
+
+	private String motivoEstorno;
 
 	public Venda() {
 		setDataVenda(SingletonManager.getInstance().getData());
@@ -92,6 +100,8 @@ public class Venda implements Serializable {
 	}
 
 	public Pagamento getPagamento() {
+		if (pagamento == null)
+			pagamento = new Pagamento();
 		return pagamento;
 	}
 
@@ -115,7 +125,7 @@ public class Venda implements Serializable {
 		this.dataVenda = dataVenda;
 	}
 
-	public void setPorcentagemDesconto(float porcentagemDesconto) {
+	public void setPorcentagemDesconto(int porcentagemDesconto) {
 		this.porcentagemDesconto = porcentagemDesconto;
 
 	}
@@ -181,6 +191,23 @@ public class Venda implements Serializable {
 		if (Float.floatToIntBits(totalVendido) != Float.floatToIntBits(other.totalVendido))
 			return false;
 		return true;
+	}
+
+	public void setEstornado(boolean estornado) {
+		this.estornado = estornado;
+	}
+
+	public boolean isEstornado() {
+		return estornado;
+	}
+
+	public void setMotivoEstorno(String motivoEstorno) {
+		this.motivoEstorno = motivoEstorno;
+
+	}
+
+	public String getMotivoEstorno() {
+		return motivoEstorno;
 	}
 
 }

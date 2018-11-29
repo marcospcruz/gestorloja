@@ -1,35 +1,16 @@
 package br.com.marcospcruz.gestorloja.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import br.com.marcospcruz.gestorloja.model.Caixa;
+import org.apache.log4j.Logger;
+
 import br.com.marcospcruz.gestorloja.model.Operacao;
 import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 public abstract class ControllerBase {
 
-	static final String BUSCA_INVALIDA = "Busca Inválida";
-
-	private Map<Object, Object> cacheMap;
-	
-//	private List cacheList;
-
-	public Map<Object, Object> getCacheMap() {
-		return cacheMap;
-	}
-
-	public void setCacheMap(Map<Object, Object> cacheMap) {
-		this.cacheMap = cacheMap;
-	}
-
-	public ControllerBase() {
-		cacheMap = new HashMap<>();
-//		cacheList=new ArrayList<>();
-	}
+	static final String BUSCA_INVALIDA = "Busca Invïálida";
 
 	/**
 	 * 
@@ -51,16 +32,17 @@ public abstract class ControllerBase {
 	 */
 	protected boolean contemAcentuacao(String parametro) {
 
-		String pattern = "íéçú";
+		String pattern = "ÇÃÉÍÓÚÕ";
 
-		for (char caractere : pattern.toCharArray())
+		for (char caractere : pattern.toLowerCase().toCharArray())
 
-			for (char c : parametro.toCharArray())
+			for (char c : parametro.toLowerCase().toCharArray())
 
-				if (c == caractere)
+				if (c == caractere) {
 
 					return true;
 
+				}
 		return false;
 
 	}
@@ -72,14 +54,6 @@ public abstract class ControllerBase {
 	protected void reloadLista() {
 
 	}
-
-//	public List getCacheList() {
-//		return cacheList;
-//	}
-//
-//	public void setCacheList(List cacheList) {
-//		this.cacheList = cacheList;
-//	}
 
 	public abstract void busca(Object id) throws Exception;
 
@@ -107,9 +81,13 @@ public abstract class ControllerBase {
 
 	public abstract void validaExistente(String text) throws Exception;
 
-	public abstract void carregaCache();
+	public abstract void novoUsuario();
 
-	public abstract String validaExclusaoItem() ;
-	
+	protected void logDebug(String message) {
+		Logger logger = SingletonManager.getInstance().getLogger(this.getClass());
+		if (logger.isDebugEnabled()) {
+			logger.debug(message);
+		}
+	}
 
 }

@@ -97,8 +97,8 @@ public enum ConstantesEnum {
 			"Necessário efetuar a busca do Registro antes de Excluir.", // 36
 			"Selecione um Tipo de Produto válido!", // 37
 			"Tipo Produto já Cadastrado com esta Descrição!", // 38
-			"Este Tipo de Produto contém Produtos associados a ele.", // 39
-			"Este Tipo de Produto contém Sub-Tipos de Produtos associados a ele.", // 40
+			"Esta Categoria de Produto contém Produtos associados a ele.", // 39
+			"Esta Categoria de Produto contém Sub-Categorias de Produtos associados a ele.", // 40
 			"Logo Marca não encontrada.", // 41
 			"É necessário selecionar um ítem de Estoque antes.", // 42
 			"Exclusão não permitida! Há ítens deste Produto no estoque.", // 43

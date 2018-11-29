@@ -12,46 +12,47 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 
 @Entity
 @Table(name = "TipoProduto")
 //@formatter:off
-@NamedQueries({ 
-	@NamedQuery(name = "tipoProduto.readAll", query = "select distinct t from SubTipoProduto t "
-		+ "LEFT JOIN FETCH t.subTiposProduto " 
-//		+ "LEFT JOIN FETCH t.itensEstoque " 
-		+ "order by t.descricaoTipo"),
+@NamedQueries({
+		@NamedQuery(name = "tipoProduto.readAll", query = "select distinct t from SubTipoProduto t "
+				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
+				+ "order by t.descricaoTipo"),
 		@NamedQuery(name = "tipoProduto.readtiposabstratos", query = "select distinct t from SubTipoProduto t "
-				+ "LEFT JOIN FETCH t.subTiposProduto " 
+				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
 //				+ "LEFT JOIN FETCH t.itensEstoque "
-				+ "where t.superTipoProduto is null order by t.descricaoTipo"),
+				+ "where t.superTipoProduto is null "
+				+ "order by t.descricaoTipo"),
 		@NamedQuery(name = "tipoProduto.readParametro", query = "select distinct t from SubTipoProduto t "
-				+ "LEFT JOIN FETCH t.subTiposProduto " 
+				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
 //				+ "LEFT JOIN FETCH t.itensEstoque "
 				+ "where lower(t.descricaoTipo) = :descricao"),
 		@NamedQuery(name = "tipoProduto.readParametroLike", query = "select distinct t from SubTipoProduto t "
-				+ "LEFT JOIN FETCH t.subTiposProduto " 
-//				+ "LEFT JOIN FETCH t.itensEstoque "
+				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
 				+ "where UPPER(t.descricaoTipo) like :descricao "
 		// + "and t.superTipoProduto is null"
 		) })
-public class SubTipoProduto extends TipoProduto {
+//@formatter:on
+public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoProduto> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7095619182533502712L;
 
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne(cascade = { CascadeType.MERGE })
 	@JoinColumn(name = "idSuperTipoProduto")
 	private SubTipoProduto superTipoProduto;
 
-	@OneToMany(mappedBy = "tipoProduto", fetch = FetchType.EAGER,orphanRemoval=true)
-	@Fetch(FetchMode.SUBSELECT)
+	@OneToMany(mappedBy = "tipoProduto", fetch = FetchType.EAGER)
+	// @Fetch(FetchMode.JOIN)
 	private List<ItemEstoque> itensEstoque;
 
 	private String sexo;
@@ -68,6 +69,11 @@ public class SubTipoProduto extends TipoProduto {
 		setDataInsercao(SingletonManager.getInstance().getData());
 		setOperador(operador);
 
+	}
+
+	public SubTipoProduto(String string) {
+		this();
+		setDescricaoTipo(string);
 	}
 
 	public String getSexo() {
@@ -131,10 +137,17 @@ public class SubTipoProduto extends TipoProduto {
 		return true;
 	}
 
+	@Override
 	public String toString() {
-
+		
 		return getDescricaoTipo();
+	}
 
+	@Override
+	public int compareTo(SubTipoProduto o) {
+
+		int result = o.getIdTipoItem() - getIdTipoItem();
+		return result;
 	}
 
 }

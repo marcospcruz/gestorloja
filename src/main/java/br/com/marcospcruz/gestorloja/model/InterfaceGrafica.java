@@ -1,6 +1,8 @@
 package br.com.marcospcruz.gestorloja.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,13 +10,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "interface.findinterface", query = "select i from InterfaceGrafica i where i.className=:className"),
+		@NamedQuery(name = "interface.findinterface", query = "select i from InterfaceGrafica i "
+				+ "JOIN FETCH i.perfisUsuario "
+				+ "where i.className=:className"),
 		@NamedQuery(name = "interface.findall", query = "select i from InterfaceGrafica i") })
 public class InterfaceGrafica implements Serializable {
 
@@ -23,14 +28,22 @@ public class InterfaceGrafica implements Serializable {
 	 */
 	private static final long serialVersionUID = -8914269988172254274L;
 
-	private static final String PACKAGE = "br.com.marcospcruz.gestorloja.view.";
+	// private static final String PACKAGE = "br.com.marcospcruz.gestorloja.view.";
+	private static final String PACKAGE = "br.com.marcospcruz.gestorloja.view.fxui.";
 	public static final String ESTOQUE = "Estoque";
 	public static final String CONTROLE_DE_CAIXA = "Controle de Caixa";
 	public static final String PONTO_DE_VENDA = "Ponto de Venda";
 	public static final String CLASS_NAME_ESTOQUE = PACKAGE + "EstoquePrincipalGui";
-//	public static final String CLASS_NAME_PDV = PACKAGE + "ControleVendaGui";
+	// public static final String CLASS_NAME_PDV = PACKAGE + "ControleVendaGui";
 	public static final String CLASS_NAME_PDV = PACKAGE + "PDV";
+	public static final String CLASS_NAME_PASSWORD = PACKAGE + "PasswordGui";
 	public static final String CLASS_NAME_CAIXA = PACKAGE + "ControleCaixaGui";
+
+	public static final String PASSWORD = "Alterar Senha";
+	public static final String USUARIOS = "Controle Usuários";
+
+	public static final String CLASS_NAME_USUARIOS = PACKAGE + "ControleUsuarioGui";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idInterfaceGrafica;
@@ -41,6 +54,13 @@ public class InterfaceGrafica implements Serializable {
 	private Usuario operador;
 	@Column(unique = true)
 	private String nomeModulo;
+
+	@ManyToMany(mappedBy = "interfaces")
+	// @JoinTable(name = "Perfis_interfaces", joinColumns = { @JoinColumn(name =
+	// "idInterface") }, inverseJoinColumns = {
+	// @JoinColumn(name = "idPerfilUsuario") })
+
+	private List<PerfilUsuario> perfisUsuario;
 
 	public Usuario getOperador() {
 		return operador;
@@ -87,6 +107,16 @@ public class InterfaceGrafica implements Serializable {
 		this.nomeModulo = nomeModulo;
 	}
 
+	public List<PerfilUsuario> getPerfisUsuario() {
+		if (perfisUsuario == null)
+			perfisUsuario = new ArrayList<PerfilUsuario>();
+		return perfisUsuario;
+	}
+
+	public void setPerfisUsuario(List<PerfilUsuario> perfisUsuario) {
+		this.perfisUsuario = perfisUsuario;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -129,8 +159,7 @@ public class InterfaceGrafica implements Serializable {
 
 	@Override
 	public String toString() {
-		return "InterfaceGrafica [idInterfaceGrafica=" + idInterfaceGrafica + ", className=" + className + ", operador="
-				+ operador + ", nomeModulo=" + nomeModulo + "]";
+		return "InterfaceGrafica [idInterfaceGrafica=" + idInterfaceGrafica + " nomeModulo=" + nomeModulo + "]";
 	}
 
 }

@@ -20,7 +20,7 @@ public class HistoricoOperacao implements Serializable {
 	 */
 	private static final long serialVersionUID = 7414908968988331865L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idHistoricoOperacao;
 	@ManyToOne
 	@JoinColumn(name = "idOperacao")
