@@ -243,7 +243,7 @@ public class EstoquePrincipalGui extends StageBase {
 		comboInfoProduto.getEditor().setText("");
 		reloadComboFabricantes();
 		reloadComboCategoria();
-		
+
 		controller.buscaTodos();
 		reloadTableView();
 		controller.setItem(null);
@@ -466,6 +466,24 @@ public class EstoquePrincipalGui extends StageBase {
 				}
 			} catch (Exception e) {
 
+				boolean teste = showConfirmAtionMessage("Produto não encontrado. Deseja realizar o Cadastro?");
+				if (teste) {
+//					String fabricante = comboFabricantes.getValue();
+//					String produto = comboInfoProduto.getValue();
+//					SubTipoProduto tipoProduto = (SubTipoProduto) categoriaProduto.getValue();
+					try {
+//						ItemEstoque itemEstoque = (ItemEstoque)getEstoqueController().getItem();
+//						itemEstoque.setFabricante(fabricante);
+//						itemEstoque.setTipoProduto(tipoProduto);
+//						itemEstoque.setProduto(produto);
+						Stage stage = new ItemEstoqueCadastro();
+
+						abreJanelaModal(stage);
+					} catch (Exception e1) {
+
+						e1.printStackTrace();
+					}
+				}
 				comboFabricantes.getEditor().setText("");
 				comboInfoProduto.getEditor().setText("");
 				categoriaProduto.getEditor().setText("");
@@ -478,7 +496,7 @@ public class EstoquePrincipalGui extends StageBase {
 
 				//
 
-				showErrorMessage("Dados não encontrados.");
+				// showErrorMessage("Dados não encontrados.");
 				e.printStackTrace();
 
 			} finally {
