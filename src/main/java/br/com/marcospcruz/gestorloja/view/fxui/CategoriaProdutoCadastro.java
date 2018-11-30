@@ -126,8 +126,11 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+				ObservableList<TipoProduto> items = superTiposProduto.getItems();
+				superTiposProduto.getItems().removeAll(items);
+				
 				superTiposProduto.setDisable(!arg2);
-
+				
 			}
 		});
 		subTipoCheck.setText("É sub categoria");
@@ -201,7 +204,12 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 		if (confirmation)
 			super.salvaDados(event);
 		tiposProduto.getEditor().setText("");
-
+		try {
+			reloadForm();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -228,7 +236,7 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 			if (tipoProduto.getSuperTipoProduto() != null) {
 				qtItensEstoque = tipoProduto.getItensEstoque().size();
 			} else {
-				
+
 				for (SubTipoProduto subTipo : tipoProduto.getSubTiposProduto()) {
 					qtItensEstoque += subTipo.getItensEstoque().size();
 				}
@@ -255,7 +263,7 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 	@Override
 	void reloadForm() throws Exception {
 		populaForm();
-		reloadTableView(CATEGORIAS_PRODUTO);
+		// reloadTableView(CATEGORIAS_PRODUTO);
 		super.criaObservableList(tiposProduto.getItems(), controller);
 		// tiposProduto.getEditor().setText("");
 

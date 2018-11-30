@@ -257,6 +257,8 @@ public abstract class StageBase extends Stage implements EventHandler<ActionEven
 			ObservableList<TipoProduto> items = categoriaProduto.getItems();
 			items.add(new SubTipoProduto("Selecione uma opção.", null));
 			items.addAll(controller.getList());
+			System.out.println(items);
+			categoriaProduto.setItems(items);
 		} catch (Exception e) {
 
 			e.printStackTrace();
