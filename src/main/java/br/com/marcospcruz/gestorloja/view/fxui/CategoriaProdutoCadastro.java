@@ -15,7 +15,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -229,6 +228,7 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 			if (tipoProduto.getSuperTipoProduto() != null) {
 				qtItensEstoque = tipoProduto.getItensEstoque().size();
 			} else {
+				
 				for (SubTipoProduto subTipo : tipoProduto.getSubTiposProduto()) {
 					qtItensEstoque += subTipo.getItensEstoque().size();
 				}

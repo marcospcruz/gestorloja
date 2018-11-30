@@ -24,7 +24,6 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 				+ "order by t.descricaoTipo"),
 		@NamedQuery(name = "tipoProduto.readtiposabstratos", query = "select distinct t from SubTipoProduto t "
 				+ "LEFT JOIN FETCH t.subTiposProduto "
-				+ "LEFT JOIN FETCH t.superTipoProduto "
 //				+ "LEFT JOIN FETCH t.itensEstoque "
 				+ "where t.superTipoProduto is null "
 				+ "order by t.descricaoTipo"),
@@ -38,7 +37,12 @@ import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 				+ "LEFT JOIN FETCH t.superTipoProduto "
 				+ "where UPPER(t.descricaoTipo) like :descricao "
 		// + "and t.superTipoProduto is null"
-		) })
+				),
+		@NamedQuery(name="tipoProduto.readById",query = "select distinct t from SubTipoProduto t "
+				+ "LEFT JOIN FETCH t.subTiposProduto "
+				+ "LEFT JOIN FETCH t.superTipoProduto "
+				+ "where t.idTipoItem = :id")
+		})
 //@formatter:on
 public class SubTipoProduto extends TipoProduto implements Comparable<SubTipoProduto> {
 

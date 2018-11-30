@@ -333,8 +333,9 @@ public class TipoProdutoController extends ControllerBase {
 	public void busca(Object id) {
 		Integer idSubProduto = Integer.valueOf(id.toString());
 		try {
-			tipoProduto = tipoProdutoDao.busca(SubTipoProduto.class, idSubProduto);
-			tipoProduto = tipoProdutoDao.update(tipoProduto);
+			// tipoProduto = tipoProdutoDao.busca(SubTipoProduto.class, idSubProduto);
+			tipoProduto = tipoProdutoDao.busca("tipoProduto.readById", "id", idSubProduto);
+			// tipoProduto = tipoProdutoDao.update(tipoProduto);
 		} catch (Exception e) {
 			SingletonManager.getInstance().getLogger(getClass()).warn(e.getMessage());
 		}
