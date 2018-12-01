@@ -63,6 +63,7 @@ public class EstoquePrincipalGui extends StageBase {
 	private AutoCompleteTextField<SubTipoProduto> subCategoriaProduto;
 
 	private AutoCompleteTextField<Produto> comboInfoProduto;
+	private boolean exibeDadosInexistentes = true;
 
 	public EstoquePrincipalGui() throws Exception {
 		super();
@@ -80,7 +81,7 @@ public class EstoquePrincipalGui extends StageBase {
 		TitledPane tablePane = super.criaTablePane("Estoque de Produtos");
 		getvBox().getChildren().addAll(cadastroPane, pesquisaPane, tablePane);
 
-		getvBox().getChildren().add(operacoes);
+		// getvBox().getChildren().add(operacoes);
 
 	}
 
@@ -184,12 +185,14 @@ public class EstoquePrincipalGui extends StageBase {
 		TitledPane pane = criaTitledPane("Operações / Cadastros");
 		//
 		Button itemEstoqueCadastro = criaButton("Novo Item Estoque");
-		Button fabricantesCadBtn = criaButton("Fabricantes / Marca");
-		Button categoriaProduto = criaButton("Categoria Produto");
-		Button produto = criaButton("Produto");
+		// Button fabricantesCadBtn = criaButton("Fabricantes / Marca");
+		// Button categoriaProduto = criaButton("Categoria Produto");
+		// Button produto = criaButton("Produto");
 
-		flowPane.getChildren().addAll(fabricantesCadBtn, categoriaProduto, produto, itemEstoqueCadastro);
-
+		// flowPane.getChildren().addAll(fabricantesCadBtn, categoriaProduto, produto,
+		// itemEstoqueCadastro);
+		flowPane.getChildren().add(itemEstoqueCadastro);
+		flowPane.getChildren().add(criaBotao("Imprime Relatório Geral", this::imprimeRelatorio));
 		//
 		pane.setContent(flowPane);
 
@@ -465,25 +468,30 @@ public class EstoquePrincipalGui extends StageBase {
 
 				}
 			} catch (Exception e) {
+				if (exibeDadosInexistentes) {
+					exibeDadosInexistentes = false;
+					boolean teste = showConfirmAtionMessage("Produto não encontrado. Deseja realizar o Cadastro?");
+					if (teste) {
 
-				boolean teste = showConfirmAtionMessage("Produto não encontrado. Deseja realizar o Cadastro?");
-				if (teste) {
-//					String fabricante = comboFabricantes.getValue();
-//					String produto = comboInfoProduto.getValue();
-//					SubTipoProduto tipoProduto = (SubTipoProduto) categoriaProduto.getValue();
-					try {
-//						ItemEstoque itemEstoque = (ItemEstoque)getEstoqueController().getItem();
-//						itemEstoque.setFabricante(fabricante);
-//						itemEstoque.setTipoProduto(tipoProduto);
-//						itemEstoque.setProduto(produto);
-						Stage stage = new ItemEstoqueCadastro();
+						// String fabricante = comboFabricantes.getValue();
+						// String produto = comboInfoProduto.getValue();
+						// SubTipoProduto tipoProduto = (SubTipoProduto) categoriaProduto.getValue();
+						try {
+							// ItemEstoque itemEstoque = (ItemEstoque)getEstoqueController().getItem();
+							// itemEstoque.setFabricante(fabricante);
+							// itemEstoque.setTipoProduto(tipoProduto);
+							// itemEstoque.setProduto(produto);
+							Stage stage = new ItemEstoqueCadastro();
 
-						abreJanelaModal(stage);
-					} catch (Exception e1) {
+							abreJanelaModal(stage);
+							reloadForm();
+						} catch (Exception e1) {
 
-						e1.printStackTrace();
+							e1.printStackTrace();
+						}
 					}
 				}
+				exibeDadosInexistentes = true;
 				comboFabricantes.getEditor().setText("");
 				comboInfoProduto.getEditor().setText("");
 				categoriaProduto.getEditor().setText("");
