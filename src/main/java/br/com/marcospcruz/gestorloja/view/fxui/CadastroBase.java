@@ -68,7 +68,7 @@ public abstract class CadastroBase extends StageBase {
 
 		root.getChildren().add(grid);
 
-		setScene(getScene());
+		setScene(scene);
 
 	}
 

@@ -126,11 +126,14 @@ public class CategoriaProdutoCadastro extends CadastroBase {
 
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+				if (arg2)
+					superTiposProduto.setValue(null);
 				ObservableList<TipoProduto> items = superTiposProduto.getItems();
 				superTiposProduto.getItems().removeAll(items);
-				
+				controller.buscaTodos();
+				items.addAll(controller.getList());
 				superTiposProduto.setDisable(!arg2);
-				
+				System.out.println(items);
 			}
 		});
 		subTipoCheck.setText("É sub categoria");
