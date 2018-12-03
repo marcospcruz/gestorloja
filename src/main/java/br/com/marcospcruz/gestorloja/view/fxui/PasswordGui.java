@@ -13,9 +13,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 
 public class PasswordGui extends StageBase {
+	private boolean permiteContinuar;
+
 	public PasswordGui() {
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -51,6 +52,7 @@ public class PasswordGui extends StageBase {
 				controller.setItem(SingletonManager.getInstance().getUsuarioLogado());
 				controller.salva();
 				showMensagemSucesso("Senha alterada com sucesso!");
+				this.permiteContinuar = true;
 				close();
 			} catch (Exception e) {
 				showErrorMessage(e);
@@ -97,4 +99,13 @@ public class PasswordGui extends StageBase {
 		// TODO Auto-generated method stub
 
 	}
+
+	public boolean isPermiteContinuar() {
+		return permiteContinuar;
+	}
+
+	public void setPermiteContinuar(boolean permiteContinuar) {
+		this.permiteContinuar = permiteContinuar;
+	}
+
 }

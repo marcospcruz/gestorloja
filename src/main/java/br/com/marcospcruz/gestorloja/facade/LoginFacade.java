@@ -15,6 +15,7 @@ import br.com.marcospcruz.gestorloja.model.Usuario;
 import br.com.marcospcruz.gestorloja.systemmanager.SingletonManager;
 import br.com.marcospcruz.gestorloja.util.Util;
 import br.com.marcospcruz.gestorloja.view.fxui.LogIn;
+import br.com.marcospcruz.gestorloja.view.fxui.PasswordGui;
 import br.com.marcospcruz.gestorloja.view.fxui.StageFactory;
 import javafx.stage.Stage;
 
@@ -37,19 +38,28 @@ public class LoginFacade {
 		Usuario usuario = buscaUsuario(nomeUsuario);
 		if (!usuario.isAtivo())
 			throw new Exception("Usuário " + nomeUsuario + " desativado!");
-		SingletonManager.getInstance().setUsuarioLogado(usuario);
+
+		boolean permiteContinuar = false;
 		if (usuario.isPrimeiroAcesso()) {
 			Stage stage = StageFactory.createStage(InterfaceGrafica.CLASS_NAME_PASSWORD);
 			// stage.initOwner(this);
 			// stage.initModality(Modality.APPLICATION_MODAL);
+
 			stage.showAndWait();
+			if(!((PasswordGui) stage).isPermiteContinuar())
+				throw new Exception("Senha não alterada.");
+
 		} else {
 			comparaSenhaUsuario(usuario, senha);
 		}
+		if (!permiteContinuar)
+			
+		SingletonManager.getInstance().setUsuarioLogado(usuario);
 		buscaSessaoUsuarioAtiva(usuario);
 		criaSessaoUsuario(usuario);
 		// SingletonManager.getInstance().setUsuarioLogado(getUsuarioLogado());
 		// abreInterfacePrincipal();
+
 		closeLoginGui();
 	}
 
@@ -88,7 +98,7 @@ public class LoginFacade {
 		SessaoUsuario sessaoUsuario = sessaoUsuarioDao.update(sessaoUsuarioBuilder.getSessaoUsuario());
 		sessaoUsuarioBuilder.setSessaoUsuario(sessaoUsuario);
 		usuario.setUltimoAcesso(sessaoUsuario.getDataInicio());
-		usuario.setPrimeiroAcesso(false);
+		// usuario.setPrimeiroAcesso(false);
 		new CrudDao<Usuario>().update(usuario);
 	}
 

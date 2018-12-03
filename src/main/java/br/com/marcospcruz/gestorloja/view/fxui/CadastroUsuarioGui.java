@@ -31,6 +31,7 @@ public class CadastroUsuarioGui extends StageBase {
 	private TitledPane perfisUsuarioPane;
 	private boolean desabilitaFields;
 	private CheckBox ativaUsuario;
+	private CheckBox resetSenhaUsuario;
 
 	public CadastroUsuarioGui() {
 		this(false);
@@ -93,9 +94,11 @@ public class CadastroUsuarioGui extends StageBase {
 		nomeUsuarioField.setDisable(desabilitaFields);
 		// nomeUsuarioField.setMaxWidth(width * 0.25);
 		dadosUsuarioGrid.add(nomeUsuarioField, 1, rowIndex++);
-		dadosUsuarioGrid.add(criaLabelNormal("Ativar Usuário: "), 0, rowIndex);
-		ativaUsuario = new CheckBox("");
-		dadosUsuarioGrid.add(ativaUsuario, 1, rowIndex++);
+
+		ativaUsuario = new CheckBox("Usuário Ativo");
+		dadosUsuarioGrid.add(ativaUsuario, 0, rowIndex);
+		resetSenhaUsuario = new CheckBox("Reset senha usuário");
+		dadosUsuarioGrid.add(resetSenhaUsuario, 1, rowIndex++);
 		// TextField nomeUsuarioField = new TextField();
 		// nomeUsuarioField.setMinWidth(width * 0.25);
 		// grid.add(nomeUsuarioField, 1, rowIndex++);
@@ -166,6 +169,9 @@ public class CadastroUsuarioGui extends StageBase {
 				user.setNomeUsuario(nomeUsuario);
 				user.setNomeCompleto(nomeCompleto);
 				user.setAtivo(ativaUsuario.isSelected());
+				if (resetSenhaUsuario.isSelected()) {
+					user.setPrimeiroAcesso(true);
+				}
 				controller.salva();
 				showMensagemSucesso("Usuário " + nomeUsuario + " salvo com sucesso.");
 				close();
